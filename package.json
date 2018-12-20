@@ -1,0 +1,9 @@
+{
+  "name": "famshare",
+  "version": "0.0.1",
+  "description": "Share the load of family accounts on services",
+  "main": "null",
+  "author": "BeeeQueue",
+  "license": "AGPL-3.0-only",
+  "private": true
+}
