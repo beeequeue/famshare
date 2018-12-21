@@ -19,6 +19,10 @@ const initialize = async () => {
         .string('discord_id')
         .notNullable()
         .unique()
+      table
+        .string('email')
+        .notNullable()
+        .unique()
       table.timestamp('created_at')
     })
   }

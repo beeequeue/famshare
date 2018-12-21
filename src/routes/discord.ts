@@ -38,12 +38,19 @@ router.get('/callback', async ctx => {
 
   const discordUser = await getUserFromToken(token)
 
+  if (!discordUser.email || !discordUser.verified) {
+    throw badRequest(
+      'You need to have a verified email address to use this service.',
+    )
+  }
+
   let user: User | null = await User.findByDiscordId(discordUser.id)
 
   if (!user) {
     user = new User({
       uuid: uuid(),
       discordId: discordUser.id,
+      email: discordUser.email,
     })
 
     await user.save()
