@@ -1,4 +1,5 @@
 import Koa from 'koa'
+import BodyParser from 'koa-bodyparser'
 
 import { router } from './routes'
 
@@ -6,7 +7,7 @@ const { PORT } = process.env
 const app = new Koa()
 
 // app.use(KoaCORS())
-// app.use(BodyParser())
+app.use(BodyParser())
 // app.use(Helmet())
 // app.use(ErrorHandler())
 
