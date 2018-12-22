@@ -6,8 +6,11 @@ export const router = new Router()
 
 router.prefix('/api')
 
-router.get('/', ({ response }) => {
-  response.body = { message: 'pong' }
+router.get('/', ({ response, session }) => {
+  response.body = {
+    message: 'pong',
+    session,
+  }
 })
 
 router.use(discord)

@@ -25,15 +25,13 @@ export class User {
   }
 
   public static findByUuid = async (uuid: string) => {
-    const user = await knex('user').where({ uuid })
+    const user = await table.where({ uuid })
 
     return new User(user)
   }
 
   public static findByDiscordId = async (id: string) => {
-    const user = await knex('user')
-      .where({ discord_id: id })
-      .first()
+    const user = await table.where({ discord_id: id }).first()
 
     if (!user) return null
 

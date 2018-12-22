@@ -56,7 +56,9 @@ router.get('/callback', async ctx => {
     await user.save()
   }
 
-  ctx.body = user
+  await ctx.authenticate(user.uuid)
+
+  ctx.body = { user, session: ctx.session }
 })
 
 export const routes = router.routes()
