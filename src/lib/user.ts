@@ -1,4 +1,4 @@
-import { knex } from './index'
+import { knex } from '../db'
 
 const table = knex('user')
 

@@ -2,7 +2,7 @@ import { badRequest } from 'boom'
 import Router from 'koa-router'
 import uuid from 'uuid/v4'
 
-import { User } from '../db/user'
+import { User } from '../lib/user'
 import { getAccessToken, getUserFromToken } from '../lib/discord'
 
 const { DISCORD_CLIENT, DISCORD_REDIRECT_URI } = process.env
