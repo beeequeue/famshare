@@ -58,9 +58,20 @@ export const SessionMiddleware = (): RequestHandler => async (
 
   const session = await Session.findByUuid(Base64.decode(cookie))
 
-  if (!session) return next()
+  if (!session) {
+    res.clearCookie('session')
 
-  const user = await User.getByUuid(session.userUuid)
+    return next()
+  }
+
+  const user = await User.findByUuid(session.userUuid)
+
+  if (!user) {
+    res.clearCookie('session')
+
+    return next()
+  }
+
   const discordUser = await getUserById(user.discordId)
 
   req.session = await getContextSession(session)

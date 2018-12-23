@@ -25,6 +25,8 @@ const initialize = async () => {
         .notNullable()
         .unique()
 
+      table.string('stripe_id')
+
       table.timestamp('created_at')
     })
   }

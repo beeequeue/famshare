@@ -3,7 +3,7 @@ import uuid from 'uuid/v4'
 import { knex } from '../db'
 
 const WEEK = 1000 * 60 * 60 * 24 * 7
-const table = knex('session')
+const table = () => knex('session')
 
 export class Session {
   public uuid: string
@@ -31,8 +31,6 @@ export class Session {
   public static generate = async (userUuid: string) => {
     const session = new Session(userUuid)
 
-    console.log(session)
-
     await session.save()
 
     return session
@@ -48,7 +46,9 @@ export class Session {
     )
 
   public static findByUuid = async (uuid: string) => {
-    const session = await table.where({ uuid }).first()
+    const session = await table()
+      .where({ uuid })
+      .first()
 
     if (!session) return null
 
@@ -56,7 +56,7 @@ export class Session {
   }
 
   public exists = async () =>
-    (await table
+    (await table()
       .count()
       .where({ uuid: this.uuid, user_uuid: this.userUuid })) === 1
 
@@ -70,11 +70,13 @@ export class Session {
     }
 
     if (await this.exists()) {
-      await table.update(data).where({ uuid: this.uuid })
+      await table()
+        .update(data)
+        .where({ uuid: this.uuid })
 
       return
     }
 
-    await table.insert(data)
+    await table().insert(data)
   }
 }

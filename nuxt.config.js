@@ -3,6 +3,10 @@ const pkg = require('./package.json')
 module.exports = {
   mode: 'universal',
 
+  env: {
+    STRIPE_CLIENT: process.env.STRIPE_CLIENT,
+  },
+
   /*
    ** Headers of the page
    */
@@ -20,6 +24,7 @@ module.exports = {
         href: 'https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700',
       },
     ],
+    script: [{ src: 'https://js.stripe.com/v3/' }],
   },
 
   srcDir: 'src/client/',
