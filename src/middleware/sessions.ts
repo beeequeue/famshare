@@ -64,7 +64,7 @@ export const SessionMiddleware = (): RequestHandler => async (
   const discordUser = await getUserById(user.discordId)
 
   req.session = await getContextSession(session)
-  req.username = discordUser.username
+  req.username = discordUser.username + '#' + discordUser.discriminator
 
   next()
 }
