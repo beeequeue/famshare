@@ -1,20 +1,35 @@
-import Koa from 'koa'
-import BodyParser from 'koa-bodyparser'
+import BodyParser from 'body-parser'
+import CookieParser from 'cookie-parser'
+import Express from 'express'
+import { Builder, Nuxt } from 'nuxt'
 
+import config from '../nuxt.config.js'
 import { SessionMiddleware } from './middleware/sessions'
 import { router } from './routes'
 
 const { PORT } = process.env
-const app = new Koa()
+const app = Express()
+const nuxt = new Nuxt(config)
 
-// app.use(KoaCORS())
-app.use(BodyParser())
-// app.use(Helmet())
+const start = async () => {
+  // app.use(KoaCORS())
+  app.use(BodyParser.json())
+  app.use(CookieParser())
+  // app.use(Helmet())
 
-app.use(SessionMiddleware())
-// app.use(ErrorHandler())
+  app.use(SessionMiddleware())
+  // app.use(ErrorHandler())
 
-app.use(router.routes())
-app.use(router.allowedMethods())
+  if (process.env.NODE_ENV === 'development') {
+    const builder = new Builder(nuxt)
+    await builder.build()
+  }
 
-app.listen(PORT || 3000, () => console.log(`Listening on ${PORT || 3000}`))
+  app.use(router)
+
+  app.use(nuxt.render)
+
+  app.listen(PORT || 3000, () => console.log(`Listening on ${PORT || 3000}`))
+}
+
+start()

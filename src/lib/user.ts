@@ -17,15 +17,26 @@ export class User {
   public readonly email!: string
   public readonly createdAt!: Date
 
-  constructor(options: Constructor) {
+  constructor(params: Constructor) {
+    const options = (params as any)[0]
     this.uuid = options.uuid
     ;(this.discordId = options.discord_id || (options.discordId as string)),
       (this.createdAt = options.created_at || options.createdAt || new Date()),
       (this.email = options.email)
   }
 
+  public static getByUuid = async (uuid: string) => {
+    const user = await table.where({ uuid })
+
+    if (!user) throw new Error(`Could not find User:${uuid}`)
+
+    return new User(user)
+  }
+
   public static findByUuid = async (uuid: string) => {
     const user = await table.where({ uuid })
+
+    if (!user) return null
 
     return new User(user)
   }

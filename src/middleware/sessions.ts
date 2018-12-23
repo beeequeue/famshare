@@ -1,40 +1,58 @@
+import { Request, RequestHandler, Response } from 'express'
 import { Base64 } from 'js-base64'
-import { Context, Middleware } from 'koa'
 import { pick } from 'rambdax'
 
+import { getUserById } from '../lib/discord'
 import { Session } from '../lib/session'
+import { User } from '../lib/user'
 
-declare module 'koa' {
+declare module 'express-serve-static-core' {
   interface Session {
     uuid: string
-    userUuid: string
+    user: Pick<User, 'uuid' | 'discordId' | 'email'>
     expiresAt: Date
   }
 
-  interface Context {
+  interface Request {
     session?: Session
+    username?: string
+    loggedIn: boolean
 
     authenticate: (userUuid: string) => void
   }
 }
 
-const getContextSession = pick(['uuid', 'userUuid', 'expiresAt'])
+const getContextSession = async ({ uuid, userUuid, expiresAt }: Session) => ({
+  uuid,
+  user: pick(
+    ['uuid', 'discordId', 'email'],
+    await User.getByUuid(userUuid),
+  ) as any,
+  expiresAt,
+})
 
-const authenticate = (ctx: Context) => async (userUuid: string) => {
+const authenticate = (req: Request, res: Response) => async (
+  userUuid: string,
+) => {
   const session = await Session.generate(userUuid)
 
-  ctx.session = getContextSession(session) as Session
-  ctx.cookies.set('session', Base64.encode(ctx.session.uuid), {
+  req.session = await getContextSession(session)
+  res.cookie('session', Base64.encode(req.session.uuid), {
     expires: session.expiresAt,
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
   })
 }
 
-export const SessionMiddleware = (): Middleware => async (ctx, next) => {
-  const cookie = ctx.cookies.get('session')
+export const SessionMiddleware = (): RequestHandler => async (
+  req,
+  res,
+  next,
+) => {
+  const cookie = req.cookies.session
 
-  ctx.authenticate = authenticate(ctx)
+  req.authenticate = authenticate(req, res)
+  req.loggedIn = false
 
   if (!cookie) return next()
 
@@ -42,7 +60,11 @@ export const SessionMiddleware = (): Middleware => async (ctx, next) => {
 
   if (!session) return next()
 
-  ctx.session = getContextSession(session)
+  const user = await User.getByUuid(session.userUuid)
+  const discordUser = await getUserById(user.discordId)
+
+  req.session = await getContextSession(session)
+  req.username = discordUser.username
 
   next()
 }

@@ -1,6 +1,6 @@
 ## Project
 .idea
-dist
+.nuxt
 .env
 !.gitkeep
 

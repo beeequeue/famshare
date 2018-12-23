@@ -1,25 +1,25 @@
 import { badRequest } from 'boom'
-import Router from 'koa-router'
+import { Router } from 'express'
 import uuid from 'uuid/v4'
 
-import { User } from '../lib/user'
 import { getAccessToken, getUserFromToken } from '../lib/discord'
+import { User } from '../lib/user'
 
-const { DISCORD_CLIENT, DISCORD_REDIRECT_URI } = process.env
+const { DISCORD_CLIENT, DISCORD_REDIRECT_URI } = process.env as {
+  [key: string]: string
+}
 const DISCORD = 'https://discordapp.com/api'
 const SCOPE = 'identify email'
 
-export const router = new Router()
+export const router = Router()
 
-router.prefix('/discord')
-
-router.get('/login', ctx =>
-  ctx.redirect(
+router.get('/login', (_req, res) =>
+  res.redirect(
     `${DISCORD}/oauth2/authorize` +
-      `?client_id=${DISCORD_CLIENT}` +
-      `&redirect_uri=${DISCORD_REDIRECT_URI}` +
+      `?client_id=${encodeURIComponent(DISCORD_CLIENT)}` +
+      `&redirect_uri=${encodeURIComponent(DISCORD_REDIRECT_URI)}` +
       '&response_type=code' +
-      `&scope=${SCOPE}`,
+      `&scope=${encodeURIComponent(SCOPE)}`,
   ),
 )
 
@@ -27,8 +27,8 @@ interface CallbackQuery {
   code?: string
 }
 
-router.get('/callback', async ctx => {
-  const { code } = ctx.request.query as CallbackQuery
+router.get('/callback', async (req, res) => {
+  const { code } = req.query as CallbackQuery
 
   if (!code) {
     throw badRequest('Did not get a code back from Discord...')
@@ -56,9 +56,7 @@ router.get('/callback', async ctx => {
     await user.save()
   }
 
-  await ctx.authenticate(user.uuid)
+  await req.authenticate(user.uuid)
 
-  ctx.body = { user, session: ctx.session }
+  res.json({ user, session: req.session })
 })
-
-export const routes = router.routes()

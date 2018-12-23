@@ -2,6 +2,7 @@ import superagent = require('superagent')
 import { badRequest } from 'boom'
 
 const {
+  DISCORD_TOKEN,
   DISCORD_CLIENT,
   DISCORD_SECRET,
   DISCORD_REDIRECT_URI,
@@ -61,11 +62,11 @@ export const getUserFromToken = async (token: string): Promise<DiscordUser> => {
 export const getUserById = async (id: string): Promise<DiscordUser> => {
   const response = await superagent
     .get(`${DISCORD}/v6/users/${id}`)
-    .auth(DISCORD_SECRET, { type: 'bearer' })
+    .set('Authorization', 'Bot ' + DISCORD_TOKEN)
     .ok(T)
 
   if (isError(response)) {
-    throw badRequest('Could not get user from token...')
+    throw badRequest(`Could not get Discord user ${id}...`)
   }
 
   return response.body

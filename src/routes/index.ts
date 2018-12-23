@@ -1,16 +1,7 @@
-import Router from 'koa-router'
+import { Router } from 'express'
 
-import { routes as discord } from './discord'
+import { router as discord } from './discord'
 
-export const router = new Router()
+export const router = Router()
 
-router.prefix('/api')
-
-router.get('/', ({ response, session }) => {
-  response.body = {
-    message: 'pong',
-    session,
-  }
-})
-
-router.use(discord)
+router.use('/discord', discord)
