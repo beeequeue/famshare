@@ -1,23 +1,24 @@
 import { badRequest } from 'boom'
-import { Router } from 'express'
+import { Router, Request } from 'express'
 import uuid from 'uuid/v4'
 
 import { getAccessToken, getUserFromToken } from '../lib/discord'
 import { User } from '../lib/user'
 
-const { DISCORD_CLIENT, DISCORD_REDIRECT_URI } = process.env as {
-  [key: string]: string
-}
+const { DISCORD_CLIENT } = process.env
 const DISCORD = 'https://discordapp.com/api'
 const SCOPE = 'identify email'
 
+const getCallbackUrl = (req: Request) =>
+  `https://${req.get('host')}/discord/callback`
+
 export const router = Router()
 
-router.get('/login', (_req, res) =>
+router.get('/login', (req, res) =>
   res.redirect(
     `${DISCORD}/oauth2/authorize` +
-      `?client_id=${encodeURIComponent(DISCORD_CLIENT)}` +
-      `&redirect_uri=${encodeURIComponent(DISCORD_REDIRECT_URI)}` +
+      `?client_id=${encodeURIComponent(DISCORD_CLIENT as string)}` +
+      `&redirect_uri=${encodeURIComponent(getCallbackUrl(req))}` +
       '&response_type=code' +
       `&scope=${encodeURIComponent(SCOPE)}`,
   ),
@@ -34,7 +35,7 @@ router.get('/callback', async (req, res) => {
     throw badRequest('Did not get a code back from Discord...')
   }
 
-  const token = await getAccessToken(code)
+  const token = await getAccessToken(code, getCallbackUrl(req))
 
   const discordUser = await getUserFromToken(token)
 
@@ -58,5 +59,5 @@ router.get('/callback', async (req, res) => {
 
   await req.authenticate(user.uuid)
 
-  res.json({ user, session: req.session })
+  res.redirect('/')
 })

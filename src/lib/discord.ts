@@ -1,12 +1,9 @@
 import superagent = require('superagent')
 import { badRequest } from 'boom'
 
-const {
-  DISCORD_TOKEN,
-  DISCORD_CLIENT,
-  DISCORD_SECRET,
-  DISCORD_REDIRECT_URI,
-} = process.env as { [key: string]: string }
+const { DISCORD_TOKEN, DISCORD_CLIENT, DISCORD_SECRET } = process.env as {
+  [key: string]: string
+}
 const DISCORD = 'https://discordapp.com/api'
 const SCOPE = 'identify email'
 
@@ -15,7 +12,10 @@ const T = () => true
 const isError = (response: superagent.Response) =>
   !response.ok || response.error
 
-export const getAccessToken = async (code: string): Promise<string> => {
+export const getAccessToken = async (
+  code: string,
+  redirectUri: string,
+): Promise<string> => {
   const response = await superagent
     .post(`${DISCORD}/oauth2/token`)
     .type('form')
@@ -24,13 +24,16 @@ export const getAccessToken = async (code: string): Promise<string> => {
       client_secret: DISCORD_SECRET,
       grant_type: 'authorization_code',
       code,
-      redirect_uri: DISCORD_REDIRECT_URI,
+      redirect_uri: redirectUri,
       scope: SCOPE,
     })
     .ok(T)
 
   if (isError(response)) {
-    throw badRequest('Could not get access token from Discord...')
+    throw badRequest(
+      'Could not get access token from Discord...',
+      response.body,
+    )
   }
 
   return response.body.access_token

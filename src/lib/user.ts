@@ -1,3 +1,5 @@
+import { stripe } from '../lib/stripe'
+
 import { knex } from '../db'
 
 const table = () => knex('user')
@@ -56,6 +58,16 @@ export class User {
     if (!user) return null
 
     return new User(user)
+  }
+
+  public createStripeCustomer = async (stripeToken: string) => {
+    const response = await stripe.customers.create({
+      email: this.email,
+      source: stripeToken,
+      metadata: { uuid: this.uuid },
+    })
+
+    return response
   }
 
   public exists = async () =>
