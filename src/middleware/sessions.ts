@@ -9,7 +9,7 @@ import { User } from '../lib/user'
 declare module 'express-serve-static-core' {
   interface Session {
     uuid: string
-    user: Pick<User, 'uuid' | 'discordId' | 'email'>
+    user: Pick<User, 'uuid' | 'discordId' | 'email' | 'stripeId'>
     expiresAt: Date
   }
 
@@ -22,14 +22,15 @@ declare module 'express-serve-static-core' {
   }
 }
 
-const getContextSession = async ({ uuid, userUuid, expiresAt }: Session) => ({
-  uuid,
-  user: pick(
-    ['uuid', 'discordId', 'email'],
-    await User.getByUuid(userUuid),
-  ) as any,
-  expiresAt,
-})
+const getContextSession = async ({ uuid, userUuid, expiresAt }: Session) => {
+  const user = await User.getByUuid(userUuid)
+
+  return {
+    uuid,
+    user: pick(['uuid', 'discordId', 'email', 'stripeId'], user) as any,
+    expiresAt,
+  }
+}
 
 const authenticate = (req: Request, res: Response) => async (
   userUuid: string,

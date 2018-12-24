@@ -19,7 +19,7 @@ export class User {
   public readonly uuid: string
   public readonly discordId: string
   public readonly email: string
-  public readonly stripeId: string | null
+  public stripeId: string | null
   public readonly createdAt: Date
 
   constructor(params: Constructor) {
@@ -61,22 +61,32 @@ export class User {
   }
 
   public createStripeCustomer = async (stripeToken: string) => {
-    const response = await stripe.customers.create({
+    const customer = await stripe.customers.create({
       email: this.email,
       source: stripeToken,
       metadata: { uuid: this.uuid },
     })
 
-    return response
+    if (!customer.id) {
+      throw new Error('Could not create Stripe customer')
+    }
+
+    this.stripeId = customer.id
+
+    await this.save()
   }
 
-  public exists = async () =>
-    (await table()
+  public exists = async () => {
+    const result = await table()
       .count()
       .where({ uuid: this.uuid })
       .orWhere({ discord_id: this.discordId })
-      .orWhere({ email: this.email })
-      .orWhere({ stripe_id: this.stripeId })) === 1
+      .first()
+
+    console.log(result)
+
+    return Number(result.count) === 1
+  }
 
   public save = async () => {
     const data = {

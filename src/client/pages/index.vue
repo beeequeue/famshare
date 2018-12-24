@@ -1,3 +1,28 @@
 <template>
-  <h1>Hello! Welcome to famshare!</h1>
+  <section>
+    <h2>Hello! Welcome to famshare!</h2>
+
+    <payment-method :setupPayments="setupPayments" />
+  </section>
 </template>
+
+<script>
+import PaymentMethod from '~/components/payment-method'
+
+export default {
+  components: { PaymentMethod },
+  computed: {
+    setupPayments() {
+      if (!this.$store.state.session) return false
+
+      return this.$store.state.session.user.stripeId != null
+    },
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+section {
+  padding: 25px 35px;
+}
+</style>

@@ -9,6 +9,10 @@ export const mutations = {
     state.loggedIn = true
     state.username = username
   },
+
+  setSetupPayments(state, bool) {
+    state.session.user.setupPayments = bool
+  },
 }
 
 export const actions = {

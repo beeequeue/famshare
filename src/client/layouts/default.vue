@@ -3,12 +3,12 @@
     <header>
       <span class="logo">Famshare</span>
 
-      <span class="name">
-        {{username}}
-      </span>
+      <span v-if="session" class="name"> {{ username }} </span>
+
+      <a v-else href="/discord/login" class="login"> Login </a>
     </header>
 
-    <nuxt/>
+    <nuxt />
   </div>
 </template>
 
@@ -20,12 +20,12 @@ export default {
     },
     username() {
       return this.$store.state.username
-    }
-  }
+    },
+  },
 }
 </script>
 
-<style>
+<style lang="scss">
 body {
   --main: #6fc776;
   --bg: #eee;
@@ -42,14 +42,18 @@ header {
   background: var(--main);
   font-size: 1.5rem;
   padding: 10px 15px;
-}
 
-.logo {
-  font-weight: 600;
-}
+  & > .logo {
+    font-weight: 600;
+  }
 
-.name {
-  margin-left: auto;
+  & > .name,
+  & > .login {
+    margin-left: auto;
+  }
+
+  & > .login {
+    cursor: pointer;
+  }
 }
 </style>
-
