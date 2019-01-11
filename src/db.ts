@@ -1,13 +1,15 @@
 import Knex, { CreateTableBuilder, QueryBuilder } from 'knex'
 import uuid from 'uuid/v4'
 
-import { Plan } from './lib/plans'
-
 export const knex = Knex({
   client: 'pg',
   connection: process.env.DB_URL as string,
   searchPath: ['famshare', 'public'],
 })
+
+export enum PlanEnum {
+  YOUTUBE = 'youtube',
+}
 
 enum Table {
   USER = 'user',
@@ -132,7 +134,7 @@ const initialize = async () => {
     }),
 
     createTableIfDoesNotExist(Table.PLAN, table => {
-      table.enum('type', [Plan.YOUTUBE]).notNullable()
+      table.enum('type', [PlanEnum.YOUTUBE]).notNullable()
 
       table
         .uuid('owner_uuid')
