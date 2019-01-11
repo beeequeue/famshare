@@ -1,4 +1,4 @@
-import Knex, { CreateTableBuilder } from 'knex'
+import Knex, { CreateTableBuilder, QueryBuilder } from 'knex'
 import uuid from 'uuid/v4'
 
 import { Plan } from './lib/plans'
@@ -17,28 +17,42 @@ enum Table {
 
 export interface TableOptions {
   uuid?: string
-  created_at?: Date
   createdAt?: Date
-  updated_at?: Date
   updatedAt?: Date
+}
+
+export interface TableData {
+  uuid: string
+  created_at: Date
+  updated_at: Date
 }
 
 export class DatabaseTable {
   protected readonly name: string
+  protected readonly table: () => QueryBuilder
+
   public readonly uuid: string
   public readonly createdAt: Date
   public readonly updatedAt: Date
 
   constructor(options: TableOptions) {
-    this.name = this.constructor.name.toLowerCase()
+    const now = new Date()
 
+    this.name = this.constructor.name.toLowerCase()
+    this.table = () => knex(this.name)
     this.uuid = options.uuid || uuid()
-    this.createdAt = options.created_at || options.createdAt || new Date()
-    this.updatedAt = options.updated_at || options.updatedAt || new Date()
+    this.createdAt = options.createdAt || now
+    this.updatedAt = options.updatedAt || now
   }
 
+  protected static _fromSql = (sql: TableData): Required<TableOptions> => ({
+    uuid: sql.uuid,
+    createdAt: sql.created_at,
+    updatedAt: sql.updated_at,
+  })
+
   public exists = async () => {
-    const result = await knex(this.name)
+    const result = await this.table()
       .count()
       .where({ uuid: this.uuid })
       .first()
@@ -55,14 +69,14 @@ export class DatabaseTable {
     }
 
     if (await this.exists()) {
-      await knex(this.name)
+      await this.table()
         .update(data)
         .where({ uuid: this.uuid })
 
       return
     }
 
-    await knex(this.name).insert(data)
+    await this.table().insert(data)
   }
 }
 

@@ -1,4 +1,4 @@
-import superagent = require('superagent')
+import superagent from 'superagent'
 import { badRequest } from 'boom'
 
 const { DISCORD_TOKEN, DISCORD_CLIENT, DISCORD_SECRET } = process.env as {

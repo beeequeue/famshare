@@ -1,7 +1,9 @@
-import { stripe } from '../lib/stripe'
-import { DatabaseTable, knex, TableOptions } from '../db'
+import { QueryBuilder } from 'knex'
 
-const table = () => knex('user')
+import { stripe } from '../lib/stripe'
+import { DatabaseTable, TableData, TableOptions } from '../db'
+
+let staticTable: () => QueryBuilder
 
 interface Constructor extends TableOptions {
   uuid: string
@@ -10,7 +12,7 @@ interface Constructor extends TableOptions {
   stripeId?: string
 }
 
-interface TableData {
+interface UserData {
   email: string
   discord_id?: string
   stripe_id?: string
@@ -21,16 +23,25 @@ export class User extends DatabaseTable {
   public readonly email: string
   public stripeId: string | null
 
-  constructor(params: Constructor & TableData) {
+  constructor(params: Constructor) {
     super(params)
 
-    this.discordId = params.discord_id || (params.discordId as string)
-    this.stripeId = params.stripe_id || params.stripeId || null
+    staticTable = this.table
+    this.discordId = params.discordId as string
+    this.stripeId = params.stripeId || null
     this.email = params.email
   }
 
+  public static fromSql = (sql: UserData & TableData) =>
+    new User({
+      ...DatabaseTable._fromSql(sql),
+      discordId: sql.discord_id,
+      email: sql.email,
+      stripeId: sql.stripe_id,
+    })
+
   public static getByUuid = async (uuid: string) => {
-    const user = await table()
+    const user = await staticTable()
       .where({ uuid })
       .first()
 
@@ -40,23 +51,23 @@ export class User extends DatabaseTable {
   }
 
   public static findByUuid = async (uuid: string) => {
-    const user = await table()
+    const user = await staticTable()
       .where({ uuid })
       .first()
 
     if (!user) return null
 
-    return new User(user)
+    return User.fromSql(user)
   }
 
   public static findByDiscordId = async (id: string) => {
-    const user = await table()
+    const user = await staticTable()
       .where({ discord_id: id })
       .first()
 
     if (!user) return null
 
-    return new User(user)
+    return User.fromSql(user)
   }
 
   public createStripeCustomer = async (stripeToken: string) => {
@@ -76,7 +87,7 @@ export class User extends DatabaseTable {
   }
 
   public exists = async () => {
-    const result = await table()
+    const result = await this.table()
       .count()
       .where({ uuid: this.uuid })
       .orWhere({ discord_id: this.discordId })
@@ -86,7 +97,7 @@ export class User extends DatabaseTable {
   }
 
   public save = async () => {
-    const data: TableData = {
+    const data: UserData = {
       discord_id: this.discordId,
       email: this.email,
       stripe_id: this.stripeId as any,
