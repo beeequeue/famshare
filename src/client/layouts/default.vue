@@ -3,7 +3,7 @@
     <header>
       <span class="logo">Famshare</span>
 
-      <span v-if="session" class="name"> {{ username }} </span>
+      <span v-if="session" class="name"> {{ identifier }} </span>
 
       <a v-else href="/discord/login" class="login"> Login </a>
     </header>
@@ -18,8 +18,8 @@ export default {
     session() {
       return this.$store.state.session
     },
-    username() {
-      return this.$store.state.username
+    identifier() {
+      return this.$store.state.identifier
     },
   },
 }

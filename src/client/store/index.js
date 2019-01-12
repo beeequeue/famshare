@@ -1,13 +1,20 @@
+import { omit } from 'rambdax'
+
 export const state = () => ({
   session: null,
   loggedIn: false,
+  identifier: null,
+  user: null,
 })
 
 export const mutations = {
-  setSession(state, { session, username }) {
-    state.session = session
-    state.loggedIn = true
-    state.username = username
+  setState(state, { session, loggedIn, identifier, user }) {
+    state.session = {
+      ...omit('user', session),
+      user,
+    }
+    state.loggedIn = loggedIn
+    state.identifier = identifier
   },
 
   setSetupPayments(state, bool) {
@@ -18,9 +25,15 @@ export const mutations = {
 export const actions = {
   nuxtServerInit({ commit }, { req }) {
     if (req.session) {
-      commit('setSession', {
+      commit('setState', {
         session: req.session,
-        username: req.username,
+        isLoggedIn: true,
+        identifier: req.identifier,
+        user: {
+          uuid: req.session.user.uuid,
+          connections: req.session.user.connections,
+          setupPayments: req.session.user.stripeId != null,
+        },
       })
     }
   },

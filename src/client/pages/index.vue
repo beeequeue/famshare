@@ -17,7 +17,7 @@ export default {
     setupPayments() {
       if (!this.$store.state.session) return false
 
-      return this.$store.state.session.user.stripeId != null
+      return this.$store.state.session.user.setupPayments
     },
   },
 }
