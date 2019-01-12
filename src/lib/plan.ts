@@ -1,8 +1,6 @@
-import { QueryBuilder } from 'knex'
+import { DatabaseTable, knex, PlanEnum, TableData, TableOptions } from '../db'
 
-import { DatabaseTable, PlanEnum, TableData, TableOptions } from '../db'
-
-let staticTable: () => QueryBuilder
+const staticTable = () => knex('plan')
 
 interface Constructor extends TableOptions {
   type: PlanEnum
@@ -24,7 +22,6 @@ export class Plan extends DatabaseTable {
   constructor(options: Constructor) {
     super(options)
 
-    staticTable = this.table
     this.type = options.type
     this.ownerUuid = options.ownerUuid
     this.paymentDueDay = options.paymentDueDay

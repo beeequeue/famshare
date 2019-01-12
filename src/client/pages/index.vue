@@ -2,6 +2,8 @@
   <section>
     <h2>Hello! Welcome to famshare!</h2>
 
+    <pre>{{ JSON.stringify(this.$store.state, null, 2) }}</pre>
+
     <payment-method :setupPayments="setupPayments" />
   </section>
 </template>

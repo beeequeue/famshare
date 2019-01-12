@@ -4,7 +4,7 @@ import Express from 'express'
 import { Builder, Nuxt } from 'nuxt'
 
 import config from '../nuxt.config.js'
-import { SessionMiddleware } from './middleware/sessions'
+import { SessionMiddleware } from './middleware/session-middleware'
 import { router } from './routes'
 
 const { PORT } = process.env

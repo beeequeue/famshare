@@ -1,9 +1,7 @@
-import { QueryBuilder } from 'knex'
-
+import { DatabaseTable, knex, TableData, TableOptions } from '../db'
 import { stripe } from '../lib/stripe'
-import { DatabaseTable, TableData, TableOptions } from '../db'
 
-let staticTable: () => QueryBuilder
+const staticTable = () => knex('user')
 
 interface Constructor extends TableOptions {
   uuid: string
@@ -26,7 +24,6 @@ export class User extends DatabaseTable {
   constructor(params: Constructor) {
     super(params)
 
-    staticTable = this.table
     this.discordId = params.discordId as string
     this.stripeId = params.stripeId || null
     this.email = params.email
@@ -47,7 +44,7 @@ export class User extends DatabaseTable {
 
     if (!user) throw new Error(`Could not find User:${uuid}`)
 
-    return new User(user)
+    return User.fromSql(user)
   }
 
   public static findByUuid = async (uuid: string) => {

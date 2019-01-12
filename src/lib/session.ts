@@ -1,9 +1,7 @@
-import { QueryBuilder } from 'knex'
-
-import { DatabaseTable, TableData, TableOptions } from '../db'
+import { DatabaseTable, knex, TableData, TableOptions } from '../db'
 
 const WEEK = 1000 * 60 * 60 * 24 * 7
-let staticTable: () => QueryBuilder
+const staticTable = () => knex('session')
 
 interface Constructor extends TableOptions {
   userUuid: string
@@ -22,7 +20,6 @@ export class Session extends DatabaseTable {
   constructor(options: Constructor) {
     super(options)
 
-    staticTable = this.table
     this.userUuid = options.userUuid
     this.expiresAt = options.expiresAt || new Date(Date.now() + WEEK)
   }

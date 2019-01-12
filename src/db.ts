@@ -8,7 +8,7 @@ export const knex = Knex({
 })
 
 export enum PlanEnum {
-  YOUTUBE = 'youtube',
+  GOOGLE = 'google',
 }
 
 enum Table {
@@ -134,7 +134,7 @@ const initialize = async () => {
     }),
 
     createTableIfDoesNotExist(Table.PLAN, table => {
-      table.enum('type', [PlanEnum.YOUTUBE]).notNullable()
+      table.enum('type', [PlanEnum.GOOGLE]).notNullable()
 
       table
         .uuid('owner_uuid')

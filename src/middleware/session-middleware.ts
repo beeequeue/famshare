@@ -9,25 +9,29 @@ import { User } from '../lib/user'
 declare module 'express-serve-static-core' {
   interface Session {
     uuid: string
-    user: Pick<User, 'uuid' | 'discordId' | 'email' | 'stripeId'>
+    user: Pick<User, PickedProps>
     expiresAt: Date
   }
 
   interface Request {
     session?: Session
-    username?: string
+    identifier?: string
     loggedIn: boolean
 
     authenticate: (userUuid: string) => void
   }
 }
 
+type PickedProps = 'uuid' | 'discordId' | 'email' | 'stripeId'
 const getContextSession = async ({ uuid, userUuid, expiresAt }: Session) => {
   const user = await User.getByUuid(userUuid)
 
   return {
     uuid,
-    user: pick(['uuid', 'discordId', 'email', 'stripeId'], user) as any,
+    user: pick<User, PickedProps>(
+      ['uuid', 'discordId', 'email', 'stripeId'],
+      user,
+    ),
     expiresAt,
   }
 }
@@ -76,7 +80,7 @@ export const SessionMiddleware = (): RequestHandler => async (
   const discordUser = await getUserById(user.discordId)
 
   req.session = await getContextSession(session)
-  req.username = discordUser.username + '#' + discordUser.discriminator
+  req.identifier = discordUser.username + '#' + discordUser.discriminator
 
   next()
 }
