@@ -1,5 +1,5 @@
 import { badRequest } from 'boom'
-import { Router, Request } from 'express'
+import { Router } from 'express'
 import uuid from 'uuid/v4'
 
 import { getAccessToken, getUserFromToken } from '../lib/discord'
@@ -9,16 +9,15 @@ const { DISCORD_CLIENT } = process.env
 const DISCORD = 'https://discordapp.com/api'
 const SCOPE = 'identify email'
 
-const getCallbackUrl = (req: Request) =>
-  `https://${req.get('host')}/discord/callback`
+const DISCORD_CALLBACK = 'https://famshare.ngrok.io/discord/callback'
 
 export const router = Router()
 
-router.get('/login', (req, res) =>
+router.get('/login', (_req, res) =>
   res.redirect(
     `${DISCORD}/oauth2/authorize` +
       `?client_id=${encodeURIComponent(DISCORD_CLIENT as string)}` +
-      `&redirect_uri=${encodeURIComponent(getCallbackUrl(req))}` +
+      `&redirect_uri=${encodeURIComponent(DISCORD_CALLBACK)}` +
       '&response_type=code' +
       `&scope=${encodeURIComponent(SCOPE)}`,
   ),
@@ -35,7 +34,7 @@ router.get('/callback', async (req, res) => {
     throw badRequest('Did not get a code back from Discord...')
   }
 
-  const token = await getAccessToken(code, getCallbackUrl(req))
+  const token = await getAccessToken(code, DISCORD_CALLBACK)
 
   const discordUser = await getUserFromToken(token)
 

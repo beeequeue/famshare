@@ -5,6 +5,7 @@ import { Builder, Nuxt } from 'nuxt'
 
 import config from '../nuxt.config.js'
 import { SessionMiddleware } from './middleware/session-middleware'
+import { ErrorHandler } from './middleware/error-handler'
 import { router } from './routes'
 
 const { PORT } = process.env
@@ -18,7 +19,6 @@ const start = async () => {
   // app.use(Helmet())
 
   app.use(SessionMiddleware())
-  // app.use(ErrorHandler())
 
   if (process.env.NODE_ENV === 'development') {
     const builder = new Builder(nuxt)
@@ -26,6 +26,8 @@ const start = async () => {
   }
 
   app.use(router)
+
+  app.use(ErrorHandler())
 
   app.use(nuxt.render)
 
