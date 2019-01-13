@@ -16,7 +16,7 @@ declare module 'express-serve-static-core' {
   interface Request {
     session?: Session
     identifier?: string
-    loggedIn: boolean
+    isLoggedIn: boolean
 
     authenticate: (userUuid: string) => void
   }
@@ -57,7 +57,7 @@ export const SessionMiddleware = (): RequestHandler => async (
   const cookie = req.cookies.session
 
   req.authenticate = authenticate(req, res)
-  req.loggedIn = false
+  req.isLoggedIn = false
 
   if (!cookie) return next()
 
@@ -80,6 +80,7 @@ export const SessionMiddleware = (): RequestHandler => async (
   const discordUser = await getUserById(user.discordId)
 
   req.session = await getContextSession(session)
+  req.isLoggedIn = true
   req.identifier = discordUser.username + '#' + discordUser.discriminator
 
   next()

@@ -11,8 +11,6 @@
 </template>
 
 <script>
-import superagent from 'superagent'
-
 export default {
   components: {},
   props: {},
@@ -21,11 +19,7 @@ export default {
   },
   methods: {
     async connectGoogle() {
-      const response = await superagent.get('/google/connect').withCredentials()
-
-      if (!response.ok) {
-        console.error(response.body.message)
-      }
+      location.href = '/google/connect'
     },
   },
 }
