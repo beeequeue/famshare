@@ -26,8 +26,12 @@ import { Card, createToken } from 'vue-stripe-elements-plus'
 
 export default {
   components: { Card },
-  props: {
-    setupPayments: Boolean,
+  computed: {
+    setupPayments() {
+      if (!this.$store.state.session) return false
+
+      return this.$store.state.session.user.setupPayments
+    },
   },
   data() {
     return {

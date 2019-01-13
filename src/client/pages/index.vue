@@ -4,22 +4,18 @@
 
     <pre>{{ JSON.stringify(this.$store.state, null, 2) }}</pre>
 
-    <payment-method :setupPayments="setupPayments" />
+    <connections />
+
+    <payment-method />
   </section>
 </template>
 
 <script>
+import Connections from '~/components/connections'
 import PaymentMethod from '~/components/payment-method'
 
 export default {
-  components: { PaymentMethod },
-  computed: {
-    setupPayments() {
-      if (!this.$store.state.session) return false
-
-      return this.$store.state.session.user.setupPayments
-    },
-  },
+  components: { Connections, PaymentMethod },
 }
 </script>
 
