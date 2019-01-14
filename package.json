@@ -17,6 +17,7 @@
     "stripe": "^6.20.0",
     "superagent": "^4.0.0",
     "ts-node": "^7.0.1",
+    "tsconfig-paths": "^3.7.0",
     "typescript": "^3.2.2",
     "uuid": "^3.3.2",
     "vue-stripe-elements-plus": "^0.2.9"
@@ -56,8 +57,8 @@
   },
   "private": true,
   "scripts": {
-    "dev": "ts-node-dev --respawn -r dotenv/config --inspect -- src/index.ts",
-    "start": "ts-node -r dotenv/config src/index.ts",
+    "dev": "ts-node-dev --respawn -r dotenv/config -r tsconfig-paths/register --inspect -- src/index.ts",
+    "start": "ts-node -r dotenv/config -r tsconfig-paths/register src/index.ts",
     "proxy": "ngrok http -subdomain famshare 3000"
   }
 }
