@@ -3,7 +3,7 @@ import { Router } from 'express'
 import uuid from 'uuid/v4'
 
 import { getAccessToken, getUserFromToken } from '../lib/discord'
-import { User } from '../lib/user'
+import { User } from '../models/user'
 
 const { DISCORD_CLIENT } = process.env
 const DISCORD = 'https://discordapp.com/api'

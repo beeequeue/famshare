@@ -47,8 +47,6 @@ export class Google {
       .ok(T)
 
     if (isError(response)) {
-      console.dir(response.status)
-      console.dir(response.body)
       throw badRequest(
         'Could not get access token from Google...',
         response.body,

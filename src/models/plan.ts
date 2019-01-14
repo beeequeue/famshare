@@ -1,6 +1,6 @@
 import { DatabaseTable, knex, PlanEnum, TableData, TableOptions } from '../db'
 
-const staticTable = () => knex('plan')
+const table = () => knex('plan')
 
 interface Constructor extends TableOptions {
   type: PlanEnum
@@ -36,7 +36,7 @@ export class Plan extends DatabaseTable {
     })
 
   public static findByUuid = async (uuid: string) => {
-    const plan = await staticTable()
+    const plan = await table()
       .where({ uuid })
       .first()
 

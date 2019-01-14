@@ -5,17 +5,22 @@
     <div class="connection">
       Google:
 
-      <button @click="connectGoogle">Connect</button>
+      <span v-if="connections.google">
+        <b>{{ connections.google.identifier }}</b>
+      </span>
+      <button v-else @click="connectGoogle">Connect</button>
     </div>
   </div>
 </template>
 
 <script>
+import { pathOr } from 'rambdax'
+
 export default {
-  components: {},
-  props: {},
-  data() {
-    return {}
+  computed: {
+    connections() {
+      return pathOr({}, 'session.user.connections', this.$store.state)
+    },
   },
   methods: {
     async connectGoogle() {

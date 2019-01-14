@@ -1,7 +1,10 @@
 import { DatabaseTable, knex, TableData, TableOptions } from '../db'
+import { pick, map } from 'rambdax'
+import { User } from '@/models/user'
+import { Connection } from '@/models/connection'
 
 const WEEK = 1000 * 60 * 60 * 24 * 7
-const staticTable = () => knex('session')
+const table = () => knex('session')
 
 interface Constructor extends TableOptions {
   userUuid: string
@@ -40,7 +43,7 @@ export class Session extends DatabaseTable {
   }
 
   public static findByUuid = async (uuid: string) => {
-    const session = await staticTable()
+    const session = await table()
       .where({ uuid })
       .first()
 
@@ -49,8 +52,35 @@ export class Session extends DatabaseTable {
     return Session.fromSql(session)
   }
 
+  public getUser = async () => {
+    return User.getByUuid(this.userUuid)
+  }
+
+  public toSessionJSON = async () => {
+    const user = await this.getUser()
+
+    return {
+      uuid: this.uuid,
+      user: {
+        ...pick<User, 'uuid' | 'discordId' | 'email' | 'stripeId'>(
+          ['uuid', 'discordId', 'email', 'stripeId'],
+          user,
+        ),
+        connections: map(
+          u =>
+            pick<
+              Connection,
+              'uuid' | 'userId' | 'identifier' | 'picture' | 'link'
+            >(['uuid', 'userId', 'identifier', 'picture', 'link'], u as any),
+          await user.getConnections(),
+        ),
+      },
+      expiresAt: this.expiresAt,
+    }
+  }
+
   public exists = async () =>
-    (await this.table()
+    (await table()
       .count()
       .where({ uuid: this.uuid, user_uuid: this.userUuid })) === 1
 

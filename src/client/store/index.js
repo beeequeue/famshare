@@ -23,17 +23,15 @@ export const mutations = {
 }
 
 export const actions = {
-  nuxtServerInit({ commit }, { req }) {
+  async nuxtServerInit({ commit }, { req }) {
     if (req.session) {
+      const session = await req.session.toSessionJSON()
+
       commit('setState', {
-        session: req.session,
+        session: session,
         isLoggedIn: true,
         identifier: req.identifier,
-        user: {
-          uuid: req.session.user.uuid,
-          connections: req.session.user.connections,
-          setupPayments: req.session.user.stripeId != null,
-        },
+        user: session.user,
       })
     }
   },

@@ -1,6 +1,8 @@
 import Knex, { CreateTableBuilder, QueryBuilder } from 'knex'
 import uuid from 'uuid/v4'
 
+import { enumToArray } from './utils'
+
 export const knex = Knex({
   client: 'pg',
   connection: process.env.DB_URL as string,
@@ -11,10 +13,15 @@ export enum PlanEnum {
   GOOGLE = 'google',
 }
 
+export enum ConnectionEnum {
+  GOOGLE = 'google',
+}
+
 enum Table {
   USER = 'user',
   SESSION = 'session',
   PLAN = 'plan',
+  CONNECTION = 'connection',
 }
 
 export interface TableOptions {
@@ -31,7 +38,7 @@ export interface TableData {
 
 export class DatabaseTable {
   protected readonly name: string
-  protected readonly table: () => QueryBuilder
+  private readonly table: () => QueryBuilder
 
   public readonly uuid: string
   public readonly createdAt: Date
@@ -134,7 +141,7 @@ const initialize = async () => {
     }),
 
     createTableIfDoesNotExist(Table.PLAN, table => {
-      table.enum('type', [PlanEnum.GOOGLE]).notNullable()
+      table.enum('type', enumToArray(PlanEnum)).notNullable()
 
       table
         .uuid('owner_uuid')
@@ -146,6 +153,24 @@ const initialize = async () => {
         .integer('payment_due_day')
         .notNullable()
         .defaultTo(0)
+    }),
+
+    createTableIfDoesNotExist(Table.CONNECTION, table => {
+      table.enum('type', enumToArray(ConnectionEnum)).notNullable()
+
+      table
+        .uuid('owner_uuid')
+        .notNullable()
+        .references('uuid')
+        .inTable(Table.USER)
+
+      table.string('user_id').notNullable()
+
+      table.string('identifier')
+
+      table.string('picture')
+
+      table.string('link')
     }),
   )
 

@@ -1,18 +1,11 @@
 import { Request, RequestHandler, Response } from 'express'
 import { Base64 } from 'js-base64'
-import { pick } from 'rambdax'
 
-import { getUserById } from '../lib/discord'
-import { Session } from '../lib/session'
-import { User } from '../lib/user'
+import { getUserById } from '@/lib/discord'
+import { Session } from '@/models/session'
+import { User } from '@/models/user'
 
 declare module 'express-serve-static-core' {
-  interface Session {
-    uuid: string
-    user: Pick<User, PickedProps>
-    expiresAt: Date
-  }
-
   interface Request {
     session?: Session
     identifier?: string
@@ -22,26 +15,12 @@ declare module 'express-serve-static-core' {
   }
 }
 
-type PickedProps = 'uuid' | 'discordId' | 'email' | 'stripeId'
-const getContextSession = async ({ uuid, userUuid, expiresAt }: Session) => {
-  const user = await User.getByUuid(userUuid)
-
-  return {
-    uuid,
-    user: pick<User, PickedProps>(
-      ['uuid', 'discordId', 'email', 'stripeId'],
-      user,
-    ),
-    expiresAt,
-  }
-}
-
 const authenticate = (req: Request, res: Response) => async (
   userUuid: string,
 ) => {
   const session = await Session.generate(userUuid)
 
-  req.session = await getContextSession(session)
+  req.session = session
   res.cookie('session', Base64.encode(req.session.uuid), {
     expires: session.expiresAt,
     httpOnly: true,
@@ -57,6 +36,7 @@ export const SessionMiddleware = (): RequestHandler => async (
   const cookie = req.cookies.session
 
   req.authenticate = authenticate(req, res)
+
   req.isLoggedIn = false
 
   if (!cookie) return next()
@@ -79,7 +59,7 @@ export const SessionMiddleware = (): RequestHandler => async (
 
   const discordUser = await getUserById(user.discordId)
 
-  req.session = await getContextSession(session)
+  req.session = session
   req.isLoggedIn = true
   req.identifier = discordUser.username + '#' + discordUser.discriminator
 

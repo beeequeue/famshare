@@ -1,7 +1,15 @@
-import { DatabaseTable, knex, TableData, TableOptions } from '../db'
-import { stripe } from '../lib/stripe'
+import {
+  ConnectionEnum,
+  DatabaseTable,
+  knex,
+  TableData,
+  TableOptions,
+} from '@/db'
+import { Connection, ConnectionConstructor } from '@/models/connection'
+import { stripe } from '@/lib/stripe'
+import { Omit } from '@/utils'
 
-const staticTable = () => knex('user')
+const table = () => knex('user')
 
 interface Constructor extends TableOptions {
   uuid: string
@@ -38,7 +46,7 @@ export class User extends DatabaseTable {
     })
 
   public static getByUuid = async (uuid: string) => {
-    const user = await staticTable()
+    const user = await table()
       .where({ uuid })
       .first()
 
@@ -48,7 +56,7 @@ export class User extends DatabaseTable {
   }
 
   public static findByUuid = async (uuid: string) => {
-    const user = await staticTable()
+    const user = await table()
       .where({ uuid })
       .first()
 
@@ -58,7 +66,7 @@ export class User extends DatabaseTable {
   }
 
   public static findByDiscordId = async (id: string) => {
-    const user = await staticTable()
+    const user = await table()
       .where({ discord_id: id })
       .first()
 
@@ -66,6 +74,9 @@ export class User extends DatabaseTable {
 
     return User.fromSql(user)
   }
+
+  public getConnections = async (type?: ConnectionEnum) =>
+    Connection.getByUserUuid(this.uuid, type)
 
   public createStripeCustomer = async (stripeToken: string) => {
     const customer = await stripe.customers.create({
@@ -83,8 +94,22 @@ export class User extends DatabaseTable {
     await this.save()
   }
 
+  public connectWith = async (
+    data: Omit<
+      ConnectionConstructor,
+      'uuid' | 'ownerUuid' | 'createdAt' | 'updatedAt'
+    >,
+  ) => {
+    const connection = new Connection({
+      ...data,
+      ownerUuid: this.uuid,
+    })
+
+    return connection.save()
+  }
+
   public exists = async () => {
-    const result = await this.table()
+    const result = await table()
       .count()
       .where({ uuid: this.uuid })
       .orWhere({ discord_id: this.discordId })
