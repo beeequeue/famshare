@@ -1,0 +1,29 @@
+type Query {
+  """
+  Returns a User if it exists.
+  """
+  User(id: String): User
+  """
+  The logged in User, if authenticated.
+  """
+  viewer: User
+}
+
+type User {
+  """
+  The User's UUID.
+  """
+  uuid: String!
+  """
+  The User's Email.
+  """
+  email: String!
+  """
+  The User's Discord ID.
+  """
+  discordId: String!
+  """
+  The User's Stripe ID if they've set up payments.
+  """
+  stripeId: String
+}
