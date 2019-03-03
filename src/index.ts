@@ -1,16 +1,13 @@
 import Express from 'express'
 import BodyParser from 'body-parser'
 import CookieParser from 'cookie-parser'
-import { Builder, Nuxt } from 'nuxt'
 
-import config from '../nuxt.config.js'
 import { SessionMiddleware } from './middleware/session-middleware'
 import { ErrorHandler } from './middleware/error-handler'
 import { router } from './routes'
 
 const { PORT } = process.env
 const app = Express()
-const nuxt = new Nuxt(config)
 
 const start = async () => {
   // app.use(KoaCORS())
@@ -20,16 +17,9 @@ const start = async () => {
 
   app.use(SessionMiddleware())
 
-  if (process.env.NODE_ENV === 'development') {
-    const builder = new Builder(nuxt)
-    await builder.build()
-  }
-
   app.use(router)
 
   app.use(ErrorHandler())
-
-  app.use(nuxt.render)
 
   app.listen(PORT || 3000, () => console.log(`Listening on ${PORT || 3000}`))
 }
