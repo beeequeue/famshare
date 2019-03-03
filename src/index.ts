@@ -1,6 +1,6 @@
+import Express from 'express'
 import BodyParser from 'body-parser'
 import CookieParser from 'cookie-parser'
-import Express from 'express'
 import { Builder, Nuxt } from 'nuxt'
 
 import config from '../nuxt.config.js'
