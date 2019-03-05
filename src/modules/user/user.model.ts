@@ -4,10 +4,10 @@ import {
   knex,
   TableData,
   TableOptions,
-} from '@/db'
-import { Connection, ConnectionConstructor } from '@/models/connection'
-import { stripe } from '@/lib/stripe'
-import { Omit } from '@/utils'
+} from '../../db'
+import { Connection, ConnectionConstructor } from '../../models/connection'
+import { stripe } from '../../lib/stripe'
+import { Omit } from '../../utils'
 
 const table = () => knex('user')
 

@@ -2,7 +2,7 @@ type Query {
   """
   Returns a User if it exists.
   """
-  User(id: String): User
+  user(id: String): User
   """
   The logged in User, if authenticated.
   """

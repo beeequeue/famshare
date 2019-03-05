@@ -1,6 +1,6 @@
 import { DatabaseTable, knex, TableData, TableOptions } from '../db'
 import { pick, map } from 'rambdax'
-import { User } from '@/models/user'
+import { User } from '@/modules/user/user.model'
 import { Connection } from '@/models/connection'
 
 const WEEK = 1000 * 60 * 60 * 24 * 7

@@ -7,15 +7,19 @@ import BodyParser from 'body-parser'
 import CookieParser from 'cookie-parser'
 import { format, transports } from 'winston'
 import { logger as Logger } from 'express-winston'
+
 import { SessionMiddleware } from '@/middleware/session-middleware'
 import { ErrorHandler } from '@/middleware/error-handler'
+import { rootValue } from '@/graphql/root'
 import { router } from '@/routes'
 import { IS_DEV } from '@/utils'
 
 const { PORT } = process.env
 const app = Express()
 
-const SCHEMA = readFileSync(resolve(__dirname, 'schema.graphql')).toString()
+const SCHEMA = readFileSync(
+  resolve(__dirname, 'graphql', 'schema.graphql'),
+).toString()
 const schema = buildSchema(SCHEMA)
 
 const start = async () => {
@@ -42,6 +46,7 @@ const start = async () => {
       schema,
       graphiql: false,
       pretty: IS_DEV,
+      rootValue,
     }),
   )
 
@@ -51,6 +56,7 @@ const start = async () => {
       schema,
       graphiql: true,
       pretty: IS_DEV,
+      rootValue,
     }),
   )
 
