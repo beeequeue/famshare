@@ -1,4 +1,4 @@
-import { getUser, getViewer } from '@/modules/user/user.graphql'
+import { getUser, getViewer } from '@/modules/user/user.resolvers'
 
 export const rootValue = {
   user: getUser,

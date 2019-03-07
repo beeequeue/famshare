@@ -13,7 +13,7 @@ type User {
   """
   The User's UUID.
   """
-  uuid: String!
+  uuid: ID!
   """
   The User's Email.
   """

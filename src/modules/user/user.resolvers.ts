@@ -1,13 +1,10 @@
-import { Request } from 'express'
 import { isNil } from 'rambdax'
 
 import { User } from '@/modules/user/user.model'
 import { UserQueryArgs, User as RUser } from '@/graphql/types'
+import { Resolver } from '@/utils'
 
-export const getUser = async (
-  args: UserQueryArgs,
-  _request: Request,
-): Promise<RUser | null> => {
+export const getUser: Resolver<RUser, UserQueryArgs> = async args => {
   const user = await User.findByUuid(args.uuid)
 
   if (isNil(user)) {
@@ -23,10 +20,7 @@ export const getUser = async (
   }
 }
 
-export const getViewer = async (
-  _: null,
-  request: Request,
-): Promise<RUser | null> => {
+export const getViewer: Resolver<RUser> = async (_, request) => {
   const { session } = request
 
   if (isNil(session)) {
