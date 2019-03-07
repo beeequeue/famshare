@@ -1,5 +1,4 @@
 import { badRequest } from 'boom'
-import { T } from 'rambdax'
 import superagent from 'superagent'
 
 const { GOOGLE_CLIENT, GOOGLE_SECRET } = process.env as {
@@ -8,6 +7,7 @@ const { GOOGLE_CLIENT, GOOGLE_SECRET } = process.env as {
 const SCOPE = 'email profile'
 export const GOOGLE_REDIRECT_URI = 'https://famshare.ngrok.io/google/callback'
 
+const T = () => true
 const isError = (response: superagent.Response) =>
   !response.ok || response.error
 
