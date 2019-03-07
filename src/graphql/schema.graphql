@@ -9,6 +9,13 @@ type Query {
   viewer: User
 }
 
+type Mutation {
+  """
+  Connect Viewer to a Stripe Token.
+  """
+  connectStripe(token: String!): User!
+}
+
 type User {
   """
   The User's UUID.
@@ -29,5 +36,5 @@ type User {
   """
   The User's registration date and time.
   """
-  createdAt: String
+  createdAt: String!
 }

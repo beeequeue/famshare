@@ -5,7 +5,7 @@ export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 export type Resolver<R extends {} | null, A extends {} | null = null> = (
   args: A,
   request: Request,
-) => Promise<R | null>
+) => Promise<R>
 
 export const enumToArray = <T>(Enum: any): T[] =>
   Object.keys(Enum).map(key => Enum[key])

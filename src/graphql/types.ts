@@ -21,7 +21,12 @@ export interface User {
   /** The User's Stripe ID if they've set up payments. */
   stripeId?: Maybe<string>
   /** The User's registration date and time. */
-  createdAt?: Maybe<string>
+  createdAt: string
+}
+
+export interface Mutation {
+  /** Connect Viewer to a Stripe Token. */
+  connectStripe: User
 }
 
 // ====================================================
@@ -30,4 +35,7 @@ export interface User {
 
 export interface UserQueryArgs {
   uuid: string
+}
+export interface ConnectStripeMutationArgs {
+  token: string
 }

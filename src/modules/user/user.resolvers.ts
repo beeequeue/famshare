@@ -1,26 +1,24 @@
 import { isNil } from 'rambdax'
 
 import { User } from '@/modules/user/user.model'
-import { UserQueryArgs, User as RUser } from '@/graphql/types'
+import {
+  ConnectStripeMutationArgs,
+  User as IUser,
+  UserQueryArgs,
+} from '@/graphql/types'
 import { Resolver } from '@/utils'
 
-export const getUser: Resolver<RUser, UserQueryArgs> = async args => {
+export const user: Resolver<IUser | null, UserQueryArgs> = async args => {
   const user = await User.findByUuid(args.uuid)
 
   if (isNil(user)) {
     return null
   }
 
-  return {
-    uuid: user.uuid,
-    email: user.email,
-    discordId: user.discordId,
-    stripeId: user.stripeId,
-    createdAt: user.createdAt.toISOString(),
-  }
+  return user.toGraphQL()
 }
 
-export const getViewer: Resolver<RUser> = async (_, request) => {
+export const viewer: Resolver<IUser | null> = async (_, request) => {
   const { session } = request
 
   if (isNil(session)) {
@@ -33,11 +31,16 @@ export const getViewer: Resolver<RUser> = async (_, request) => {
     return null
   }
 
-  return {
-    uuid: user.uuid,
-    email: user.email,
-    discordId: user.discordId,
-    stripeId: user.stripeId,
-    createdAt: user.createdAt.toISOString(),
-  }
+  return user.toGraphQL()
+}
+
+export const connectStripe: Resolver<IUser, ConnectStripeMutationArgs> = async (
+  args,
+  request,
+) => {
+  const user = await request.session!.getUser()
+
+  await user.createStripeCustomer(args.token)
+
+  return user.toGraphQL()
 }

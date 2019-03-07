@@ -1,6 +1,10 @@
-import { getUser, getViewer } from '@/modules/user/user.resolvers'
+import { user, viewer, connectStripe } from '@/modules/user/user.resolvers'
 
 export const rootValue = {
-  user: getUser,
-  viewer: getViewer,
+  // Query
+  user,
+  viewer,
+
+  // Mutation
+  connectStripe,
 }

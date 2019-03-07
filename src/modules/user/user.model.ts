@@ -4,10 +4,11 @@ import {
   knex,
   TableData,
   TableOptions,
-} from '../../db'
-import { Connection, ConnectionConstructor } from '../../models/connection'
-import { stripe } from '../../lib/stripe'
-import { Omit } from '../../utils'
+} from '@/db'
+import { Connection, ConnectionConstructor } from '@/models/connection'
+import { stripe } from '@/lib/stripe'
+import { User as GraphqlUser } from '@/graphql/types'
+import { Omit } from '@/utils'
 
 const table = () => knex('user')
 
@@ -74,6 +75,14 @@ export class User extends DatabaseTable {
 
     return User.fromSql(user)
   }
+
+  public toGraphQL = (): GraphqlUser => ({
+    uuid: this.uuid,
+    discordId: this.discordId,
+    email: this.email,
+    stripeId: this.stripeId,
+    createdAt: this.createdAt.toISOString(),
+  })
 
   public getConnections = async (type?: ConnectionEnum) =>
     Connection.getByUserUuid(this.uuid, type)
