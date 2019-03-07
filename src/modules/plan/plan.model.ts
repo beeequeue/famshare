@@ -1,4 +1,4 @@
-import { DatabaseTable, knex, PlanEnum, TableData, TableOptions } from '../db'
+import { DatabaseTable, knex, PlanEnum, TableData, TableOptions } from '@/db'
 
 const table = () => knex('plan')
 

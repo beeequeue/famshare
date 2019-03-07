@@ -2,7 +2,7 @@ import { Request, RequestHandler, Response } from 'express'
 import { Base64 } from 'js-base64'
 
 import { getUserById } from '@/lib/discord'
-import { Session } from '@/models/session'
+import { Session } from '@/modules/session/session.model'
 import { User } from '@/modules/user/user.model'
 
 declare module 'express-serve-static-core' {

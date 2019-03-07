@@ -5,7 +5,10 @@ import {
   TableData,
   TableOptions,
 } from '@/db'
-import { Connection, ConnectionConstructor } from '@/models/connection'
+import {
+  Connection,
+  ConnectionConstructor,
+} from '@/modules/connection/connection.model'
 import { stripe } from '@/lib/stripe'
 import { User as GraphqlUser } from '@/graphql/types'
 import { Omit } from '@/utils'

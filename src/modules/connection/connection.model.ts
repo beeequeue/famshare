@@ -4,7 +4,7 @@ import {
   knex,
   TableData,
   TableOptions,
-} from '../db'
+} from '@/db'
 import { Omit } from '@/utils'
 
 const table = () => knex('connection')
