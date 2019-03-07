@@ -2,7 +2,7 @@ type Query {
   """
   Returns a User if it exists.
   """
-  user(id: String): User
+  user(uuid: String!): User
   """
   The logged in User, if authenticated.
   """
@@ -26,4 +26,8 @@ type User {
   The User's Stripe ID if they've set up payments.
   """
   stripeId: String
+  """
+  The User's registration date and time.
+  """
+  createdAt: String
 }

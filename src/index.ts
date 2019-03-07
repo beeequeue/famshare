@@ -5,12 +5,12 @@ import Express from 'express'
 import GraphQL from 'express-graphql'
 import BodyParser from 'body-parser'
 import CookieParser from 'cookie-parser'
-import { format, transports } from 'winston'
+import { transports } from 'winston'
 import { logger as Logger } from 'express-winston'
 
 import { SessionMiddleware } from '@/middleware/session-middleware'
 import { ErrorHandler } from '@/middleware/error-handler'
-import { rootValue } from '@/graphql/root'
+import { rootValue } from '@/graphql/resolvers'
 import { router } from '@/routes'
 import { IS_DEV } from '@/utils'
 
@@ -26,7 +26,6 @@ const start = async () => {
   app.use(
     Logger({
       transports: [new transports.Console()],
-      format: format.combine(format.colorize(), format.simple()),
       meta: false,
     }),
   )

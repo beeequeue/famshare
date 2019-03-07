@@ -1,0 +1,10 @@
+overwrite: true
+generates:
+  ./src/graphql/types.ts:
+    schema: ./src/graphql/schema.graphql
+    plugins:
+      - typescript-common
+      - typescript-server
+    config:
+      namingConvention:
+        enumValues: change-case#upperCase
