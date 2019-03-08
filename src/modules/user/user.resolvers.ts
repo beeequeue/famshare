@@ -1,12 +1,10 @@
-import { isNil } from 'rambdax'
-
 import { User } from '@/modules/user/user.model'
 import {
   ConnectStripeMutationArgs,
   User as IUser,
   UserQueryArgs,
 } from '@/graphql/types'
-import { Resolver } from '@/utils'
+import { isNil, Resolver } from '@/utils'
 
 export const user: Resolver<IUser | null, UserQueryArgs> = async args => {
   const user = await User.findByUuid(args.uuid)
@@ -25,7 +23,7 @@ export const viewer: Resolver<IUser | null> = async (_, request) => {
     return null
   }
 
-  const user = await User.findByUuid(session.userUuid)
+  const user = await User.findByUuid(session.user.uuid)
 
   if (isNil(user)) {
     return null
@@ -38,7 +36,7 @@ export const connectStripe: Resolver<IUser, ConnectStripeMutationArgs> = async (
   args,
   request,
 ) => {
-  const user = await request.session!.getUser()
+  const user = await request.session!.user
 
   await user.createStripeCustomer(args.token)
 

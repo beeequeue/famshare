@@ -3,11 +3,12 @@ import { Router } from 'express'
 
 import { Google } from '@/lib/google'
 import { ConnectionEnum } from '@/db'
+import { isNil } from '@/utils'
 
 export const router = Router()
 
 router.get('/connect', (req, res) => {
-  if (!req.isLoggedIn) {
+  if (isNil(req.session)) {
     throw unauthorized('You need to be logged in to connect a Google account.')
   }
 
@@ -19,7 +20,7 @@ interface CallbackQuery {
 }
 
 router.get('/callback', async (req, res) => {
-  if (!req.isLoggedIn) {
+  if (isNil(req.session)) {
     throw unauthorized('You need to be logged in to connect a Google account.')
   }
 
@@ -39,13 +40,7 @@ router.get('/callback', async (req, res) => {
     )
   }
 
-  const user = await req.session!.getUser()
-
-  if (!user) {
-    throw badRequest(
-      "You need to have verified the account's email to connect it.",
-    )
-  }
+  const user = await req.session.user
 
   await user.connectWith({
     type: ConnectionEnum.GOOGLE,
