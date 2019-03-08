@@ -1,8 +1,5 @@
-import { pick, map } from 'rambdax'
-
 import { DatabaseTable, knex, TableData, TableOptions } from '@/db'
 import { User } from '../user/user.model'
-import { Connection } from '../connection/connection.model'
 
 const WEEK = 1000 * 60 * 60 * 24 * 7
 const table = () => knex('session')
@@ -55,29 +52,6 @@ export class Session extends DatabaseTable {
 
   public getUser = async () => {
     return User.getByUuid(this.userUuid)
-  }
-
-  public toSessionJSON = async () => {
-    const user = await this.getUser()
-
-    return {
-      uuid: this.uuid,
-      user: {
-        ...pick<User, 'uuid' | 'discordId' | 'email' | 'stripeId'>(
-          ['uuid', 'discordId', 'email', 'stripeId'],
-          user,
-        ),
-        connections: map(
-          u =>
-            pick<
-              Connection,
-              'uuid' | 'userId' | 'identifier' | 'picture' | 'link'
-            >(['uuid', 'userId', 'identifier', 'picture', 'link'], u as any),
-          await user.getConnections(),
-        ),
-      },
-      expiresAt: this.expiresAt,
-    }
   }
 
   public exists = async () =>
