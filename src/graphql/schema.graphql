@@ -2,7 +2,7 @@ type Query {
   """
   Returns a User if it exists.
   """
-  user(uuid: String!): User
+  user(uuid: ID!): User
   """
   The logged in User, if authenticated.
   """
@@ -36,5 +36,10 @@ type User {
   """
   The User's registration date and time.
   """
-  createdAt: String!
+  createdAt: Date!
 }
+
+"""
+A ISO-8601 formatted date.
+"""
+scalar Date

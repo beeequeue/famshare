@@ -8,3 +8,5 @@ generates:
     config:
       namingConvention:
         enumValues: change-case#upperCase
+      scalars:
+        Date: Date

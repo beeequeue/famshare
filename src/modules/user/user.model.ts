@@ -84,7 +84,7 @@ export class User extends DatabaseTable {
     discordId: this.discordId,
     email: this.email,
     stripeId: this.stripeId,
-    createdAt: this.createdAt.toISOString(),
+    createdAt: this.createdAt,
   })
 
   public getConnections = async (type?: ConnectionEnum) =>

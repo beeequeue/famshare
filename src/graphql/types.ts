@@ -1,5 +1,11 @@
 export type Maybe<T> = T | null
 
+/** A ISO-8601 formatted date. */
+
+// ====================================================
+// Scalars
+// ====================================================
+
 // ====================================================
 // Types
 // ====================================================
@@ -21,7 +27,7 @@ export interface User {
   /** The User's Stripe ID if they've set up payments. */
   stripeId?: Maybe<string>
   /** The User's registration date and time. */
-  createdAt: string
+  createdAt: Date
 }
 
 export interface Mutation {
