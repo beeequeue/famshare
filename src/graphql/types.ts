@@ -1,5 +1,19 @@
 export type Maybe<T> = T | null
 
+export interface CreatePlanOptions {
+  name: string
+
+  type: PlanType
+
+  amount: number
+  /** 0-indexed day in month payments are done. */
+  paymentDueDay: number
+}
+
+export enum PlanType {
+  GOOGLE = 'GOOGLE',
+}
+
 /** A ISO-8601 formatted date. */
 
 // ====================================================
@@ -33,6 +47,22 @@ export interface User {
 export interface Mutation {
   /** Connect Viewer to a Stripe Token. */
   connectStripe: User
+
+  createPlan: Plan
+}
+
+export interface Plan {
+  name: string
+
+  type: PlanType
+
+  amount: number
+
+  paymentDue: Date
+
+  owner: User
+
+  createdAt: Date
 }
 
 // ====================================================
@@ -44,4 +74,7 @@ export interface UserQueryArgs {
 }
 export interface ConnectStripeMutationArgs {
   token: string
+}
+export interface CreatePlanMutationArgs {
+  options: CreatePlanOptions
 }

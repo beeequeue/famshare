@@ -1,17 +1,14 @@
 import Knex, { CreateTableBuilder, QueryBuilder } from 'knex'
 import uuid from 'uuid/v4'
 
-import { enumToArray } from './utils'
+import { PlanType } from '@/graphql/types'
+import { enumToArray } from '@/utils'
 
 export const knex = Knex({
   client: 'pg',
   connection: process.env.DB_URL as string,
   searchPath: ['famshare', 'public'],
 })
-
-export enum PlanEnum {
-  GOOGLE = 'google',
-}
 
 export enum ConnectionEnum {
   GOOGLE = 'google',
@@ -141,18 +138,19 @@ const initialize = async () => {
     }),
 
     createTableIfDoesNotExist(Table.PLAN, table => {
-      table.enum('type', enumToArray(PlanEnum)).notNullable()
+      table.string('name').notNullable()
+
+      table.enum('type', enumToArray(PlanType)).notNullable()
+
+      table.integer('amount').notNullable()
+
+      table.integer('payment_due_day').notNullable()
 
       table
         .uuid('owner_uuid')
         .notNullable()
         .references('uuid')
         .inTable(Table.USER)
-
-      table
-        .integer('payment_due_day')
-        .notNullable()
-        .defaultTo(0)
     }),
 
     createTableIfDoesNotExist(Table.CONNECTION, table => {

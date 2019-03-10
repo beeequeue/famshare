@@ -1,38 +1,49 @@
-import { DatabaseTable, knex, PlanEnum, TableData, TableOptions } from '@/db'
+import { DatabaseTable, knex, TableData, TableOptions } from '@/db'
+import { PlanType } from '@/graphql/types'
 
 const table = () => knex('plan')
 
 interface Constructor extends TableOptions {
-  type: PlanEnum
+  name: string
+  type: PlanType
+  paymentDueDay: number
+  amount: number
   ownerUuid: string
-  paymentDueDay: Date
 }
 
 interface PlanData {
-  type: PlanEnum
+  name: string
+  type: PlanType
+  payment_due_day: number
+  amount: number
   owner_uuid: string
-  payment_due_day: Date
 }
 
 export class Plan extends DatabaseTable {
-  public readonly type: PlanEnum
+  public readonly name: string
+  public readonly type: PlanType
+  public readonly amount: number
+  public readonly paymentDueDay: number
   public readonly ownerUuid: string
-  public readonly paymentDueDay: Date
 
   constructor(options: Constructor) {
     super(options)
 
+    this.name = options.name
     this.type = options.type
-    this.ownerUuid = options.ownerUuid
+    this.amount = options.amount
     this.paymentDueDay = options.paymentDueDay
+    this.ownerUuid = options.ownerUuid
   }
 
   public static fromSql = (sql: PlanData & TableData) =>
     new Plan({
       ...DatabaseTable._fromSql(sql),
-      type: sql.type as PlanEnum,
-      ownerUuid: sql.owner_uuid,
+      name: sql.name,
+      type: sql.type as PlanType,
+      amount: sql.amount,
       paymentDueDay: sql.payment_due_day,
+      ownerUuid: sql.owner_uuid,
     })
 
   public static findByUuid = async (uuid: string) => {
@@ -47,9 +58,11 @@ export class Plan extends DatabaseTable {
 
   public save = async () => {
     const data: PlanData = {
+      name: this.name,
       type: this.type,
-      owner_uuid: this.ownerUuid,
+      amount: this.amount,
       payment_due_day: this.paymentDueDay,
+      owner_uuid: this.ownerUuid,
     }
 
     return this._save(data)

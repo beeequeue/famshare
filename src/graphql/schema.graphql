@@ -14,7 +14,11 @@ type Mutation {
   Connect Viewer to a Stripe Token.
   """
   connectStripe(token: String!): User!
+
+  createPlan(options: CreatePlanOptions!): Plan!
 }
+
+# User
 
 type User {
   """
@@ -37,6 +41,31 @@ type User {
   The User's registration date and time.
   """
   createdAt: Date!
+}
+
+# Plan
+
+enum PlanType {
+  GOOGLE
+}
+
+type Plan {
+  name: String!
+  type: PlanType!
+  amount: Int!
+  paymentDue: Date!
+  owner: User!
+  createdAt: Date!
+}
+
+input CreatePlanOptions {
+  name: String!
+  type: PlanType!
+  amount: Int!
+  """
+  0-indexed day in month payments are done.
+  """
+  paymentDueDay: Int!
 }
 
 """
