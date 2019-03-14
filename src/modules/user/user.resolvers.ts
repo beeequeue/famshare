@@ -23,13 +23,7 @@ export const viewer: Resolver<IUser | null> = async (_, request) => {
     return null
   }
 
-  const user = await User.findByUuid(session.user.uuid)
-
-  if (isNil(user)) {
-    return null
-  }
-
-  return user.toGraphQL()
+  return session.user.toGraphQL()
 }
 
 export const connectStripe: Resolver<IUser, ConnectStripeMutationArgs> = async (

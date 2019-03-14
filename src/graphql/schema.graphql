@@ -6,7 +6,7 @@ type Query {
   """
   The logged in User, if authenticated.
   """
-  viewer: User
+  viewer: User @loggedIn
   """
   Returns a Plan if it exists.
   """
@@ -17,9 +17,9 @@ type Mutation {
   """
   Connect Viewer to a Stripe Token.
   """
-  connectStripe(token: String!): User!
+  connectStripe(token: String!): User! @loggedIn
 
-  createPlan(options: CreatePlanOptions!): Plan!
+  createPlan(options: CreatePlanOptions!): Plan! @loggedIn
 
   editPlan(options: EditPlanOptions!): Plan @auth(level: PLAN_OWNER)
 }
@@ -28,7 +28,6 @@ type Mutation {
 
 enum AccessLevel {
   ADMIN
-  MODERATOR
 }
 
 type User {
@@ -81,13 +80,17 @@ scalar Date
 
 enum AuthLevel {
   ADMIN
-  MODERATOR
   PLAN_OWNER
   PLAN_MEMBER
   LOGGED_IN
 }
 
 """
-Set a required authorization level to access Field or Mutation.
+Asserts that client is logged in.
+"""
+directive @loggedIn on FIELD_DEFINITION
+"""
+Asserts that client is logged in.
+Sets a required AccessLevel to access Field.
 """
 directive @auth(level: AuthLevel!) on FIELD_DEFINITION

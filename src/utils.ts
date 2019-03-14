@@ -31,7 +31,7 @@ export const pick = <T extends {}, K extends Array<keyof T>>(
     )
 
 export const isNil = (variable: any): variable is null | undefined => {
-  return variable === null || variable === false
+  return variable === null || variable === undefined
 }
 
 export const IS_DEV = process.env.NODE_ENV === 'development'

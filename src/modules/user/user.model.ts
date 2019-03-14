@@ -10,7 +10,7 @@ import {
   ConnectionConstructor,
 } from '@/modules/connection/connection.model'
 import { stripe } from '@/lib/stripe'
-import { User as GraphqlUser } from '@/graphql/types'
+import { AccessLevel, User as GraphqlUser } from '@/graphql/types'
 import { Omit } from '@/utils'
 
 const table = () => knex('user')
@@ -18,12 +18,14 @@ const table = () => knex('user')
 interface Constructor extends TableOptions {
   uuid: string
   email: string
+  accessLevel?: AccessLevel
   discordId?: string
   stripeId?: string
 }
 
 interface UserData {
   email: string
+  access_level?: AccessLevel
   discord_id?: string
   stripe_id?: string
 }
@@ -31,14 +33,16 @@ interface UserData {
 export class User extends DatabaseTable {
   public readonly discordId: string
   public readonly email: string
+  public readonly accessLevel: AccessLevel | null
   public stripeId: string | null
 
   constructor(params: Constructor) {
     super(params)
 
     this.discordId = params.discordId as string
-    this.stripeId = params.stripeId || null
     this.email = params.email
+    this.accessLevel = params.accessLevel || null
+    this.stripeId = params.stripeId || null
   }
 
   public static fromSql = (sql: UserData & TableData) =>
@@ -46,6 +50,7 @@ export class User extends DatabaseTable {
       ...DatabaseTable._fromSql(sql),
       discordId: sql.discord_id,
       email: sql.email,
+      accessLevel: sql.access_level,
       stripeId: sql.stripe_id,
     })
 
@@ -83,6 +88,7 @@ export class User extends DatabaseTable {
     uuid: this.uuid,
     discordId: this.discordId,
     email: this.email,
+    accessLevel: this.accessLevel,
     stripeId: this.stripeId,
     createdAt: this.createdAt,
   })
@@ -134,6 +140,7 @@ export class User extends DatabaseTable {
     const data: UserData = {
       discord_id: this.discordId,
       email: this.email,
+      access_level: this.accessLevel || undefined,
       stripe_id: this.stripeId as any,
     }
 

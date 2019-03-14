@@ -16,12 +16,10 @@ export interface EditPlanOptions {
 
 export enum AccessLevel {
   ADMIN = 'ADMIN',
-  MODERATOR = 'MODERATOR',
 }
 
 export enum AuthLevel {
   ADMIN = 'ADMIN',
-  MODERATOR = 'MODERATOR',
   PLAN_OWNER = 'PLAN_OWNER',
   PLAN_MEMBER = 'PLAN_MEMBER',
   LOGGED_IN = 'LOGGED_IN',
