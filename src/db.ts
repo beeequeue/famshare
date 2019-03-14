@@ -1,7 +1,7 @@
 import Knex, { CreateTableBuilder, QueryBuilder } from 'knex'
 import uuid from 'uuid/v4'
 
-import { PlanType } from '@/graphql/types'
+import { AccessLevel } from '@/graphql/types'
 import { enumToArray } from '@/utils'
 
 export const knex = Knex({
@@ -124,6 +124,8 @@ const initialize = async () => {
         .notNullable()
         .unique()
 
+      table.enum('access_level', enumToArray(AccessLevel))
+
       table.string('stripe_id')
     }),
 
@@ -140,11 +142,9 @@ const initialize = async () => {
     createTableIfDoesNotExist(Table.PLAN, table => {
       table.string('name').notNullable()
 
-      table.enum('type', enumToArray(PlanType)).notNullable()
-
       table.integer('amount').notNullable()
 
-      table.integer('payment_due_day').notNullable()
+      table.integer('payment_day').notNullable()
 
       table
         .uuid('owner_uuid')

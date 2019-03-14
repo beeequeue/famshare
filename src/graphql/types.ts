@@ -3,11 +3,9 @@ export type Maybe<T> = T | null
 export interface CreatePlanOptions {
   name: string
 
-  type: PlanType
-
   amount: number
-  /** 0-indexed day in month payments are done. */
-  paymentDueDay: number
+  /** 1-indexed day in month payments are done. */
+  paymentDay: number
 }
 
 export interface EditPlanOptions {
@@ -19,10 +17,6 @@ export interface EditPlanOptions {
 export enum AccessLevel {
   ADMIN = 'ADMIN',
   MODERATOR = 'MODERATOR',
-}
-
-export enum PlanType {
-  GOOGLE = 'GOOGLE',
 }
 
 export enum AuthLevel {
@@ -53,13 +47,12 @@ export interface Query {
 }
 
 export interface User {
-  /** The User's UUID. */
   uuid: string
-  /** The User's Email. */
+
   email: string
-  /** The User's Access Level. */
+
   accessLevel?: Maybe<AccessLevel>
-  /** The User's Discord ID. */
+
   discordId: string
   /** The User's Stripe ID if they've set up payments. */
   stripeId?: Maybe<string>
@@ -72,11 +65,11 @@ export interface Plan {
 
   name: string
 
-  type: PlanType
-
   amount: number
 
-  paymentDue: Date
+  paymentDay: number
+
+  nextPaymentDate: Date
 
   owner: User
 
@@ -89,7 +82,7 @@ export interface Mutation {
 
   createPlan: Plan
 
-  editPlan: Plan
+  editPlan?: Maybe<Plan>
 }
 
 // ====================================================
@@ -109,5 +102,5 @@ export interface CreatePlanMutationArgs {
   options: CreatePlanOptions
 }
 export interface EditPlanMutationArgs {
-  options?: Maybe<EditPlanOptions>
+  options: EditPlanOptions
 }

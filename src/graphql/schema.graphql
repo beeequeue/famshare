@@ -21,32 +21,20 @@ type Mutation {
 
   createPlan(options: CreatePlanOptions!): Plan!
 
-  editPlan(options: EditPlanOptions): Plan! @auth(level: PLAN_OWNER)
+  editPlan(options: EditPlanOptions!): Plan @auth(level: PLAN_OWNER)
 }
 
 # User
 
 enum AccessLevel {
-  ADMIN,
+  ADMIN
   MODERATOR
 }
 
 type User {
-  """
-  The User's UUID.
-  """
   uuid: ID!
-  """
-  The User's Email.
-  """
   email: String!
-  """
-  The User's Access Level.
-  """
   accessLevel: AccessLevel
-  """
-  The User's Discord ID.
-  """
   discordId: String!
   """
   The User's Stripe ID if they've set up payments.
@@ -60,28 +48,23 @@ type User {
 
 # Plan
 
-enum PlanType {
-  GOOGLE
-}
-
 type Plan {
   uuid: ID!
   name: String!
-  type: PlanType!
   amount: Int!
-  paymentDue: Date!
+  paymentDay: Int!
+  nextPaymentDate: Date!
   owner: User!
   createdAt: Date!
 }
 
 input CreatePlanOptions {
   name: String!
-  type: PlanType!
   amount: Int!
   """
-  0-indexed day in month payments are done.
+  1-indexed day in month payments are done.
   """
-  paymentDueDay: Int!
+  paymentDay: Int!
 }
 
 input EditPlanOptions {
@@ -97,10 +80,10 @@ scalar Date
 # Authorization
 
 enum AuthLevel {
-  ADMIN,
-  MODERATOR,
-  PLAN_OWNER,
-  PLAN_MEMBER,
+  ADMIN
+  MODERATOR
+  PLAN_OWNER
+  PLAN_MEMBER
   LOGGED_IN
 }
 
