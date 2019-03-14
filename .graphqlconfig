@@ -1,0 +1,12 @@
+{
+  "name": "Local",
+  "schemaPath": "src/graphql/schema.graphql",
+  "extensions": {
+    "endpoints": {
+      "Default GraphQL Endpoint": {
+        "url": "https://famshare.eu.ngrok.io/graphql",
+        "introspect": false
+      }
+    }
+  }
+}

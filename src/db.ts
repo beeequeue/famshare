@@ -34,8 +34,8 @@ export interface TableData {
 }
 
 export class DatabaseTable {
-  protected readonly name: string
-  private readonly table: () => QueryBuilder
+  private readonly __name: string
+  private readonly __table: () => QueryBuilder
 
   public readonly uuid: string
   public readonly createdAt: Date
@@ -44,8 +44,8 @@ export class DatabaseTable {
   constructor(options: TableOptions) {
     const now = new Date()
 
-    this.name = this.constructor.name.toLowerCase()
-    this.table = () => knex(this.name)
+    this.__name = this.constructor.name.toLowerCase()
+    this.__table = () => knex(this.__name)
     this.uuid = options.uuid || uuid()
     this.createdAt = options.createdAt || now
     this.updatedAt = options.updatedAt || now
@@ -58,7 +58,7 @@ export class DatabaseTable {
   })
 
   public exists = async () => {
-    const result = await this.table()
+    const result = await this.__table()
       .count()
       .where({ uuid: this.uuid })
       .first()
@@ -75,14 +75,14 @@ export class DatabaseTable {
     }
 
     if (await this.exists()) {
-      await this.table()
+      await this.__table()
         .update(data)
         .where({ uuid: this.uuid })
 
       return
     }
 
-    await this.table().insert(data)
+    await this.__table().insert(data)
   }
 }
 
