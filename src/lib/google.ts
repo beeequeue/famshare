@@ -5,7 +5,6 @@ const { GOOGLE_CLIENT, GOOGLE_SECRET } = process.env as {
   [key: string]: string
 }
 const SCOPE = 'email profile'
-export const GOOGLE_REDIRECT_URI = 'https://famshare.ngrok.io/google/callback'
 
 const T = () => true
 const isError = (response: superagent.Response) =>
@@ -25,23 +24,29 @@ interface GoogleUser {
 }
 
 export class Google {
-  public static connectUrl =
+  private static getCallbackUrl = (hostname: string) =>
+    `https://${hostname}/google/callback`
+
+  public static getConnectUrl = (hostname: string) =>
     'https://accounts.google.com/o/oauth2/v2/auth' +
     `?client_id=${encodeURIComponent(GOOGLE_CLIENT as string)}` +
-    `&redirect_uri=${encodeURIComponent(GOOGLE_REDIRECT_URI)}` +
+    `&redirect_uri=${encodeURIComponent(Google.getCallbackUrl(hostname))}` +
     '&access_type=online' +
     '&include_granted_scopes=true' +
     `&scope=${encodeURIComponent(SCOPE)}` +
     '&response_type=code'
 
-  public static getAccessToken = async (code: string): Promise<string> => {
+  public static getAccessToken = async (
+    code: string,
+    hostname: string,
+  ): Promise<string> => {
     const response = await superagent
       .post('https://www.googleapis.com/oauth2/v4/token')
       .query({
         code,
         client_id: GOOGLE_CLIENT,
         client_secret: GOOGLE_SECRET,
-        redirect_uri: GOOGLE_REDIRECT_URI,
+        redirect_uri: Google.getCallbackUrl(hostname),
         grant_type: 'authorization_code',
       })
       .ok(T)

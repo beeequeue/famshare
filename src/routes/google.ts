@@ -12,7 +12,7 @@ router.get('/connect', (req, res) => {
     throw unauthorized('You need to be logged in to connect a Google account.')
   }
 
-  res.redirect(Google.connectUrl)
+  res.redirect(Google.getConnectUrl(req.hostname))
 })
 
 interface CallbackQuery {
@@ -30,7 +30,7 @@ router.get('/callback', async (req, res) => {
     throw badRequest('Did not get a code back from Discord...')
   }
 
-  const token = await Google.getAccessToken(code)
+  const token = await Google.getAccessToken(code, req.hostname)
 
   const googleUser = await Google.getUserFromToken(token)
 
