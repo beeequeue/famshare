@@ -10,8 +10,27 @@ export interface CreatePlanOptions {
   paymentDueDay: number
 }
 
+export interface EditPlanOptions {
+  uuid: string
+
+  name?: Maybe<string>
+}
+
+export enum AccessLevel {
+  ADMIN = 'ADMIN',
+  MODERATOR = 'MODERATOR',
+}
+
 export enum PlanType {
   GOOGLE = 'GOOGLE',
+}
+
+export enum AuthLevel {
+  ADMIN = 'ADMIN',
+  MODERATOR = 'MODERATOR',
+  PLAN_OWNER = 'PLAN_OWNER',
+  PLAN_MEMBER = 'PLAN_MEMBER',
+  LOGGED_IN = 'LOGGED_IN',
 }
 
 /** A ISO-8601 formatted date. */
@@ -29,6 +48,8 @@ export interface Query {
   user?: Maybe<User>
   /** The logged in User, if authenticated. */
   viewer?: Maybe<User>
+  /** Returns a Plan if it exists. */
+  plan?: Maybe<Plan>
 }
 
 export interface User {
@@ -36,6 +57,8 @@ export interface User {
   uuid: string
   /** The User's Email. */
   email: string
+  /** The User's Access Level. */
+  accessLevel?: Maybe<AccessLevel>
   /** The User's Discord ID. */
   discordId: string
   /** The User's Stripe ID if they've set up payments. */
@@ -44,14 +67,9 @@ export interface User {
   createdAt: Date
 }
 
-export interface Mutation {
-  /** Connect Viewer to a Stripe Token. */
-  connectStripe: User
-
-  createPlan: Plan
-}
-
 export interface Plan {
+  uuid: string
+
   name: string
 
   type: PlanType
@@ -65,6 +83,15 @@ export interface Plan {
   createdAt: Date
 }
 
+export interface Mutation {
+  /** Connect Viewer to a Stripe Token. */
+  connectStripe: User
+
+  createPlan: Plan
+
+  editPlan: Plan
+}
+
 // ====================================================
 // Arguments
 // ====================================================
@@ -72,9 +99,15 @@ export interface Plan {
 export interface UserQueryArgs {
   uuid: string
 }
+export interface PlanQueryArgs {
+  uuid: string
+}
 export interface ConnectStripeMutationArgs {
   token: string
 }
 export interface CreatePlanMutationArgs {
   options: CreatePlanOptions
+}
+export interface EditPlanMutationArgs {
+  options?: Maybe<EditPlanOptions>
 }

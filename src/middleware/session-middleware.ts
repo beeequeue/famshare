@@ -1,4 +1,4 @@
-import { RequestHandler, Response } from 'express'
+import { Request as IRequest, RequestHandler, Response } from 'express'
 import { Base64 } from 'js-base64'
 
 import { getUserById } from '@/lib/discord'
@@ -16,6 +16,18 @@ declare module 'express-serve-static-core' {
     session?: ISession
 
     authenticate: (userUuid: string) => void
+  }
+}
+
+declare module 'express' {
+  interface GraphqlRequest extends IRequest {
+    body: {
+      operationName?: string
+      query: string
+      variables: {
+        [key: string]: any | undefined
+      }
+    }
   }
 }
 

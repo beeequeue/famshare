@@ -1,5 +1,8 @@
+import { setDate } from 'date-fns'
+
 import { DatabaseTable, knex, TableData, TableOptions } from '@/db'
-import { PlanType } from '@/graphql/types'
+import { Plan as GraphqlPlan, PlanType } from '@/graphql/types'
+import { User } from '@/modules/user/user.model'
 
 const table = () => knex('plan')
 
@@ -55,6 +58,28 @@ export class Plan extends DatabaseTable {
 
     return Plan.fromSql(plan)
   }
+
+  public static getByUuid = async (uuid: string) => {
+    const plan = await table()
+      .where({ uuid })
+      .first()
+
+    if (!plan) throw new Error(`Could not find Plan:${uuid}`)
+
+    return Plan.fromSql(plan)
+  }
+
+  public getOwner = async () => User.getByUuid(this.ownerUuid)
+
+  public toGraphQL = async (): Promise<GraphqlPlan> => ({
+    uuid: this.uuid,
+    name: this.name,
+    type: this.type,
+    amount: this.amount,
+    paymentDue: setDate(new Date(), this.paymentDueDay),
+    owner: await this.getOwner(),
+    createdAt: this.createdAt,
+  })
 
   public save = async () => {
     const data: PlanData = {

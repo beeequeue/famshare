@@ -7,6 +7,10 @@ type Query {
   The logged in User, if authenticated.
   """
   viewer: User
+  """
+  Returns a Plan if it exists.
+  """
+  plan(uuid: ID!): Plan
 }
 
 type Mutation {
@@ -16,9 +20,16 @@ type Mutation {
   connectStripe(token: String!): User!
 
   createPlan(options: CreatePlanOptions!): Plan!
+
+  editPlan(options: EditPlanOptions): Plan! @auth(level: PLAN_OWNER)
 }
 
 # User
+
+enum AccessLevel {
+  ADMIN,
+  MODERATOR
+}
 
 type User {
   """
@@ -29,6 +40,10 @@ type User {
   The User's Email.
   """
   email: String!
+  """
+  The User's Access Level.
+  """
+  accessLevel: AccessLevel
   """
   The User's Discord ID.
   """
@@ -50,6 +65,7 @@ enum PlanType {
 }
 
 type Plan {
+  uuid: ID!
   name: String!
   type: PlanType!
   amount: Int!
@@ -68,7 +84,27 @@ input CreatePlanOptions {
   paymentDueDay: Int!
 }
 
+input EditPlanOptions {
+  uuid: ID!
+  name: String
+}
+
 """
 A ISO-8601 formatted date.
 """
 scalar Date
+
+# Authorization
+
+enum AuthLevel {
+  ADMIN,
+  MODERATOR,
+  PLAN_OWNER,
+  PLAN_MEMBER,
+  LOGGED_IN
+}
+
+"""
+Set a required authorization level to access Field or Mutation.
+"""
+directive @auth(level: AuthLevel!) on FIELD_DEFINITION
