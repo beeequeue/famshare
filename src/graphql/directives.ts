@@ -7,20 +7,7 @@ import { AccessLevel, AuthLevel } from '@/graphql/types'
 import { IS_NOT_PLAN_OWNER, NOT_LOGGED_IN } from '@/errors'
 import { isNil } from '@/utils'
 
-const LoggedInDirective: DirectiveResolverFn<any, GraphqlRequest> = async (
-  _next,
-  _source,
-  _args,
-  context,
-) => {
-  const isLoggedIn = !isNil(context.session)
-
-  if (!isLoggedIn) {
-    throw forbidden(NOT_LOGGED_IN)
-  }
-}
-
-const AuthDirective: DirectiveResolverFn<any, GraphqlRequest> = async (
+const RestrictDirective: DirectiveResolverFn<any, GraphqlRequest> = async (
   next,
   _source,
   args,
@@ -48,7 +35,20 @@ const AuthDirective: DirectiveResolverFn<any, GraphqlRequest> = async (
   }
 }
 
+const IsAuthedDirective: DirectiveResolverFn<any, GraphqlRequest> = async (
+  _next,
+  _source,
+  _args,
+  context,
+) => {
+  const isLoggedIn = !isNil(context.session)
+
+  if (!isLoggedIn) {
+    throw forbidden(NOT_LOGGED_IN)
+  }
+}
+
 export const directives: IDirectiveResolvers<any, GraphqlRequest> = {
-  auth: AuthDirective,
-  loggedIn: LoggedInDirective,
+  restrict: RestrictDirective,
+  isAuthed: IsAuthedDirective,
 }

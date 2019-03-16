@@ -22,7 +22,6 @@ export enum AuthLevel {
   ADMIN = 'ADMIN',
   PLAN_OWNER = 'PLAN_OWNER',
   PLAN_MEMBER = 'PLAN_MEMBER',
-  LOGGED_IN = 'LOGGED_IN',
 }
 
 /** A ISO-8601 formatted date. */
@@ -64,9 +63,9 @@ export interface Plan {
   name: string
 
   amount: number
-
+  /** 1-indexed day in month payments are done. */
   paymentDay: number
-
+  /** The date the next payment will be attempted. */
   nextPaymentDate: Date
 
   owner: User
