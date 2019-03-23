@@ -1,9 +1,12 @@
 import { Request as IRequest, RequestHandler, Response } from 'express'
+import { unauthorized } from 'boom'
 import { Base64 } from 'js-base64'
 
 import { getUserById } from '@/lib/discord'
 import { Session } from '@/modules/session/session.model'
 import { User } from '@/modules/user/user.model'
+import { isNil } from '@/utils'
+import { NOT_LOGGED_IN } from '@/errors'
 
 declare module 'express-serve-static-core' {
   interface ISession {
@@ -70,4 +73,11 @@ export const SessionMiddleware = (): RequestHandler => async (
   }
 
   next()
+}
+
+export const assertLoggedIn = (): RequestHandler => (req, res, next) => {
+  if (!isNil(req.session)) return next()
+
+  res.status(401)
+  res.send(unauthorized(NOT_LOGGED_IN).output.payload)
 }

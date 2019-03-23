@@ -4,7 +4,10 @@ import CookieParser from 'cookie-parser'
 import { transports } from 'winston'
 import { logger as Logger } from 'express-winston'
 
-import { SessionMiddleware } from '@/middleware/session-middleware'
+import {
+  assertLoggedIn,
+  SessionMiddleware,
+} from '@/middleware/session-middleware'
 import { ErrorHandler } from '@/middleware/error-handler'
 import { router } from '@/routes'
 import { GraphQLMiddleware } from '@/graphql'
@@ -29,9 +32,9 @@ const start = async () => {
 
   app.use(router)
 
-  app.post('/graphql', GraphQLMiddleware())
+  app.post('/graphql', assertLoggedIn(), GraphQLMiddleware())
 
-  app.get('/graphql', GraphQLMiddleware(true))
+  app.get('/graphql', assertLoggedIn(), GraphQLMiddleware(true))
 
   app.use(ErrorHandler())
 

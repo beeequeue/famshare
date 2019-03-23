@@ -6,7 +6,7 @@ type Query {
   """
   The logged in User, if authenticated.
   """
-  viewer: User @isAuthed
+  viewer: User!
   """
   Returns a Plan if it exists.
   """
@@ -17,9 +17,9 @@ type Mutation {
   """
   Connect Viewer to a Stripe Token.
   """
-  connectStripe(token: String!): User! @isAuthed
+  connectStripe(token: String!): User!
 
-  createPlan(options: CreatePlanOptions!): Plan! @isAuthed
+  createPlan(options: CreatePlanOptions!): Plan!
 
   editPlan(options: EditPlanOptions!): Plan @restrict(level: PLAN_OWNER)
 }
@@ -92,10 +92,6 @@ enum AuthLevel {
 
 """
 Asserts that client is logged in.
-"""
-directive @isAuthed on FIELD_DEFINITION
-"""
-Asserts that client is logged in.
 Sets a required AccessLevel to access Field.
 """
-directive @restrict(level: AuthLevel!) on FIELD_DEFINITION
+directive @restrict(level: AuthLevel!) on OBJECT | FIELD_DEFINITION

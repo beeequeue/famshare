@@ -1,3 +1,5 @@
+export const UNAUTHORIZED = 'You are not authorized to access this resource.'
+
 export const NOT_LOGGED_IN = 'You need to be logged in to access this resource.'
 
 export const IS_NOT_PLAN_OWNER =

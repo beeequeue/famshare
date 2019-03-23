@@ -38,7 +38,7 @@ export interface Query {
   /** Returns a User if it exists. */
   user?: Maybe<User>
   /** The logged in User, if authenticated. */
-  viewer?: Maybe<User>
+  viewer: User
   /** Returns a Plan if it exists. */
   plan?: Maybe<Plan>
 }
