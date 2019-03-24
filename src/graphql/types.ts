@@ -20,8 +20,6 @@ export enum AccessLevel {
 
 export enum AuthLevel {
   ADMIN = 'ADMIN',
-  PLAN_OWNER = 'PLAN_OWNER',
-  PLAN_MEMBER = 'PLAN_MEMBER',
 }
 
 /** A ISO-8601 formatted date. */
@@ -38,7 +36,7 @@ export interface Query {
   /** Returns a User if it exists. */
   user?: Maybe<User>
   /** The logged in User, if authenticated. */
-  viewer: User
+  viewer?: Maybe<User>
   /** Returns a Plan if it exists. */
   plan?: Maybe<Plan>
 }
@@ -79,7 +77,7 @@ export interface Mutation {
 
   createPlan: Plan
 
-  editPlan?: Maybe<Plan>
+  editPlan: Plan
 }
 
 // ====================================================

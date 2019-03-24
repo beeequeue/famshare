@@ -13,7 +13,7 @@ const SCHEMA = readFileSync(resolve(__dirname, 'schema.graphql')).toString()
 const schema = makeExecutableSchema({
   typeDefs: SCHEMA,
   resolvers: resolverFunctions,
-  directiveResolvers: directives,
+  schemaDirectives: directives,
 })
 
 export const GraphQLMiddleware = (graphiql = false) =>

@@ -1,54 +1,90 @@
-import { GraphqlRequest } from 'express'
-import { forbidden, unauthorized } from 'boom'
-import { DirectiveResolverFn, IDirectiveResolvers } from 'graphql-tools'
+import { Request } from 'express'
+import { defaultFieldResolver, GraphQLField, GraphQLObjectType } from 'graphql'
+import { SchemaDirectiveVisitor } from 'graphql-tools'
 
 import { Plan } from '@/modules/plan/plan.model'
 import { AccessLevel, AuthLevel } from '@/graphql/types'
-import { IS_NOT_PLAN_OWNER, NOT_LOGGED_IN } from '@/errors'
 import { isNil } from '@/utils'
 
-const RestrictDirective: DirectiveResolverFn<any, GraphqlRequest> = async (
-  next,
-  _source,
-  args,
-  context,
-) => {
-  const { level: requiredLevel } = args as { level: AuthLevel }
+declare module 'graphql' {
+  class GraphQLObjectType {
+    _authFieldsWrapped?: boolean
+    _requiredAuthLevel?: AuthLevel
+  }
+  interface GraphQLField<TSource, TContext, TArgs = { [key: string]: any }> {
+    _requiredAuthLevel?: AuthLevel
+  }
+}
 
-  if (isNil(context.session)) {
-    throw forbidden(NOT_LOGGED_IN)
+type GqlObject = GraphQLObjectType<null, Request>
+type GqlField = GraphQLField<any, Request>
+
+export class AuthDirective extends SchemaDirectiveVisitor {
+  visitObject(type: GqlObject) {
+    type._requiredAuthLevel = this.args.level
+
+    this.ensureIsNullable(type)
+    this.ensureFieldsWrapped(type)
   }
 
-  const { user } = context.session
+  visitFieldDefinition(field: GqlField, details: { objectType: GqlObject }) {
+    field._requiredAuthLevel = this.args.level
 
-  if (user.accessLevel === AccessLevel.ADMIN) {
-    return next()
+    this.ensureIsNullable(field)
+    this.ensureFieldsWrapped(details.objectType)
   }
 
-  if (requiredLevel === AuthLevel.PLAN_OWNER) {
-    const { uuid } = context.body.variables.options
-    const { ownerUuid } = await Plan.getByUuid(uuid)
+  ensureIsNullable = (type: GqlField | GqlObject) => {
+    const notNullableMessage = `It seems that the field ${
+      type.name
+    } is restricted, but is not nullable.`
 
-    if (context.session.user.uuid !== ownerUuid) {
-      throw unauthorized(IS_NOT_PLAN_OWNER)
+    if (isNil(type.astNode)) {
+      console.warn(notNullableMessage)
+      return false
+    }
+
+    if (type.astNode.kind === 'ObjectTypeDefinition') {
+      // TODO
+    } else if (type.astNode.type.kind === 'NonNullType') {
+      console.warn(notNullableMessage)
+      return false
     }
   }
-}
 
-const IsAuthedDirective: DirectiveResolverFn<any, GraphqlRequest> = async (
-  _next,
-  _source,
-  _args,
-  context,
-) => {
-  const isLoggedIn = !isNil(context.session)
+  ensureFieldsWrapped = (objectType: GqlObject) => {
+    if (objectType._authFieldsWrapped) return
+    objectType._authFieldsWrapped = true
 
-  if (!isLoggedIn) {
-    throw forbidden(NOT_LOGGED_IN)
+    const fields = objectType.getFields()
+
+    Object.keys(fields).forEach(fieldName => {
+      const field = fields[fieldName]
+      const { resolve = defaultFieldResolver } = field
+
+      field.resolve = async (...args) => {
+        const requiredLevel =
+          field._requiredAuthLevel || objectType._requiredAuthLevel
+
+        if (!requiredLevel) {
+          return resolve.apply(this, args)
+        }
+
+        const context = args[2]
+        if (isNil(context.session)) {
+          return null
+        }
+
+        const { user } = context.session
+
+        if (user.accessLevel !== AccessLevel.ADMIN) {
+          return null
+        }
+      }
+    })
   }
 }
 
-export const directives: IDirectiveResolvers<any, GraphqlRequest> = {
-  restrict: RestrictDirective,
-  isAuthed: IsAuthedDirective,
+export const directives = {
+  restrict: AuthDirective,
 }

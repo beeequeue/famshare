@@ -6,7 +6,7 @@ type Query {
   """
   The logged in User, if authenticated.
   """
-  viewer: User!
+  viewer: User
   """
   Returns a Plan if it exists.
   """
@@ -21,7 +21,7 @@ type Mutation {
 
   createPlan(options: CreatePlanOptions!): Plan!
 
-  editPlan(options: EditPlanOptions!): Plan @restrict(level: PLAN_OWNER)
+  editPlan(options: EditPlanOptions!): Plan!
 }
 
 # User
@@ -86,8 +86,6 @@ scalar Date
 
 enum AuthLevel {
   ADMIN
-  PLAN_OWNER
-  PLAN_MEMBER
 }
 
 """
