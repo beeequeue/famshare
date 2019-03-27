@@ -51,6 +51,9 @@ const compileProject = async (): CompileReturn => {
   log.await(`Compiling project using TypeScript ${TypeScript.version}...`)
 
   const { stdout, stderr } = await tools.runInWorkspace('yarn', ['build'], {
+    env: {
+      NODE_ENV: 'production',
+    },
     reject: false,
   })
 
