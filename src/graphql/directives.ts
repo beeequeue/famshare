@@ -2,12 +2,11 @@ import { Request } from 'express'
 import { defaultFieldResolver, GraphQLField, GraphQLObjectType } from 'graphql'
 import { SchemaDirectiveVisitor } from 'graphql-tools'
 
-import { Plan } from '@/modules/plan/plan.model'
 import { AccessLevel, AuthLevel } from '@/graphql/types'
 import { isNil } from '@/utils'
 
 declare module 'graphql' {
-  class GraphQLObjectType {
+  interface GraphQLObjectType {
     _authFieldsWrapped?: boolean
     _requiredAuthLevel?: AuthLevel
   }

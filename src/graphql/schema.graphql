@@ -49,7 +49,9 @@ type User {
 
 type Plan {
   uuid: ID!
+
   name: String!
+
   amount: Int!
   """
   1-indexed day in month payments are done.
@@ -59,12 +61,15 @@ type Plan {
   The date the next payment will be attempted.
   """
   nextPaymentDate: Date!
+
   owner: User!
+
   createdAt: Date!
 }
 
 input CreatePlanOptions {
   name: String!
+
   amount: Int!
   """
   1-indexed day in month payments are done.
@@ -74,6 +79,7 @@ input CreatePlanOptions {
 
 input EditPlanOptions {
   uuid: ID!
+
   name: String
 }
 
