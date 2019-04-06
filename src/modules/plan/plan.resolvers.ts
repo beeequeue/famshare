@@ -1,3 +1,5 @@
+import { notFound } from 'boom'
+
 import { Plan } from '@/modules/plan/plan.model'
 import {
   CreatePlanMutationArgs,
@@ -11,7 +13,7 @@ export const plan: Resolver<IPlan | null, PlanQueryArgs> = async args => {
   const plan = await Plan.findByUuid(args.uuid)
 
   if (isNil(plan)) {
-    return null
+    throw notFound()
   }
 
   return await plan.toGraphQL()
@@ -37,7 +39,7 @@ export const editPlan: Resolver<IPlan | null, EditPlanMutationArgs> = async ({
   const plan = await Plan.findByUuid(options.uuid)
 
   if (isNil(plan)) {
-    return null
+    throw notFound()
   }
 
   plan.name = options.name || plan.name

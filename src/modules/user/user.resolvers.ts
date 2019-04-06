@@ -1,3 +1,4 @@
+import { notFound, unauthorized } from 'boom'
 import { User } from '@/modules/user/user.model'
 import {
   ConnectStripeMutationArgs,
@@ -10,7 +11,7 @@ export const user: Resolver<IUser | null, UserQueryArgs> = async args => {
   const user = await User.findByUuid(args.uuid)
 
   if (isNil(user)) {
-    return null
+    throw notFound()
   }
 
   return user.toGraphQL()
@@ -20,7 +21,7 @@ export const viewer: Resolver<IUser | null> = async (_, request) => {
   const { session } = request
 
   if (isNil(session)) {
-    return null
+    throw unauthorized()
   }
 
   return session.user.toGraphQL()
