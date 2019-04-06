@@ -3,6 +3,17 @@ declare module '*/schema.graphql' {
   export = content
 }
 
+declare module '*/knexfile' {
+  import { Config } from 'knex'
+
+  const config: {
+    development: Config
+    production: Config
+  }
+
+  export = config
+}
+
 // For @types/superagent
 type Blob = any
 type XMLHttpRequest = any

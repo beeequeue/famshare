@@ -1,14 +1,12 @@
 import Knex, { CreateTableBuilder, QueryBuilder } from 'knex'
 import uuid from 'uuid/v4'
 
+import config from '@/../knexfile'
 import { AccessLevel } from '@/graphql/types'
 import { enumToArray } from '@/utils'
 
-export const knex = Knex({
-  client: 'pg',
-  connection: process.env.DB_URL as string,
-  searchPath: ['famshare', 'public'],
-})
+const { NODE_ENV } = process.env
+export const knex = Knex(config[NODE_ENV as 'development' | 'production'])
 
 export enum ConnectionEnum {
   GOOGLE = 'google',
