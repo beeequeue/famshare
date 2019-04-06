@@ -18,6 +18,10 @@ export enum AccessLevel {
   ADMIN = 'ADMIN',
 }
 
+export enum ConnectionType {
+  GOOGLE = 'GOOGLE',
+}
+
 export enum AuthLevel {
   ADMIN = 'ADMIN',
 }
@@ -53,6 +57,24 @@ export interface User {
   stripeId?: Maybe<string>
   /** The User's registration date and time. */
   createdAt: Date
+
+  connections: Connection[]
+}
+
+export interface Connection {
+  uuid: string
+
+  type: ConnectionType
+
+  ownerUuid: string
+
+  userId: string
+
+  identifier: string
+
+  picture?: Maybe<string>
+
+  link?: Maybe<string>
 }
 
 export interface Plan {
@@ -78,6 +100,8 @@ export interface Mutation {
   createPlan: Plan
 
   editPlan: Plan
+
+  deleteConnection: User
 }
 
 // ====================================================
@@ -98,4 +122,7 @@ export interface CreatePlanMutationArgs {
 }
 export interface EditPlanMutationArgs {
   options: EditPlanOptions
+}
+export interface DeleteConnectionMutationArgs {
+  uuid: string
 }

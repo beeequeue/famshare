@@ -22,6 +22,10 @@ type Mutation {
   createPlan(options: CreatePlanOptions!): Plan!
 
   editPlan(options: EditPlanOptions!): Plan!
+
+  # Connection
+
+  deleteConnection(uuid: ID!): User!
 }
 
 # User
@@ -43,6 +47,8 @@ type User {
   The User's registration date and time.
   """
   createdAt: Date!
+
+  connections: [Connection!]!
 }
 
 # Plan
@@ -81,6 +87,28 @@ input EditPlanOptions {
   uuid: ID!
 
   name: String
+}
+
+# Connection
+
+enum ConnectionType {
+  GOOGLE,
+}
+
+type Connection {
+  uuid: ID!
+
+  type: ConnectionType!
+
+  ownerUuid: ID!
+
+  userId: ID!
+
+  identifier: String!
+
+  picture: String
+
+  link: String
 }
 
 """

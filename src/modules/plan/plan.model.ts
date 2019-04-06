@@ -73,13 +73,15 @@ export class Plan extends DatabaseTable {
       nextPaymentDate = addMonths(nextPaymentDate, 1)
     }
 
+    const user = await this.getOwner()
+
     return {
       uuid: this.uuid,
       name: this.name,
       amount: this.amount,
       paymentDay: this.paymentDay,
       nextPaymentDate,
-      owner: await this.getOwner(),
+      owner: await user.toGraphQL(),
       createdAt: this.createdAt,
     }
   }

@@ -2,15 +2,11 @@ import Knex, { CreateTableBuilder, QueryBuilder } from 'knex'
 import uuid from 'uuid/v4'
 
 import config from '@/../knexfile'
-import { AccessLevel } from '@/graphql/types'
+import { AccessLevel, ConnectionType } from '@/graphql/types'
 import { enumToArray } from '@/utils'
 
 const { NODE_ENV } = process.env
 export const knex = Knex(config[NODE_ENV as 'development' | 'production'])
-
-export enum ConnectionEnum {
-  GOOGLE = 'google',
-}
 
 enum Table {
   USER = 'user',
@@ -62,6 +58,18 @@ export class DatabaseTable {
       .first()
 
     return Number(result.count) === 1
+  }
+
+  public delete = async () => {
+    if (!(await this.exists())) {
+      throw new Error(
+        `Tried to delete non-existant ${this.__name}-${this.uuid}`,
+      )
+    }
+
+    this.__table()
+      .delete()
+      .where({ uuid: this.uuid })
   }
 
   protected _save = async (extraData: any) => {
@@ -152,7 +160,7 @@ const initialize = async () => {
     }),
 
     createTableIfDoesNotExist(Table.CONNECTION, table => {
-      table.enum('type', enumToArray(ConnectionEnum)).notNullable()
+      table.enum('type', enumToArray(ConnectionType)).notNullable()
 
       table
         .uuid('owner_uuid')
@@ -162,7 +170,7 @@ const initialize = async () => {
 
       table.string('user_id').notNullable()
 
-      table.string('identifier')
+      table.string('identifier').notNullable()
 
       table.string('picture')
 

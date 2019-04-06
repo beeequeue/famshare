@@ -1,21 +1,16 @@
-import {
-  ConnectionEnum,
-  DatabaseTable,
-  knex,
-  TableData,
-  TableOptions,
-} from '@/db'
-import { Omit } from '@/utils'
+import { DatabaseTable, knex, TableData, TableOptions } from '@/db'
+import { ConnectionType, Connection as IConnection } from '@/graphql/types'
+import { isNil } from '@/utils'
 
 const table = () => knex('connection')
 
 export interface ConnectionConstructor extends TableOptions {
-  type: ConnectionEnum
+  type: ConnectionType
   ownerUuid: string
   userId: string
   identifier: string
-  picture: string
-  link: string
+  picture?: string
+  link?: string
 }
 
 interface ConnectionData {
@@ -23,21 +18,17 @@ interface ConnectionData {
   owner_uuid: string
   user_id: string
   identifier: string
-  picture: string
-  link: string
-}
-
-type Connections = {
-  [key in ConnectionEnum]?: Omit<ConnectionConstructor, keyof TableOptions>
+  picture?: string
+  link?: string
 }
 
 export class Connection extends DatabaseTable {
-  public readonly type: ConnectionEnum
+  public readonly type: ConnectionType
   public readonly ownerUuid: string
   public readonly userId: string
   public readonly identifier: string
-  public readonly picture: string
-  public readonly link: string
+  public readonly picture?: string
+  public readonly link?: string
 
   constructor(options: ConnectionConstructor) {
     super(options)
@@ -50,10 +41,20 @@ export class Connection extends DatabaseTable {
     this.link = options.link
   }
 
+  public toGraphQL = (): IConnection => ({
+    uuid: this.uuid,
+    type: this.type,
+    ownerUuid: this.ownerUuid,
+    userId: this.userId,
+    identifier: this.identifier,
+    picture: this.picture,
+    link: this.link,
+  })
+
   public static fromSql = (sql: ConnectionData & TableData) =>
     new Connection({
       ...DatabaseTable._fromSql(sql),
-      type: sql.type as ConnectionEnum,
+      type: sql.type as ConnectionType,
       ownerUuid: sql.owner_uuid,
       userId: sql.user_id,
       identifier: sql.identifier,
@@ -61,26 +62,28 @@ export class Connection extends DatabaseTable {
       link: sql.link,
     })
 
-  public static getByUserUuid = async (
-    ownerUuid: string,
-    filter?: ConnectionEnum,
-  ): Promise<Connections> => {
-    const data: Connections = {}
-    const query: any = { owner_uuid: ownerUuid }
+  public static findByUuid = async (
+    uuid: string,
+  ): Promise<Connection | null> => {
+    const sql = await table()
+      .where({ uuid })
+      .first()
 
-    if (filter != null) {
-      query.type = filter
+    if (isNil(sql)) {
+      return null
     }
 
-    const connections: any[] = await table().where(query)
+    return Connection.fromSql(sql)
+  }
 
-    if (!connections) return data
+  public static getByUserUuid = async (
+    ownerUuid: string,
+  ): Promise<Connection[]> => {
+    const query: any = { owner_uuid: ownerUuid }
 
-    connections.map(Connection.fromSql).forEach(conn => {
-      data[conn.type] = conn
-    })
+    const sql: any[] = await table().where(query)
 
-    return data
+    return sql.map(Connection.fromSql)
   }
 
   public save = async () => {

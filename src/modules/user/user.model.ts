@@ -1,17 +1,10 @@
-import {
-  ConnectionEnum,
-  DatabaseTable,
-  knex,
-  TableData,
-  TableOptions,
-} from '@/db'
+import { DatabaseTable, knex, TableData, TableOptions } from '@/db'
 import {
   Connection,
   ConnectionConstructor,
 } from '@/modules/connection/connection.model'
 import { stripe } from '@/lib/stripe'
 import { AccessLevel, User as GraphqlUser } from '@/graphql/types'
-import { Omit } from '@/utils'
 
 const table = () => knex('user')
 
@@ -84,17 +77,23 @@ export class User extends DatabaseTable {
     return User.fromSql(user)
   }
 
-  public toGraphQL = (): GraphqlUser => ({
-    uuid: this.uuid,
-    discordId: this.discordId,
-    email: this.email,
-    accessLevel: this.accessLevel,
-    stripeId: this.stripeId,
-    createdAt: this.createdAt,
-  })
+  public toGraphQL = async (): Promise<GraphqlUser> => {
+    const connections = (await this.getConnections()).map(conn =>
+      conn.toGraphQL(),
+    )
 
-  public getConnections = async (type?: ConnectionEnum) =>
-    Connection.getByUserUuid(this.uuid, type)
+    return {
+      uuid: this.uuid,
+      discordId: this.discordId,
+      email: this.email,
+      accessLevel: this.accessLevel,
+      stripeId: this.stripeId,
+      createdAt: this.createdAt,
+      connections,
+    }
+  }
+
+  public getConnections = async () => Connection.getByUserUuid(this.uuid)
 
   public createStripeCustomer = async (stripeToken: string) => {
     const customer = await stripe.customers.create({

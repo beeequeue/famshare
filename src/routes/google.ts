@@ -2,7 +2,7 @@ import { badRequest, unauthorized } from 'boom'
 import { Router } from 'express'
 
 import { Google } from '@/lib/google'
-import { ConnectionEnum } from '@/db'
+import { ConnectionType } from '@/graphql/types'
 import { isNil } from '@/utils'
 
 export const router = Router()
@@ -43,7 +43,7 @@ router.get('/callback', async (req, res) => {
   const user = await req.session.user
 
   await user.connectWith({
-    type: ConnectionEnum.GOOGLE,
+    type: ConnectionType.GOOGLE,
     userId: googleUser.id,
     identifier: googleUser.name,
     picture: googleUser.picture,
