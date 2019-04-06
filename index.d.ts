@@ -14,6 +14,8 @@ declare module '*/knexfile' {
   export = config
 }
 
+type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
+
 // For @types/superagent
 type Blob = any
 type XMLHttpRequest = any
