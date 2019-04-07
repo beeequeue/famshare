@@ -1,5 +1,6 @@
 import { DatabaseTable, knex, TableData, TableOptions } from '@/db'
 import { ConnectionType, Connection as IConnection } from '@/graphql/types'
+import { User } from '@/modules/user/user.model'
 import { isNil } from '@/utils'
 
 const table = () => knex('connection')
@@ -41,16 +42,20 @@ export class Connection extends DatabaseTable {
     this.link = options.link
   }
 
-  public toGraphQL = (): IConnection => ({
-    uuid: this.uuid,
-    type: this.type,
-    ownerUuid: this.ownerUuid,
-    userId: this.userId,
-    identifier: this.identifier,
-    picture: this.picture,
-    link: this.link,
-    createdAt: this.createdAt,
-  })
+  public toGraphQL = async (): Promise<IConnection> => {
+    const owner = await User.getByUuid(this.ownerUuid)
+
+    return {
+      uuid: this.uuid,
+      type: this.type,
+      owner: await owner.toGraphQL(),
+      userId: this.userId,
+      identifier: this.identifier,
+      picture: this.picture,
+      link: this.link,
+      createdAt: this.createdAt,
+    }
+  }
 
   public static fromSql = (sql: ConnectionData & TableData) =>
     new Connection({

@@ -22,6 +22,14 @@ export enum ConnectionType {
   GOOGLE = 'GOOGLE',
 }
 
+export enum SubscriptionStatus {
+  INVITED = 'INVITED',
+  ACTIVE = 'ACTIVE',
+  LATE = 'LATE',
+  EXPIRED = 'EXPIRED',
+  EXEMPTED = 'EXEMPTED',
+}
+
 export enum AuthLevel {
   ADMIN = 'ADMIN',
 }
@@ -57,6 +65,8 @@ export interface User {
   stripeId?: Maybe<string>
 
   connections: Connection[]
+
+  subscriptions: Subscription[]
   /** The User's registration date and time. */
   createdAt: Date
 }
@@ -66,7 +76,7 @@ export interface Connection {
 
   type: ConnectionType
 
-  ownerUuid: string
+  owner: User
 
   userId: string
 
@@ -75,6 +85,18 @@ export interface Connection {
   picture?: Maybe<string>
 
   link?: Maybe<string>
+
+  createdAt: Date
+}
+
+export interface Subscription {
+  uuid: string
+
+  plan: Plan
+
+  user: User
+
+  status: SubscriptionStatus
 
   createdAt: Date
 }
@@ -102,18 +124,10 @@ export interface Mutation {
   createPlan: Plan
 
   editPlan: Plan
-
+  /** Remove connection to a service */
   deleteConnection: User
-}
-
-export interface Subscription {
-  uuid: string
-
-  planUuid: string
-
-  userUuid: string
-
-  createdAt: Date
+  /** Subscribes Viewer to a Plan */
+  subscribe: User
 }
 
 // ====================================================
@@ -137,4 +151,7 @@ export interface EditPlanMutationArgs {
 }
 export interface DeleteConnectionMutationArgs {
   type: ConnectionType
+}
+export interface SubscribeMutationArgs {
+  planUuid: string
 }

@@ -19,12 +19,16 @@ type Mutation {
   """
   connectStripe(token: String!): User!
 
+  # Plan
+
   createPlan(options: CreatePlanOptions!): Plan!
 
   editPlan(options: EditPlanOptions!): Plan!
 
   # Connection
-
+  """
+  Remove connection to a service
+  """
   deleteConnection(type: ConnectionType!): User!
 }
 
@@ -45,6 +49,8 @@ type User {
   stripeId: String
 
   connections: [Connection!]!
+
+  subscriptions: [Subscription!]!
 
   """
   The User's registration date and time.
@@ -101,7 +107,7 @@ type Connection {
 
   type: ConnectionType!
 
-  ownerUuid: ID!
+  owner: User!
 
   userId: ID!
 
@@ -116,12 +122,22 @@ type Connection {
 
 # Subscription
 
+enum SubscriptionStatus {
+  INVITED,
+  ACTIVE,
+  LATE,
+  EXPIRED,
+  EXEMPTED
+}
+
 type Subscription {
   uuid: ID!
 
-  planUuid: ID!
+  plan: Plan!
 
-  userUuid: ID!
+  user: User!
+
+  status: SubscriptionStatus!
 
   createdAt: Date!
 }

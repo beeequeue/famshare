@@ -1,25 +1,30 @@
 import { DatabaseTable, knex, TableData, TableOptions } from '@/db'
-import { Subscription as ISubscription } from '@/graphql/types'
-import { isNil, pick } from '@/utils'
+import { User } from '@/modules/user/user.model'
+import { Plan } from '@/modules/plan/plan.model'
+import {
+  Subscription as ISubscription,
+  SubscriptionStatus,
+} from '@/graphql/types'
+import { isNil } from '@/utils'
 
 const table = () => knex('subscription')
 
 export interface SubscriptionConstructor extends TableOptions {
   planUuid: string
   userUuid: string
-  status: string
+  status: SubscriptionStatus
 }
 
 interface SubscriptionData {
   plan_uuid: string
   user_uuid: string
-  status: string
+  status: SubscriptionStatus
 }
 
 export class Subscription extends DatabaseTable {
   public readonly planUuid: string
   public readonly userUuid: string
-  public readonly status: string
+  public readonly status: SubscriptionStatus
 
   constructor(options: SubscriptionConstructor) {
     super(options)
@@ -29,8 +34,20 @@ export class Subscription extends DatabaseTable {
     this.status = options.status
   }
 
-  public toGraphQL = (): ISubscription =>
-    pick(this, ['uuid', 'planUuid', 'userUuid', 'createdAt'])
+  public toGraphQL = async (): Promise<ISubscription> => {
+    const [user, plan] = await Promise.all([
+      User.getByUuid(this.userUuid),
+      Plan.getByUuid(this.planUuid),
+    ])
+
+    return {
+      uuid: this.uuid,
+      user: await user.toGraphQL(),
+      plan: await plan.toGraphQL(),
+      status: this.status,
+      createdAt: this.createdAt,
+    }
+  }
 
   public static fromSql = (sql: SubscriptionData & TableData) =>
     new Subscription({

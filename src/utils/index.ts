@@ -7,6 +7,25 @@ export type Resolver<R extends {} | null, A extends {} | null = null> = (
   request: Request,
 ) => Promise<R>
 
+export const IS_DEV = process.env.NODE_ENV === 'development'
+
+export const mapAsync = async <T, R>(
+  items: T[],
+  fn: (item: T) => Promise<R>,
+) => {
+  const promises = items.map(fn)
+
+  return await Promise.all(promises)
+}
+
+export const mapToGraphQL = async <T extends { toGraphQL: Function }>(
+  items: T[],
+) => {
+  const promises = items.map(item => item.toGraphQL())
+
+  return await Promise.all(promises)
+}
+
 export const enumToArray = <T>(Enum: any): T[] =>
   Object.keys(Enum).map(key => Enum[key])
 
@@ -29,5 +48,3 @@ export const pick = <T extends {}, K extends Array<keyof T>>(
       (obj, [key, val]) => Object.assign(obj, { [key]: val }),
       {} as any,
     )
-
-export const IS_DEV = process.env.NODE_ENV === 'development'
