@@ -57,7 +57,7 @@ export class DatabaseTable {
       .where({ uuid: this.uuid })
       .first()
 
-    return Number(result.count) === 1
+    return Number(result['count(*)']) === 1
   }
 
   public delete = async () => {
@@ -67,7 +67,7 @@ export class DatabaseTable {
       )
     }
 
-    this.__table()
+    await this.__table()
       .delete()
       .where({ uuid: this.uuid })
   }
