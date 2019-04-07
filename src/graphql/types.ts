@@ -106,6 +106,16 @@ export interface Mutation {
   deleteConnection: User
 }
 
+export interface Subscription {
+  uuid: string
+
+  planUuid: string
+
+  userUuid: string
+
+  createdAt: Date
+}
+
 // ====================================================
 // Arguments
 // ====================================================

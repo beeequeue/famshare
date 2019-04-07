@@ -13,6 +13,7 @@ enum Table {
   SESSION = 'session',
   PLAN = 'plan',
   CONNECTION = 'connection',
+  SUBSCRIPTION = 'subscription',
 }
 
 export interface TableOptions {
@@ -163,6 +164,14 @@ const initialize = async () => {
       table.string('picture')
 
       table.string('link')
+    }),
+
+    createTableIfDoesNotExist(Table.SUBSCRIPTION, table => {
+      table.uuid('plan_uuid').notNullable()
+
+      table.uuid('user_uuid').notNullable()
+
+      table.string('status').notNullable()
     }),
   )
 

@@ -114,6 +114,18 @@ type Connection {
   createdAt: Date!
 }
 
+# Subscription
+
+type Subscription {
+  uuid: ID!
+
+  planUuid: ID!
+
+  userUuid: ID!
+
+  createdAt: Date!
+}
+
 """
 A ISO-8601 formatted date.
 """
