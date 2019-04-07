@@ -136,11 +136,7 @@ const initialize = async () => {
     }),
 
     createTableIfDoesNotExist(Table.SESSION, table => {
-      table
-        .uuid('user_uuid')
-        .notNullable()
-        .references('uuid')
-        .inTable(Table.USER)
+      table.uuid('user_uuid').notNullable()
 
       table.timestamp('expires_at').notNullable()
     }),
@@ -152,21 +148,13 @@ const initialize = async () => {
 
       table.integer('payment_day').notNullable()
 
-      table
-        .uuid('owner_uuid')
-        .notNullable()
-        .references('uuid')
-        .inTable(Table.USER)
+      table.uuid('owner_uuid').notNullable()
     }),
 
     createTableIfDoesNotExist(Table.CONNECTION, table => {
       table.enum('type', enumToArray(ConnectionType)).notNullable()
 
-      table
-        .uuid('owner_uuid')
-        .notNullable()
-        .references('uuid')
-        .inTable(Table.USER)
+      table.uuid('owner_uuid').notNullable()
 
       table.string('user_id').notNullable()
 
