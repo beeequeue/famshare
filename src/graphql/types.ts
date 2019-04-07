@@ -55,10 +55,10 @@ export interface User {
   discordId: string
   /** The User's Stripe ID if they've set up payments. */
   stripeId?: Maybe<string>
-  /** The User's registration date and time. */
-  createdAt: Date
 
   connections: Connection[]
+  /** The User's registration date and time. */
+  createdAt: Date
 }
 
 export interface Connection {
@@ -75,6 +75,8 @@ export interface Connection {
   picture?: Maybe<string>
 
   link?: Maybe<string>
+
+  createdAt: Date
 }
 
 export interface Plan {

@@ -49,6 +49,7 @@ export class Connection extends DatabaseTable {
     identifier: this.identifier,
     picture: this.picture,
     link: this.link,
+    createdAt: this.createdAt,
   })
 
   public static fromSql = (sql: ConnectionData & TableData) =>

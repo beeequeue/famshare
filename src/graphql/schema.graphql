@@ -43,12 +43,13 @@ type User {
   The User's Stripe ID if they've set up payments.
   """
   stripeId: String
+
+  connections: [Connection!]!
+
   """
   The User's registration date and time.
   """
   createdAt: Date!
-
-  connections: [Connection!]!
 }
 
 # Plan
@@ -109,6 +110,8 @@ type Connection {
   picture: String
 
   link: String
+
+  createdAt: Date!
 }
 
 """
