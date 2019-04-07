@@ -124,5 +124,5 @@ export interface EditPlanMutationArgs {
   options: EditPlanOptions
 }
 export interface DeleteConnectionMutationArgs {
-  uuid: string
+  type: ConnectionType
 }

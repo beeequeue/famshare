@@ -25,7 +25,7 @@ type Mutation {
 
   # Connection
 
-  deleteConnection(uuid: ID!): User!
+  deleteConnection(type: ConnectionType!): User!
 }
 
 # User

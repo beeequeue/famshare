@@ -1,5 +1,7 @@
 import { Request } from 'express'
 
+export * from './functional'
+
 export type Resolver<R extends {} | null, A extends {} | null = null> = (
   args: A,
   request: Request,
@@ -27,9 +29,5 @@ export const pick = <T extends {}, K extends Array<keyof T>>(
       (obj, [key, val]) => Object.assign(obj, { [key]: val }),
       {} as any,
     )
-
-export const isNil = (variable: any): variable is null | undefined => {
-  return variable === null || variable === undefined
-}
 
 export const IS_DEV = process.env.NODE_ENV === 'development'
