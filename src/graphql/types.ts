@@ -130,6 +130,16 @@ export interface Mutation {
   subscribe: User
 }
 
+export interface Invite {
+  uuid: string
+
+  shortId: string
+
+  usedBy?: Maybe<User>
+
+  createdAt: Date
+}
+
 // ====================================================
 // Arguments
 // ====================================================
@@ -153,5 +163,5 @@ export interface DeleteConnectionMutationArgs {
   type: ConnectionType
 }
 export interface SubscribeMutationArgs {
-  planUuid: string
+  uuid: string
 }

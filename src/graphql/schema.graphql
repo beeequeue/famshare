@@ -30,6 +30,12 @@ type Mutation {
   Remove connection to a service
   """
   deleteConnection(type: ConnectionType!): User!
+
+  # Subscription
+  """
+  Subscribes Viewer to a Plan
+  """
+  subscribe(uuid: ID!): User!
 }
 
 # User
@@ -138,6 +144,18 @@ type Subscription {
   user: User!
 
   status: SubscriptionStatus!
+
+  createdAt: Date!
+}
+
+# Invite
+
+type Invite {
+  uuid: ID!
+
+  shortId: ID!
+
+  usedBy: User
 
   createdAt: Date!
 }

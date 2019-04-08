@@ -14,6 +14,7 @@ enum Table {
   PLAN = 'plan',
   CONNECTION = 'connection',
   SUBSCRIPTION = 'subscription',
+  INVITE = 'invite',
 }
 
 export interface TableOptions {
@@ -172,6 +173,10 @@ const initialize = async () => {
       table.uuid('user_uuid').notNullable()
 
       table.string('status').notNullable()
+    }),
+
+    createTableIfDoesNotExist(Table.INVITE, table => {
+      table.uuid('short_id').notNullable()
     }),
   )
 
