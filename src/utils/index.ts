@@ -2,7 +2,7 @@ import { Request } from 'express'
 
 export * from './functional'
 
-export type Resolver<R extends {} | null, A extends {} | null = null> = (
+export type IResolver<R extends {} | null, A extends {} | null = null> = (
   args: A,
   request: Request,
 ) => Promise<R>

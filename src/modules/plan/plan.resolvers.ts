@@ -7,9 +7,9 @@ import {
   Plan as IPlan,
   PlanQueryArgs,
 } from '@/graphql/types'
-import { isNil, Resolver } from '@/utils'
+import { isNil, IResolver } from '@/utils'
 
-export const plan: Resolver<IPlan | null, PlanQueryArgs> = async args => {
+export const plan: IResolver<IPlan | null, PlanQueryArgs> = async args => {
   const plan = await Plan.findByUuid(args.uuid)
 
   if (isNil(plan)) {
@@ -19,7 +19,7 @@ export const plan: Resolver<IPlan | null, PlanQueryArgs> = async args => {
   return await plan.toGraphQL()
 }
 
-export const createPlan: Resolver<IPlan, CreatePlanMutationArgs> = async (
+export const createPlan: IResolver<IPlan, CreatePlanMutationArgs> = async (
   { options },
   context,
 ) => {
@@ -33,7 +33,7 @@ export const createPlan: Resolver<IPlan, CreatePlanMutationArgs> = async (
   return plan.toGraphQL()
 }
 
-export const editPlan: Resolver<IPlan | null, EditPlanMutationArgs> = async ({
+export const editPlan: IResolver<IPlan | null, EditPlanMutationArgs> = async ({
   options,
 }) => {
   const plan = await Plan.findByUuid(options.uuid)

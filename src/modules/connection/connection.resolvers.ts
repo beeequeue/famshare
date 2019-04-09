@@ -2,9 +2,9 @@ import { notFound } from 'boom'
 
 import { User } from '@/modules/user/user.model'
 import { DeleteConnectionMutationArgs, User as IUser } from '@/graphql/types'
-import { isNil, propEq, Resolver } from '@/utils'
+import { isNil, propEq, IResolver } from '@/utils'
 
-export const deleteConnection: Resolver<
+export const deleteConnection: IResolver<
   IUser | null,
   DeleteConnectionMutationArgs
 > = async (args, request) => {
