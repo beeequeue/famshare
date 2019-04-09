@@ -9,7 +9,7 @@ import { enumToArray } from '@/utils'
 const { NODE_ENV } = process.env
 export const knex = Knex(config[NODE_ENV as 'development' | 'production'])
 
-enum Table {
+export enum Table {
   USER = 'user',
   SESSION = 'session',
   PLAN = 'plan',

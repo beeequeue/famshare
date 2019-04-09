@@ -1,11 +1,13 @@
 import { Field, Int, ObjectType } from 'type-graphql'
 import { addMonths, isAfter, setDate } from 'date-fns'
 
-import { DatabaseTable, knex, TableData, TableOptions } from '@/db'
+import { DatabaseTable, knex, Table, TableData, TableOptions } from '@/db'
 import { User } from '@/modules/user/user.model'
 import { Invite } from '@/modules/invite/invite.model'
-import { Plan as GraphqlPlan } from '@/graphql/types'
-import { mapToGraphQL } from '@/utils'
+import {
+  Subscription,
+  SubscriptionStatus,
+} from '@/modules/subscription/subscription.model'
 
 const table = () => knex('plan')
 
@@ -25,17 +27,6 @@ interface PlanData {
 
 @ObjectType()
 export class Plan extends DatabaseTable {
-  @Field()
-  public name: string
-  @Field(() => Int)
-  public readonly amount: number
-  @Field(() => Int)
-  public readonly paymentDay: number
-
-  @Field(() => User)
-  public readonly owner!: User
-  public readonly ownerUuid: string
-
   constructor(options: Constructor) {
     super(options)
 
@@ -43,6 +34,48 @@ export class Plan extends DatabaseTable {
     this.amount = options.amount
     this.paymentDay = options.paymentDay
     this.ownerUuid = options.ownerUuid
+  }
+
+  @Field()
+  public name: string
+  @Field(() => Int)
+  public readonly amount: number
+  @Field(() => Int)
+  public readonly paymentDay: number
+  @Field(() => Date)
+  public nextPaymentDate() {
+    let nextPaymentDate = setDate(new Date(), this.paymentDay)
+
+    if (isAfter(new Date(), nextPaymentDate)) {
+      nextPaymentDate = addMonths(nextPaymentDate, 1)
+    }
+
+    return nextPaymentDate
+  }
+
+  @Field(() => User)
+  public readonly owner!: User
+  public readonly ownerUuid: string
+  public getOwner = async () => User.getByUuid(this.ownerUuid)
+
+  @Field(() => [User])
+  public readonly members!: User[]
+  public getMembers = async () => {
+    const results: any[] = await knex(Table.USER)
+      .select(
+        'user.uuid',
+        'discord_id',
+        'email',
+        'access_level',
+        'stripe_id',
+        'user.created_at',
+        'user.updated_at',
+      )
+      .innerJoin(Table.SUBSCRIPTION, function() {
+        this.on('user.uuid', '=', 'subscription.user_uuid')
+      })
+
+    return results.map(result => User.fromSql(result))
   }
 
   public static fromSql = (sql: PlanData & TableData) =>
@@ -74,8 +107,6 @@ export class Plan extends DatabaseTable {
     return Plan.fromSql(plan)
   }
 
-  public getOwner = async () => User.getByUuid(this.ownerUuid)
-
   public getInvites = async () => Invite.getByPlan(this.uuid)
 
   public createInvite = async (expiresAt: Date) => {
@@ -93,26 +124,17 @@ export class Plan extends DatabaseTable {
     return invite
   }
 
-  public toGraphQL = async (): Promise<GraphqlPlan> => {
-    let nextPaymentDate = setDate(new Date(), this.paymentDay)
+  public subscribeUser = async (userUuid: string, inviteUuid: string) => {
+    const subscription = new Subscription({
+      planUuid: this.uuid,
+      userUuid,
+      inviteUuid,
+      status: SubscriptionStatus.JOINED,
+    })
 
-    if (isAfter(new Date(), nextPaymentDate)) {
-      nextPaymentDate = addMonths(nextPaymentDate, 1)
-    }
+    await subscription.save()
 
-    const user = await this.getOwner()
-    const invites = await this.getInvites()
-
-    return {
-      uuid: this.uuid,
-      name: this.name,
-      amount: this.amount,
-      paymentDay: this.paymentDay,
-      nextPaymentDate,
-      owner: await user.toGraphQL(),
-      invites: await mapToGraphQL(invites),
-      createdAt: this.createdAt,
-    }
+    return subscription
   }
 
   public save = async () => {

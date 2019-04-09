@@ -12,7 +12,7 @@ import {
   SubscriptionFieldResolver,
   SubscriptionResolver,
 } from '@/modules/subscription/subscription.resolvers'
-import { rootValue } from '@/graphql/resolvers'
+import { PlanFieldResolver, PlanResolver } from '@/modules/plan/plan.resolvers'
 import { resolverFunctions } from '@/graphql/validation'
 import { directives } from '@/graphql/directives'
 import { IS_DEV } from '@/utils'
@@ -26,6 +26,8 @@ export const GraphQLMiddleware = async (graphiql = false) => {
       InviteFieldResolver,
       SubscriptionResolver,
       SubscriptionFieldResolver,
+      PlanResolver,
+      PlanFieldResolver,
     ],
   })
 
@@ -44,6 +46,5 @@ export const GraphQLMiddleware = async (graphiql = false) => {
     schema: mergeSchemas({ schemas: [oldSchema, newSchema] }),
     graphiql,
     pretty: IS_DEV,
-    rootValue,
   })
 }

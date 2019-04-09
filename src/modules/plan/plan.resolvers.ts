@@ -1,50 +1,106 @@
-import { notFound } from 'boom'
+import {
+  Arg,
+  Ctx,
+  Field,
+  FieldResolver,
+  ID,
+  InputType,
+  Int,
+  Mutation,
+  Query,
+  Resolver,
+  ResolverInterface,
+  Root,
+} from 'type-graphql'
+import { Request } from 'express'
+import { forbidden, notFound } from 'boom'
 
 import { Plan } from '@/modules/plan/plan.model'
-import {
-  CreatePlanMutationArgs,
-  EditPlanMutationArgs,
-  Plan as IPlan,
-  PlanQueryArgs,
-} from '@/graphql/types'
-import { isNil, IResolver } from '@/utils'
+import { isNil } from '@/utils'
 
-export const plan: IResolver<IPlan | null, PlanQueryArgs> = async args => {
-  const plan = await Plan.findByUuid(args.uuid)
+@InputType()
+class CreatePlanOptions implements Partial<Plan> {
+  @Field()
+  name!: string
 
-  if (isNil(plan)) {
-    throw notFound()
-  }
+  @Field(() => Int)
+  amount!: number
 
-  return await plan.toGraphQL()
-}
-
-export const createPlan: IResolver<IPlan, CreatePlanMutationArgs> = async (
-  { options },
-  context,
-) => {
-  const plan = new Plan({
-    ...options,
-    ownerUuid: context.session!.user.uuid,
+  @Field(() => Int, {
+    description: '1-indexed day in month payments are done.',
   })
-
-  await plan.save()
-
-  return plan.toGraphQL()
+  paymentDay!: number
 }
 
-export const editPlan: IResolver<IPlan | null, EditPlanMutationArgs> = async ({
-  options,
-}) => {
-  const plan = await Plan.findByUuid(options.uuid)
+@InputType()
+class EditPlanOptions implements Partial<Plan> {
+  @Field(() => ID)
+  uuid!: string
 
-  if (isNil(plan)) {
-    throw notFound()
+  @Field({ nullable: true })
+  name!: string
+}
+
+@Resolver()
+export class PlanResolver {
+  @Query(() => Plan)
+  async plan(@Arg('uuid', () => ID) uuid: string) {
+    const plan = await Plan.findByUuid(uuid)
+
+    if (isNil(plan)) {
+      throw notFound()
+    }
+
+    return plan
   }
 
-  plan.name = options.name || plan.name
+  @Mutation(() => Plan)
+  async createPlan(
+    @Arg('options') options: CreatePlanOptions,
+    @Ctx() context: Request,
+  ): Promise<Plan> {
+    const plan = new Plan({
+      ...options,
+      ownerUuid: context.session!.user.uuid,
+    })
 
-  await plan.save()
+    await plan.save()
 
-  return plan.toGraphQL()
+    return plan
+  }
+
+  @Mutation(() => Plan)
+  async editPlan(
+    @Arg('options') options: EditPlanOptions,
+    @Ctx() context: Request,
+  ): Promise<Plan> {
+    const plan = await Plan.findByUuid(options.uuid)
+
+    if (isNil(plan)) {
+      throw notFound()
+    }
+
+    if (plan.ownerUuid !== context.session!.user.uuid) {
+      throw forbidden('You are not the owner of this Plan.')
+    }
+
+    plan.name = options.name || plan.name
+
+    await plan.save()
+
+    return plan
+  }
+}
+
+@Resolver(() => Plan)
+export class PlanFieldResolver implements ResolverInterface<Plan> {
+  @FieldResolver()
+  async owner(@Root() plan: Plan) {
+    return await plan.getOwner()
+  }
+
+  @FieldResolver()
+  async members(@Root() plan: Plan) {
+    return await plan.getMembers()
+  }
 }

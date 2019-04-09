@@ -2,7 +2,6 @@ import { Field, ID, ObjectType } from 'type-graphql'
 
 import { DatabaseTable, knex, TableData, TableOptions } from '@/db'
 import { Plan } from '@/modules/plan/plan.model'
-import { Invite as IInvite } from '@/graphql/types'
 import { isNil } from '@/utils'
 
 const table = () => knex('invite')
@@ -42,20 +41,6 @@ export class Invite extends DatabaseTable {
     this.cancelled = options.cancelled
     this.expiresAt = options.expiresAt
     this.planUuid = options.planUuid
-  }
-
-  public toGraphQL = async (): Promise<IInvite> => {
-    const plan = await Plan.getByUuid(this.planUuid)
-
-    return {
-      uuid: this.uuid,
-      shortId: this.shortId,
-      cancelled: this.cancelled,
-      expiresAt: this.expiresAt,
-      plan: await plan.toGraphQL(),
-      usedBy: null,
-      createdAt: this.createdAt,
-    }
   }
 
   public static fromSql = (sql: InviteData & TableData) =>

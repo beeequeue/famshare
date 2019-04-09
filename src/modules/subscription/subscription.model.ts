@@ -3,9 +3,8 @@ import { Field, ObjectType, registerEnumType } from 'type-graphql'
 import { DatabaseTable, knex, TableData, TableOptions } from '@/db'
 import { User } from '@/modules/user/user.model'
 import { Plan } from '@/modules/plan/plan.model'
-import { Subscription as ISubscription } from '@/graphql/types'
-import { isNil } from '@/utils'
 import { Invite } from '@/modules/invite/invite.model'
+import { isNil } from '@/utils'
 
 const table = () => knex('subscription')
 
@@ -57,21 +56,6 @@ export class Subscription extends DatabaseTable {
     this.userUuid = options.userUuid
     this.inviteUuid = options.inviteUuid
     this.status = options.status
-  }
-
-  public toGraphQL = async (): Promise<ISubscription> => {
-    const [user, plan] = await Promise.all([
-      User.getByUuid(this.userUuid),
-      Plan.getByUuid(this.planUuid),
-    ])
-
-    return {
-      uuid: this.uuid,
-      user: await user.toGraphQL(),
-      plan: await plan.toGraphQL(),
-      status: this.status,
-      createdAt: this.createdAt,
-    }
   }
 
   public static fromSql = (sql: SubscriptionData & TableData) =>
