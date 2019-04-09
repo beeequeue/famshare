@@ -1,8 +1,10 @@
 import { addMonths, isAfter, setDate } from 'date-fns'
 
 import { DatabaseTable, knex, TableData, TableOptions } from '@/db'
-import { Plan as GraphqlPlan } from '@/graphql/types'
 import { User } from '@/modules/user/user.model'
+import { Invite } from '@/modules/invite/invite.model'
+import { Plan as GraphqlPlan } from '@/graphql/types'
+import { mapToGraphQL } from '@/utils'
 
 const table = () => knex('plan')
 
@@ -66,6 +68,23 @@ export class Plan extends DatabaseTable {
 
   public getOwner = async () => User.getByUuid(this.ownerUuid)
 
+  public getInvites = async () => Invite.getByPlan(this.uuid)
+
+  public createInvite = async (expiresAt: Date) => {
+    const shortId = await Invite.generateShortId()
+
+    const invite = new Invite({
+      shortId,
+      cancelled: false,
+      expiresAt,
+      planUuid: this.uuid,
+    })
+
+    await invite.save()
+
+    return invite
+  }
+
   public toGraphQL = async (): Promise<GraphqlPlan> => {
     let nextPaymentDate = setDate(new Date(), this.paymentDay)
 
@@ -74,6 +93,7 @@ export class Plan extends DatabaseTable {
     }
 
     const user = await this.getOwner()
+    const invites = await this.getInvites()
 
     return {
       uuid: this.uuid,
@@ -82,6 +102,7 @@ export class Plan extends DatabaseTable {
       paymentDay: this.paymentDay,
       nextPaymentDate,
       owner: await user.toGraphQL(),
+      invites: await mapToGraphQL(invites),
       createdAt: this.createdAt,
     }
   }

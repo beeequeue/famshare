@@ -123,18 +123,18 @@ const initialize = async () => {
   promises.push(
     createTableIfDoesNotExist(Table.USER, table => {
       table
-        .string('discord_id')
+        .string('discord_id', 50)
         .notNullable()
         .unique()
 
       table
-        .string('email')
+        .string('email', 100)
         .notNullable()
         .unique()
 
       table.enum('access_level', enumToArray(AccessLevel))
 
-      table.string('stripe_id')
+      table.string('stripe_id', 50)
     }),
 
     createTableIfDoesNotExist(Table.SESSION, table => {
@@ -144,7 +144,7 @@ const initialize = async () => {
     }),
 
     createTableIfDoesNotExist(Table.PLAN, table => {
-      table.string('name').notNullable()
+      table.string('name', 100).notNullable()
 
       table.integer('amount').notNullable()
 
@@ -158,9 +158,9 @@ const initialize = async () => {
 
       table.uuid('owner_uuid').notNullable()
 
-      table.string('user_id').notNullable()
+      table.string('user_id', 100).notNullable()
 
-      table.string('identifier').notNullable()
+      table.string('identifier', 100).notNullable()
 
       table.string('picture')
 
@@ -172,11 +172,17 @@ const initialize = async () => {
 
       table.uuid('user_uuid').notNullable()
 
-      table.string('status').notNullable()
+      table.string('status', 25).notNullable()
     }),
 
     createTableIfDoesNotExist(Table.INVITE, table => {
-      table.uuid('short_id').notNullable()
+      table.string('short_id', 20).notNullable()
+
+      table.boolean('cancelled').notNullable()
+
+      table.timestamp('expires_at').notNullable()
+
+      table.uuid('plan_uuid').notNullable()
     }),
   )
 

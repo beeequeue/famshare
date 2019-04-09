@@ -34,7 +34,7 @@ export enum AuthLevel {
   ADMIN = 'ADMIN',
 }
 
-/** A ISO-8601 formatted date. */
+/** A ISO-8601 formatted date. E.g. 2019-04-09T11:28:11.479Z */
 
 // ====================================================
 // Scalars
@@ -114,6 +114,24 @@ export interface Plan {
 
   owner: User
 
+  invites: Invite[]
+
+  createdAt: Date
+}
+
+export interface Invite {
+  uuid: string
+
+  shortId: string
+
+  cancelled: boolean
+
+  expiresAt: Date
+
+  plan: Plan
+
+  usedBy?: Maybe<User>
+
   createdAt: Date
 }
 
@@ -128,16 +146,8 @@ export interface Mutation {
   deleteConnection: User
   /** Subscribes Viewer to a Plan */
   subscribe: User
-}
-
-export interface Invite {
-  uuid: string
-
-  shortId: string
-
-  usedBy?: Maybe<User>
-
-  createdAt: Date
+  /** Creates an Invite to a Plan */
+  createInvite: Plan
 }
 
 // ====================================================
@@ -164,4 +174,11 @@ export interface DeleteConnectionMutationArgs {
 }
 export interface SubscribeMutationArgs {
   uuid: string
+
+  inviteId: string
+}
+export interface CreateInviteMutationArgs {
+  planUuid: string
+
+  expiresAt: Date
 }
