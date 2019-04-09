@@ -8,6 +8,10 @@ import {
   InviteFieldResolver,
   InviteResolver,
 } from '@/modules/invite/invite.resolvers'
+import {
+  SubscriptionFieldResolver,
+  SubscriptionResolver,
+} from '@/modules/subscription/subscription.resolvers'
 import { rootValue } from '@/graphql/resolvers'
 import { resolverFunctions } from '@/graphql/validation'
 import { directives } from '@/graphql/directives'
@@ -17,7 +21,12 @@ const SCHEMA = readFileSync(resolve(__dirname, 'schema.graphql')).toString()
 
 export const GraphQLMiddleware = async (graphiql = false) => {
   const { typeDefs, resolvers } = await buildTypeDefsAndResolvers({
-    resolvers: [InviteResolver, InviteFieldResolver],
+    resolvers: [
+      InviteResolver,
+      InviteFieldResolver,
+      SubscriptionResolver,
+      SubscriptionFieldResolver,
+    ],
   })
 
   const oldSchema = makeExecutableSchema({

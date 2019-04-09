@@ -1,4 +1,5 @@
 import { AccessLevel } from '@/modules/user/user.model'
+import { SubscriptionStatus } from '@/modules/subscription/subscription.model'
 
 export type Maybe<T> = T | null
 
@@ -18,14 +19,6 @@ export interface EditPlanOptions {
 
 export enum ConnectionType {
   GOOGLE = 'GOOGLE',
-}
-
-export enum SubscriptionStatus {
-  INVITED = 'INVITED',
-  ACTIVE = 'ACTIVE',
-  LATE = 'LATE',
-  EXPIRED = 'EXPIRED',
-  EXEMPTED = 'EXEMPTED',
 }
 
 export enum AuthLevel {

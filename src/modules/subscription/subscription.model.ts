@@ -1,29 +1,53 @@
+import { Field, ObjectType, registerEnumType } from 'type-graphql'
+
 import { DatabaseTable, knex, TableData, TableOptions } from '@/db'
 import { User } from '@/modules/user/user.model'
 import { Plan } from '@/modules/plan/plan.model'
-import {
-  Subscription as ISubscription,
-  SubscriptionStatus,
-} from '@/graphql/types'
+import { Subscription as ISubscription } from '@/graphql/types'
 import { isNil } from '@/utils'
+import { Invite } from '@/modules/invite/invite.model'
 
 const table = () => knex('subscription')
+
+export enum SubscriptionStatus {
+  INVITED = 'INVITED',
+  JOINED = 'JOINED',
+  ACTIVE = 'ACTIVE',
+  LATE = 'LATE',
+  EXPIRED = 'EXPIRED',
+  EXEMPTED = 'EXEMPTED',
+}
+
+registerEnumType(SubscriptionStatus, {
+  name: 'SubscriptionStatus',
+})
 
 export interface SubscriptionConstructor extends TableOptions {
   planUuid: string
   userUuid: string
+  inviteUuid: string
   status: SubscriptionStatus
 }
 
 interface SubscriptionData {
   plan_uuid: string
   user_uuid: string
+  invite_uuid: string
   status: SubscriptionStatus
 }
 
+@ObjectType()
 export class Subscription extends DatabaseTable {
+  @Field(() => Plan)
+  public readonly plan!: Plan
   public readonly planUuid: string
+  @Field(() => User)
+  public readonly user!: User
   public readonly userUuid: string
+  @Field(() => Invite)
+  public readonly invite!: Invite
+  public readonly inviteUuid: string
+  @Field(() => SubscriptionStatus)
   public readonly status: SubscriptionStatus
 
   constructor(options: SubscriptionConstructor) {
@@ -31,6 +55,7 @@ export class Subscription extends DatabaseTable {
 
     this.planUuid = options.planUuid
     this.userUuid = options.userUuid
+    this.inviteUuid = options.inviteUuid
     this.status = options.status
   }
 
@@ -54,6 +79,7 @@ export class Subscription extends DatabaseTable {
       ...DatabaseTable._fromSql(sql),
       planUuid: sql.plan_uuid,
       userUuid: sql.user_uuid,
+      inviteUuid: sql.invite_uuid,
       status: sql.status,
     })
 
@@ -85,6 +111,7 @@ export class Subscription extends DatabaseTable {
     const data: SubscriptionData = {
       user_uuid: this.userUuid,
       plan_uuid: this.planUuid,
+      invite_uuid: this.inviteUuid,
       status: this.status,
     }
 

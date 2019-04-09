@@ -16,6 +16,10 @@ export enum AccessLevel {
   ADMIN = 'ADMIN',
 }
 
+registerEnumType(AccessLevel, {
+  name: 'AccessLevel',
+})
+
 interface Constructor extends TableOptions {
   uuid: string
   email: string
@@ -31,10 +35,6 @@ interface UserData {
   stripe_id?: string
 }
 
-registerEnumType(AccessLevel, {
-  name: 'AccessLevel',
-})
-
 @ObjectType()
 export class User extends DatabaseTable {
   @Field(() => ID)
@@ -45,6 +45,9 @@ export class User extends DatabaseTable {
   public readonly accessLevel: AccessLevel | null
   @Field(() => ID, { nullable: true })
   public stripeId: string | null
+
+  @Field(() => [Subscription])
+  public readonly subscriptions!: Subscription[]
 
   constructor(params: Constructor) {
     super(params)

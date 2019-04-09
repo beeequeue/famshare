@@ -175,6 +175,8 @@ const initialize = async () => {
 
       table.uuid('user_uuid').notNullable()
 
+      table.uuid('invite_uuid').notNullable()
+
       table.string('status', 25).notNullable()
     }),
 
