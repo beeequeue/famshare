@@ -7,8 +7,6 @@ import {
 } from '@/modules/connection/connection.model'
 import { Subscription } from '@/modules/subscription/subscription.model'
 import { stripe } from '@/lib/stripe'
-import { User as GraphqlUser } from '@/graphql/types'
-import { mapToGraphQL } from '@/utils'
 
 const table = () => knex('user')
 
@@ -95,22 +93,6 @@ export class User extends DatabaseTable {
     if (!user) return null
 
     return User.fromSql(user)
-  }
-
-  public toGraphQL = async (): Promise<GraphqlUser> => {
-    const connections = await this.getConnections()
-    const subscriptions = await this.getSubscriptions()
-
-    return {
-      uuid: this.uuid,
-      discordId: this.discordId,
-      email: this.email,
-      accessLevel: this.accessLevel,
-      stripeId: this.stripeId,
-      createdAt: this.createdAt,
-      connections: await mapToGraphQL(connections),
-      subscriptions: await mapToGraphQL(subscriptions),
-    }
   }
 
   public getConnections = async () => Connection.getByUserUuid(this.uuid)

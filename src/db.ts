@@ -3,8 +3,6 @@ import { Field, ID, ObjectType } from 'type-graphql'
 import uuid from 'uuid/v4'
 
 import config from '@/../knexfile'
-import { ConnectionType } from '@/graphql/types'
-import { enumToArray } from '@/utils'
 
 const { NODE_ENV } = process.env
 export const knex = Knex(config[NODE_ENV as 'development' | 'production'])
@@ -157,7 +155,7 @@ const initialize = async () => {
     }),
 
     createTableIfDoesNotExist(Table.CONNECTION, table => {
-      table.enum('type', enumToArray(ConnectionType)).notNullable()
+      table.string('type', 25).notNullable()
 
       table.uuid('owner_uuid').notNullable()
 

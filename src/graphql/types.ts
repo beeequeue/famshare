@@ -1,5 +1,6 @@
 import { AccessLevel } from '@/modules/user/user.model'
 import { SubscriptionStatus } from '@/modules/subscription/subscription.model'
+import { ConnectionType } from '@/modules/connection/connection.model'
 
 export type Maybe<T> = T | null
 
@@ -15,10 +16,6 @@ export interface EditPlanOptions {
   uuid: string
 
   name?: Maybe<string>
-}
-
-export enum ConnectionType {
-  GOOGLE = 'GOOGLE',
 }
 
 export enum AuthLevel {

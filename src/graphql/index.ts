@@ -1,8 +1,6 @@
 import GraphQL from 'express-graphql'
 import { buildTypeDefsAndResolvers } from 'type-graphql'
-import { makeExecutableSchema, mergeSchemas } from 'graphql-tools'
-import { readFileSync } from 'fs'
-import { resolve } from 'path'
+import { makeExecutableSchema } from 'graphql-tools'
 
 import {
   InviteFieldResolver,
@@ -13,11 +11,12 @@ import {
   SubscriptionResolver,
 } from '@/modules/subscription/subscription.resolvers'
 import { PlanFieldResolver, PlanResolver } from '@/modules/plan/plan.resolvers'
-import { resolverFunctions } from '@/graphql/validation'
+import {
+  ConnectionFieldResolver,
+  ConnectionResolver,
+} from '@/modules/connection/connection.resolvers'
 import { directives } from '@/graphql/directives'
 import { IS_DEV } from '@/utils'
-
-const SCHEMA = readFileSync(resolve(__dirname, 'schema.graphql')).toString()
 
 export const GraphQLMiddleware = async (graphiql = false) => {
   const { typeDefs, resolvers } = await buildTypeDefsAndResolvers({
@@ -28,22 +27,19 @@ export const GraphQLMiddleware = async (graphiql = false) => {
       SubscriptionFieldResolver,
       PlanResolver,
       PlanFieldResolver,
+      ConnectionResolver,
+      ConnectionFieldResolver,
     ],
   })
 
-  const oldSchema = makeExecutableSchema({
-    typeDefs: SCHEMA,
-    resolvers: resolverFunctions,
+  const schema = makeExecutableSchema({
+    typeDefs,
+    resolvers,
     schemaDirectives: directives,
   })
 
-  const newSchema = makeExecutableSchema({
-    typeDefs,
-    resolvers,
-  })
-
   return GraphQL({
-    schema: mergeSchemas({ schemas: [oldSchema, newSchema] }),
+    schema,
     graphiql,
     pretty: IS_DEV,
   })

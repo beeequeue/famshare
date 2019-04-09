@@ -1,9 +1,18 @@
+import { Field, ID, ObjectType, registerEnumType } from 'type-graphql'
+
 import { DatabaseTable, knex, TableData, TableOptions } from '@/db'
-import { ConnectionType, Connection as IConnection } from '@/graphql/types'
 import { User } from '@/modules/user/user.model'
 import { isNil } from '@/utils'
 
 const table = () => knex('connection')
+
+export enum ConnectionType {
+  GOOGLE = 'GOOGLE',
+}
+
+registerEnumType(ConnectionType, {
+  name: 'ConnectionType',
+})
 
 export interface ConnectionConstructor extends TableOptions {
   type: ConnectionType
@@ -23,13 +32,23 @@ interface ConnectionData {
   link?: string
 }
 
+@ObjectType()
 export class Connection extends DatabaseTable {
+  @Field(() => ConnectionType)
   public readonly type: ConnectionType
-  public readonly ownerUuid: string
+  @Field(() => ID)
   public readonly userId: string
+  @Field()
   public readonly identifier: string
+  @Field({ nullable: true })
   public readonly picture?: string
+  @Field({ nullable: true })
   public readonly link?: string
+
+  @Field(() => User)
+  public readonly owner!: User
+  public readonly ownerUuid: string
+  public getOwner = async () => User.getByUuid(this.ownerUuid)
 
   constructor(options: ConnectionConstructor) {
     super(options)
@@ -40,21 +59,6 @@ export class Connection extends DatabaseTable {
     this.identifier = options.identifier
     this.picture = options.picture
     this.link = options.link
-  }
-
-  public toGraphQL = async (): Promise<IConnection> => {
-    const owner = await User.getByUuid(this.ownerUuid)
-
-    return {
-      uuid: this.uuid,
-      type: this.type,
-      owner: await owner.toGraphQL(),
-      userId: this.userId,
-      identifier: this.identifier,
-      picture: this.picture,
-      link: this.link,
-      createdAt: this.createdAt,
-    }
   }
 
   public static fromSql = (sql: ConnectionData & TableData) =>

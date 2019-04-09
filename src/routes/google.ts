@@ -1,8 +1,8 @@
 import { badRequest, unauthorized } from 'boom'
 import { Router } from 'express'
 
+import { ConnectionType } from '@/modules/connection/connection.model'
 import { Google } from '@/lib/google'
-import { ConnectionType } from '@/graphql/types'
 import { isNil } from '@/utils'
 
 export const router = Router()
