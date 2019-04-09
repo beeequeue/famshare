@@ -31,6 +31,9 @@ export class Plan extends DatabaseTable {
   public readonly amount: number
   @Field(() => Int)
   public readonly paymentDay: number
+
+  @Field(() => User)
+  public readonly owner!: User
   public readonly ownerUuid: string
 
   constructor(options: Constructor) {

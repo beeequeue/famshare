@@ -2,7 +2,8 @@ import { Request } from 'express'
 import { defaultFieldResolver, GraphQLField, GraphQLObjectType } from 'graphql'
 import { SchemaDirectiveVisitor } from 'graphql-tools'
 
-import { AccessLevel, AuthLevel } from '@/graphql/types'
+import { AccessLevel } from '@/modules/user/user.model'
+import { AuthLevel } from '@/graphql/types'
 import { isNil } from '@/utils'
 
 declare module 'graphql' {

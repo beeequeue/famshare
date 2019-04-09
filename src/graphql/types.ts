@@ -1,3 +1,5 @@
+import { AccessLevel } from '@/modules/user/user.model'
+
 export type Maybe<T> = T | null
 
 export interface CreatePlanOptions {
@@ -12,10 +14,6 @@ export interface EditPlanOptions {
   uuid: string
 
   name?: Maybe<string>
-}
-
-export enum AccessLevel {
-  ADMIN = 'ADMIN',
 }
 
 export enum ConnectionType {

@@ -3,7 +3,7 @@ import { Field, ID, ObjectType } from 'type-graphql'
 import uuid from 'uuid/v4'
 
 import config from '@/../knexfile'
-import { AccessLevel, ConnectionType } from '@/graphql/types'
+import { ConnectionType } from '@/graphql/types'
 import { enumToArray } from '@/utils'
 
 const { NODE_ENV } = process.env
@@ -135,7 +135,7 @@ const initialize = async () => {
         .notNullable()
         .unique()
 
-      table.enum('access_level', enumToArray(AccessLevel))
+      table.string('access_level', 25)
 
       table.string('stripe_id', 50)
     }),

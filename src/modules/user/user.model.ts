@@ -1,3 +1,5 @@
+import { Field, ID, ObjectType, registerEnumType } from 'type-graphql'
+
 import { DatabaseTable, knex, TableData, TableOptions } from '@/db'
 import {
   Connection,
@@ -5,10 +7,14 @@ import {
 } from '@/modules/connection/connection.model'
 import { Subscription } from '@/modules/subscription/subscription.model'
 import { stripe } from '@/lib/stripe'
-import { AccessLevel, User as GraphqlUser } from '@/graphql/types'
+import { User as GraphqlUser } from '@/graphql/types'
 import { mapToGraphQL } from '@/utils'
 
 const table = () => knex('user')
+
+export enum AccessLevel {
+  ADMIN = 'ADMIN',
+}
 
 interface Constructor extends TableOptions {
   uuid: string
@@ -25,10 +31,19 @@ interface UserData {
   stripe_id?: string
 }
 
+registerEnumType(AccessLevel, {
+  name: 'AccessLevel',
+})
+
+@ObjectType()
 export class User extends DatabaseTable {
+  @Field(() => ID)
   public readonly discordId: string
+  @Field()
   public readonly email: string
+  @Field(() => AccessLevel, { nullable: true })
   public readonly accessLevel: AccessLevel | null
+  @Field(() => ID, { nullable: true })
   public stripeId: string | null
 
   constructor(params: Constructor) {
