@@ -1,3 +1,4 @@
+import { Field, Int, ObjectType } from 'type-graphql'
 import { addMonths, isAfter, setDate } from 'date-fns'
 
 import { DatabaseTable, knex, TableData, TableOptions } from '@/db'
@@ -22,9 +23,13 @@ interface PlanData {
   owner_uuid: string
 }
 
+@ObjectType()
 export class Plan extends DatabaseTable {
+  @Field()
   public name: string
+  @Field(() => Int)
   public readonly amount: number
+  @Field(() => Int)
   public readonly paymentDay: number
   public readonly ownerUuid: string
 

@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import Express from 'express'
 import BodyParser from 'body-parser'
 import CookieParser from 'cookie-parser'
@@ -32,9 +33,9 @@ const start = async () => {
 
   app.use(router)
 
-  app.post('/graphql', assertLoggedIn(), GraphQLMiddleware())
+  app.post('/graphql', assertLoggedIn(), await GraphQLMiddleware())
 
-  app.get('/graphql', assertLoggedIn(), GraphQLMiddleware(true))
+  app.get('/graphql', assertLoggedIn(), await GraphQLMiddleware(true))
 
   app.use(ErrorHandler())
 

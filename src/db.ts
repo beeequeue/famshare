@@ -1,4 +1,5 @@
 import Knex, { CreateTableBuilder, QueryBuilder } from 'knex'
+import { Field, ID, ObjectType } from 'type-graphql'
 import uuid from 'uuid/v4'
 
 import config from '@/../knexfile'
@@ -29,10 +30,12 @@ export interface TableData {
   updated_at: Date
 }
 
+@ObjectType()
 export class DatabaseTable {
   private readonly __name: string
   private readonly __table: () => QueryBuilder
 
+  @Field(() => ID)
   public readonly uuid: string
   public readonly createdAt: Date
   public readonly updatedAt: Date

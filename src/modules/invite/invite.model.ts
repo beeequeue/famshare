@@ -1,3 +1,5 @@
+import { Field, ID, ObjectType } from 'type-graphql'
+
 import { DatabaseTable, knex, TableData, TableOptions } from '@/db'
 import { Plan } from '@/modules/plan/plan.model'
 import { Invite as IInvite } from '@/graphql/types'
@@ -19,10 +21,18 @@ interface InviteData {
   plan_uuid: string
 }
 
+@ObjectType()
 export class Invite extends DatabaseTable {
+  @Field(() => ID)
   public readonly shortId: string
+  @Field()
   public readonly cancelled: boolean
+  @Field()
   public readonly expiresAt: Date
+
+  // GQL Abstractions
+  @Field(() => Plan)
+  public readonly plan!: Plan
   public readonly planUuid: string
 
   constructor(options: InviteConstructor) {
@@ -66,6 +76,20 @@ export class Invite extends DatabaseTable {
 
     if (isNil(sql)) {
       return null
+    }
+
+    return Invite.fromSql(sql)
+  }
+
+  public static findByUuid = async (uuid: string): Promise<Invite | null> => {
+    const query = { uuid }
+
+    const sql = await table()
+      .where(query)
+      .first()
+
+    if (isNil(sql)) {
+      if (!sql) return null
     }
 
     return Invite.fromSql(sql)
