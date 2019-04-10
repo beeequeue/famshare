@@ -3,7 +3,6 @@ import { defaultFieldResolver, GraphQLField, GraphQLObjectType } from 'graphql'
 import { SchemaDirectiveVisitor } from 'graphql-tools'
 
 import { AccessLevel } from '@/modules/user/user.model'
-import { AuthLevel } from '@/graphql/types'
 import { isNil } from '@/utils'
 
 declare module 'graphql' {
@@ -14,6 +13,10 @@ declare module 'graphql' {
   interface GraphQLField<TSource, TContext, TArgs = { [key: string]: any }> {
     _requiredAuthLevel?: AuthLevel
   }
+}
+
+export enum AuthLevel {
+  ADMIN = 'ADMIN',
 }
 
 type GqlObject = GraphQLObjectType<null, Request>
