@@ -1,4 +1,4 @@
-import { Request as IRequest, RequestHandler, Response } from 'express'
+import { Request, Request as IRequest, RequestHandler, Response } from 'express'
 import { unauthorized } from 'boom'
 import { Base64 } from 'js-base64'
 
@@ -34,10 +34,27 @@ declare module 'express' {
   }
 }
 
-const authenticate = (res: Response) => async (userUuid: string) => {
+const getBaseDomain = (req: Request) => {
+  const subdomains = req.subdomains
+    .splice(1)
+    .reverse()
+    .join('.')
+
+  if (subdomains.length < 1) {
+    return req.hostname
+  }
+
+  return req.hostname.replace(subdomains + '.', '')
+}
+
+const authenticate = (req: Request, res: Response) => async (
+  userUuid: string,
+) => {
   const session = await Session.generate(userUuid)
+  console.log('.' + getBaseDomain(req))
 
   res.cookie('session', Base64.encode(session.uuid), {
+    domain: '.' + getBaseDomain(req),
     expires: session.expiresAt,
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -51,7 +68,7 @@ export const SessionMiddleware = (): RequestHandler => async (
 ) => {
   const cookie = req.cookies.session
 
-  req.authenticate = authenticate(res)
+  req.authenticate = authenticate(req, res)
 
   if (!cookie) return next()
 

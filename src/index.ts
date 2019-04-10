@@ -1,7 +1,9 @@
 import 'reflect-metadata'
 import Express from 'express'
+import CORS from 'cors'
 import BodyParser from 'body-parser'
 import CookieParser from 'cookie-parser'
+import Helmet from 'helmet'
 import { transports } from 'winston'
 import { logger as Logger } from 'express-winston'
 
@@ -24,10 +26,15 @@ const start = async () => {
     }),
   )
 
-  // app.use(KoaCORS())
+  app.use(
+    CORS({
+      origin: true,
+      credentials: true,
+    }),
+  )
   app.use(BodyParser.json())
   app.use(CookieParser())
-  // app.use(Helmet())
+  app.use(Helmet())
 
   app.use(SessionMiddleware())
 
