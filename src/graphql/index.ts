@@ -3,32 +3,35 @@ import { buildTypeDefsAndResolvers } from 'type-graphql'
 import { makeExecutableSchema } from 'graphql-tools'
 
 import {
+  ConnectionFieldResolver,
+  ConnectionResolver,
+} from '@/modules/connection/connection.resolvers'
+import {
   InviteFieldResolver,
   InviteResolver,
 } from '@/modules/invite/invite.resolvers'
+import { PlanFieldResolver, PlanResolver } from '@/modules/plan/plan.resolvers'
 import {
   SubscriptionFieldResolver,
   SubscriptionResolver,
 } from '@/modules/subscription/subscription.resolvers'
-import { PlanFieldResolver, PlanResolver } from '@/modules/plan/plan.resolvers'
-import {
-  ConnectionFieldResolver,
-  ConnectionResolver,
-} from '@/modules/connection/connection.resolvers'
+import { UserFieldResolver, UserResolver } from '@/modules/user/user.resolvers'
 import { directives } from '@/graphql/directives'
 import { IS_DEV } from '@/utils'
 
 export const GraphQLMiddleware = async (graphiql = false) => {
   const { typeDefs, resolvers } = await buildTypeDefsAndResolvers({
     resolvers: [
-      InviteResolver,
-      InviteFieldResolver,
-      SubscriptionResolver,
-      SubscriptionFieldResolver,
-      PlanResolver,
-      PlanFieldResolver,
       ConnectionResolver,
       ConnectionFieldResolver,
+      InviteResolver,
+      InviteFieldResolver,
+      PlanResolver,
+      PlanFieldResolver,
+      SubscriptionResolver,
+      SubscriptionFieldResolver,
+      UserResolver,
+      UserFieldResolver,
     ],
   })
 

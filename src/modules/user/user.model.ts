@@ -7,6 +7,7 @@ import {
 } from '@/modules/connection/connection.model'
 import { Subscription } from '@/modules/subscription/subscription.model'
 import { stripe } from '@/lib/stripe'
+import { isNil } from '@/utils'
 
 const table = () => knex('user')
 
@@ -41,11 +42,19 @@ export class User extends DatabaseTable {
   public readonly email: string
   @Field(() => AccessLevel, { nullable: true })
   public readonly accessLevel: AccessLevel | null
-  @Field(() => ID, { nullable: true })
+  @Field()
+  public hasSetupStripe(): boolean {
+    return !isNil(this.stripeId)
+  }
   public stripeId: string | null
+
+  @Field(() => [Connection])
+  public readonly connections!: Connection[]
+  public getConnections = async () => Connection.getByUserUuid(this.uuid)
 
   @Field(() => [Subscription])
   public readonly subscriptions!: Subscription[]
+  public getSubscriptions = async () => Subscription.getByUserUuid(this.uuid)
 
   constructor(params: Constructor) {
     super(params)
@@ -94,10 +103,6 @@ export class User extends DatabaseTable {
 
     return User.fromSql(user)
   }
-
-  public getConnections = async () => Connection.getByUserUuid(this.uuid)
-
-  public getSubscriptions = async () => Subscription.getByUserUuid(this.uuid)
 
   public createStripeCustomer = async (stripeToken: string) => {
     const customer = await stripe.customers.create({
