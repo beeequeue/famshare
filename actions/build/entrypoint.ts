@@ -7,16 +7,11 @@ import {
 
 const tools = new Toolkit({
   event: ['push'],
+  secrets: ['GITHUB_TOKEN'],
 })
 
 const { log } = tools
-const { GITHUB_TOKEN, GITHUB_ACTION } = process.env
-
-const assertVariables = () => {
-  if (GITHUB_TOKEN == null || GITHUB_TOKEN.length < 1) {
-    return tools.exit.failure('You need to tick the GITHUB_TOKEN secret!')
-  }
-}
+const { GITHUB_ACTION } = process.env
 
 const regex = /^((?:.*\/.*)+)\((\d+),(\d+)\): (\w+).*: (.*)$/
 const getAnnotations = (
@@ -98,8 +93,6 @@ const compileProject = async (): CompileReturn => {
 }
 
 const main = async () => {
-  assertVariables()
-
   const compilePromise = compileProject()
 
   const checkName = GITHUB_ACTION
@@ -108,7 +101,7 @@ const main = async () => {
     check_name: checkName,
     status: 'in_progress' as 'in_progress',
     ref: tools.context.ref,
-    ...tools.context.repo(),
+    ...tools.context.repo,
   })
 
   const check = response.data.check_runs.find(
@@ -120,7 +113,7 @@ const main = async () => {
   await tools.github.checks.update({
     check_run_id: check.id,
     completed_at: new Date().toISOString(),
-    ...tools.context.repo(),
+    ...tools.context.repo,
     ...result,
   })
 
