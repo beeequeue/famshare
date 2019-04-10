@@ -67,7 +67,7 @@
   "scripts": {
     "build": "yarn tsc --noEmit -P tsconfig.json",
     "dev": "ts-node-dev --respawn -r dotenv/config -r tsconfig-paths/register --inspect -- src/index.ts",
-    "proxy": "ngrok http --region eu -subdomain famshare 3000",
+    "proxy": "ngrok start famshare famshare-ui",
     "start": "ts-node -r dotenv/config -r tsconfig-paths/register src/index.ts"
   }
 }

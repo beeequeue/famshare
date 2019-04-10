@@ -39,7 +39,7 @@ const start = async () => {
 
   app.use(ErrorHandler())
 
-  app.listen(PORT || 3000, () => console.log(`Listening on ${PORT || 3000}`))
+  app.listen(PORT || 3100, () => console.log(`Listening on ${PORT || 3100}`))
 }
 
 start()
