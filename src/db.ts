@@ -28,7 +28,7 @@ export interface TableData {
   updated_at: Date
 }
 
-@ObjectType()
+@ObjectType({ description: 'Not used - is base for all models.' })
 export class DatabaseTable {
   private readonly __name: string
   private readonly __table: () => QueryBuilder

@@ -1,7 +1,8 @@
 import { Field, ID, ObjectType } from 'type-graphql'
 
-import { DatabaseTable, knex, TableData, TableOptions } from '@/db'
+import { DatabaseTable, knex, Table, TableData, TableOptions } from '@/db'
 import { Plan } from '@/modules/plan/plan.model'
+import { User } from '@/modules/user/user.model'
 import { isNil } from '@/utils'
 
 const table = () => knex('invite')
@@ -29,10 +30,12 @@ export class Invite extends DatabaseTable {
   @Field()
   public readonly expiresAt: Date
 
-  // GQL Abstractions
   @Field(() => Plan)
   public readonly plan!: Plan
   public readonly planUuid: string
+
+  @Field(() => User, { nullable: true })
+  public readonly user!: User | null
 
   constructor(options: InviteConstructor) {
     super(options)
@@ -124,6 +127,25 @@ export class Invite extends DatabaseTable {
       .where({ short_id: shortId })
 
     return Number(result['count(*)']) === 1
+  }
+
+  public getUserOf = async () => {
+    const result: any = await knex(Table.USER)
+      .select('user.*')
+      .innerJoin(Table.SUBSCRIPTION, function() {
+        this.on('user.uuid', '=', 'subscription.user_uuid')
+      })
+      .innerJoin(Table.INVITE, function() {
+        this.on('subscription.invite_uuid', '=', 'invite.uuid')
+      })
+      .where({ 'invite.uuid': this.uuid })
+      .first()
+
+    if (isNil(result)) {
+      return null
+    }
+
+    return User.fromSql(result)
   }
 
   public save = async () => {

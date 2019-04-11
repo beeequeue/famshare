@@ -40,9 +40,13 @@ export class Plan extends DatabaseTable {
   public name: string
   @Field(() => Int)
   public readonly amount: number
-  @Field(() => Int)
+  @Field(() => Int, {
+    description: '1-indexed day in month payments are done.',
+  })
   public readonly paymentDay: number
-  @Field(() => Date)
+  @Field(() => Date, {
+    description: 'The date the next payment will be attempted.',
+  })
   public nextPaymentDate() {
     let nextPaymentDate = setDate(new Date(), this.paymentDay)
 
@@ -62,18 +66,11 @@ export class Plan extends DatabaseTable {
   public readonly members!: User[]
   public getMembers = async () => {
     const results: any[] = await knex(Table.USER)
-      .select(
-        'user.uuid',
-        'discord_id',
-        'email',
-        'access_level',
-        'stripe_id',
-        'user.created_at',
-        'user.updated_at',
-      )
+      .select('user.*')
       .innerJoin(Table.SUBSCRIPTION, function() {
         this.on('user.uuid', '=', 'subscription.user_uuid')
       })
+      .where({ 'subscription.uuid': this.uuid })
 
     return results.map(result => User.fromSql(result))
   }

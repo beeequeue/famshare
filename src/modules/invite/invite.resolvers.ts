@@ -69,4 +69,9 @@ export class InviteFieldResolver implements ResolverInterface<Invite> {
   async plan(@Root() invite: Invite) {
     return await Plan.getByUuid(invite.planUuid)
   }
+
+  @FieldResolver()
+  async user(@Root() invite: Invite) {
+    return await invite.getUserOf()
+  }
 }
