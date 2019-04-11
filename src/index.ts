@@ -13,12 +13,14 @@ import {
 } from '@/middleware/session-middleware'
 import { ErrorHandler } from '@/middleware/error-handler'
 import { router } from '@/routes'
-import { GraphQLMiddleware } from '@/graphql'
+import { createGraphQLMiddleware } from '@/graphql'
 
 const { PORT } = process.env
 const app = Express()
 
 const start = async () => {
+  const { GraphQLMiddleware, schema } = await createGraphQLMiddleware()
+
   app.use(
     Logger({
       transports: [new transports.Console()],
@@ -40,9 +42,14 @@ const start = async () => {
 
   app.use(router)
 
-  app.post('/graphql', assertLoggedIn(), await GraphQLMiddleware())
+  app.post('/graphql', assertLoggedIn(), GraphQLMiddleware())
 
-  app.get('/graphql', assertLoggedIn(), await GraphQLMiddleware(true))
+  app.get('/graphql', assertLoggedIn(), GraphQLMiddleware(true))
+
+  app.get('/graphql/schema.graphql', (_, res) => {
+    res.contentType('text/graphql')
+    res.send(schema)
+  })
 
   app.use(ErrorHandler())
 
