@@ -2,7 +2,7 @@ workflow "Build" {
   on = "push"
   resolves = [
     "Compile project",
-    "rkusa/eslint-action@1.0.0",
+    "Install Dependencies",
   ]
 }
 
@@ -15,10 +15,4 @@ action "Compile project" {
   uses = "./actions/build"
   secrets = ["GITHUB_TOKEN"]
   needs = ["Install Dependencies"]
-}
-
-action "rkusa/eslint-action@1.0.0" {
-  uses = "rkusa/eslint-action@1.0.0"
-  needs = ["Install Dependencies"]
-  secrets = ["GITHUB_TOKEN"]
 }
