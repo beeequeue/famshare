@@ -1,11 +1,4 @@
-import { Request } from 'express'
-
 export * from './functional'
-
-export type IResolver<R extends {} | null, A extends {} | null = null> = (
-  args: A,
-  request: Request,
-) => Promise<R>
 
 export const IS_DEV = process.env.NODE_ENV === 'development'
 
@@ -15,7 +8,7 @@ export const mapAsync = async <T, R>(
 ) => {
   const promises = items.map(fn)
 
-  return await Promise.all(promises)
+  return Promise.all(promises)
 }
 
 export const mapToGraphQL = async <T extends { toGraphQL: Function }>(
@@ -23,7 +16,7 @@ export const mapToGraphQL = async <T extends { toGraphQL: Function }>(
 ) => {
   const promises = items.map(item => item.toGraphQL())
 
-  return await Promise.all(promises)
+  return Promise.all(promises)
 }
 
 export const enumToArray = <T>(Enum: any): T[] =>
@@ -38,12 +31,12 @@ export const mapObject = <T extends {}, R extends {}>(
   return keys.map((key, i) => func((obj as any)[key], i))
 }
 
-export const pick = <T extends {}, K extends Array<keyof T>>(
+export const pick = <T extends {}, K extends (keyof T)[]>(
   obj: T,
   keys: K,
 ): Pick<T, K[number]> =>
   Object.entries(obj)
-    .filter(([key]) => keys.includes(key as any))
+    .filter(([key]) => keys.includes(key as keyof T))
     .reduce<Pick<T, K[number]>>(
       (obj, [key, val]) => Object.assign(obj, { [key]: val }),
       {} as any,

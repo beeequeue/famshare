@@ -1,4 +1,4 @@
-import { Request as IRequest, RequestHandler, Response } from 'express'
+import { RequestHandler, Response } from 'express'
 import { unauthorized } from 'boom'
 import { Base64 } from 'js-base64'
 
@@ -15,22 +15,11 @@ declare module 'express-serve-static-core' {
     identifier: string
   }
 
+  // eslint-disable-next-line @typescript-eslint/interface-name-prefix
   interface Request {
     session?: ISession
 
     authenticate: (userUuid: string) => void
-  }
-}
-
-declare module 'express' {
-  interface GraphqlRequest extends IRequest {
-    body: {
-      operationName?: string
-      query: string
-      variables: {
-        [key: string]: any | undefined
-      }
-    }
   }
 }
 

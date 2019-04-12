@@ -24,12 +24,12 @@ router.get('/login', (req, res) =>
   ),
 )
 
-interface CallbackQuery {
+interface ICallbackQuery {
   code?: string
 }
 
 router.get('/callback', async (req, res) => {
-  const { code } = req.query as CallbackQuery
+  const { code } = req.query as ICallbackQuery
 
   if (!code) {
     throw badRequest('Did not get a code back from Discord...')

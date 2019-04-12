@@ -15,7 +15,7 @@ router.get('/connect', (req, res) => {
   res.redirect(Google.getConnectUrl(req.hostname))
 })
 
-interface CallbackQuery {
+interface ICallbackQuery {
   code?: string
 }
 
@@ -24,7 +24,7 @@ router.get('/callback', async (req, res) => {
     throw unauthorized('You need to be logged in to connect a Google account.')
   }
 
-  const { code } = req.query as CallbackQuery
+  const { code } = req.query as ICallbackQuery
 
   if (!code) {
     throw badRequest('Did not get a code back from Discord...')

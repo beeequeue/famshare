@@ -10,7 +10,7 @@ const T = () => true
 const isError = (response: superagent.Response) =>
   !response.ok || response.error
 
-interface GoogleUser {
+interface IGoogleUser {
   id: string
   name: string
   given_name: string
@@ -44,10 +44,12 @@ export class Google {
       .post('https://www.googleapis.com/oauth2/v4/token')
       .query({
         code,
+        /* eslint-disable @typescript-eslint/camelcase */
         client_id: GOOGLE_CLIENT,
         client_secret: GOOGLE_SECRET,
         redirect_uri: Google.getCallbackUrl(hostname),
         grant_type: 'authorization_code',
+        /* eslint-enable @typescript-eslint/camelcase */
       })
       .ok(T)
 
@@ -63,7 +65,7 @@ export class Google {
 
   public static getUserFromToken = async (
     token: string,
-  ): Promise<GoogleUser> => {
+  ): Promise<IGoogleUser> => {
     const response = await superagent
       .get(`https://www.googleapis.com/userinfo/v2/me`)
       .auth(token, { type: 'bearer' })

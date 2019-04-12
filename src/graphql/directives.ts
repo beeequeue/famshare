@@ -6,10 +6,12 @@ import { AccessLevel } from '@/modules/user/user.model'
 import { isNil } from '@/utils'
 
 declare module 'graphql' {
+  // eslint-disable-next-line @typescript-eslint/interface-name-prefix
   interface GraphQLObjectType {
     _authFieldsWrapped?: boolean
     _requiredAuthLevel?: AuthLevel
   }
+  // eslint-disable-next-line @typescript-eslint/interface-name-prefix
   interface GraphQLField<TSource, TContext, TArgs = { [key: string]: any }> {
     _requiredAuthLevel?: AuthLevel
   }
@@ -23,21 +25,24 @@ type GqlObject = GraphQLObjectType<null, Request>
 type GqlField = GraphQLField<any, Request>
 
 export class AuthDirective extends SchemaDirectiveVisitor {
-  visitObject(type: GqlObject) {
+  public visitObject(type: GqlObject) {
     type._requiredAuthLevel = this.args.level
 
     this.ensureIsNullable(type)
     this.ensureFieldsWrapped(type)
   }
 
-  visitFieldDefinition(field: GqlField, details: { objectType: GqlObject }) {
+  public visitFieldDefinition(
+    field: GqlField,
+    details: { objectType: GqlObject },
+  ) {
     field._requiredAuthLevel = this.args.level
 
     this.ensureIsNullable(field)
     this.ensureFieldsWrapped(details.objectType)
   }
 
-  ensureIsNullable = (type: GqlField | GqlObject) => {
+  public ensureIsNullable = (type: GqlField | GqlObject) => {
     const notNullableMessage = `It seems that the field ${
       type.name
     } is restricted, but is not nullable.`
@@ -55,7 +60,7 @@ export class AuthDirective extends SchemaDirectiveVisitor {
     }
   }
 
-  ensureFieldsWrapped = (objectType: GqlObject) => {
+  public ensureFieldsWrapped = (objectType: GqlObject) => {
     if (objectType._authFieldsWrapped) return
     objectType._authFieldsWrapped = true
 

@@ -20,12 +20,14 @@ export const getAccessToken = async (
     .post(`${DISCORD}/oauth2/token`)
     .type('form')
     .send({
+      /* eslint-disable @typescript-eslint/camelcase */
       client_id: DISCORD_CLIENT,
       client_secret: DISCORD_SECRET,
       grant_type: 'authorization_code',
       code,
       redirect_uri: redirectUri,
       scope: SCOPE,
+      /* eslint-enable @typescript-eslint/camelcase */
     })
     .ok(T)
 
@@ -39,7 +41,7 @@ export const getAccessToken = async (
   return response.body.access_token
 }
 
-interface DiscordUser {
+interface IDiscordUser {
   id: string
   username: string
   discriminator: string
@@ -49,7 +51,9 @@ interface DiscordUser {
   bot?: boolean
 }
 
-export const getUserFromToken = async (token: string): Promise<DiscordUser> => {
+export const getUserFromToken = async (
+  token: string,
+): Promise<IDiscordUser> => {
   const response = await superagent
     .get(`${DISCORD}/v6/users/@me`)
     .auth(token, { type: 'bearer' })
@@ -62,7 +66,7 @@ export const getUserFromToken = async (token: string): Promise<DiscordUser> => {
   return response.body
 }
 
-export const getUserById = async (id: string): Promise<DiscordUser> => {
+export const getUserById = async (id: string): Promise<IDiscordUser> => {
   const response = await superagent
     .get(`${DISCORD}/v6/users/${id}`)
     .set('Authorization', 'Bot ' + DISCORD_TOKEN)

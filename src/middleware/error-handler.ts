@@ -5,7 +5,6 @@ export const ErrorHandler = (): ErrorRequestHandler => async (
   err,
   _req,
   res,
-  _next,
 ) => {
   if (process.env.NODE_ENV === 'production') {
     delete err.stack

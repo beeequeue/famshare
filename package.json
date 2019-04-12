@@ -3,6 +3,9 @@
   "description": "Easily set up recurring payments based on plans.",
   "version": "0.0.1",
   "author": "BeeeQueue",
+  "engines": {
+    "node": ">=11.12"
+  },
   "dependencies": {
     "@types/body-parser": "1.17.0",
     "@types/boom": "7.2.1",
@@ -48,7 +51,18 @@
     "@types/helmet": "0.0.43",
     "@types/minimist": "1.2.0",
     "@types/signale": "1.2.1",
+    "@typescript-eslint/eslint-plugin": "1.6.0",
+    "@typescript-eslint/parser": "1.6.0",
     "actions-toolkit": "2.0.0",
+    "eslint": "5.16.0",
+    "eslint-config-prettier": "4.1.0",
+    "eslint-config-standard": "12.0.0",
+    "eslint-import-resolver-typescript": "1.1.1",
+    "eslint-plugin-import": "2.16.0",
+    "eslint-plugin-node": "8.0.1",
+    "eslint-plugin-prettier": "3.0.1",
+    "eslint-plugin-promise": "4.1.1",
+    "eslint-plugin-standard": "4.0.0",
     "husky": "1.3.1",
     "lint-staged": "8.1.5",
     "prettier": "1.16.4",
@@ -71,6 +85,7 @@
   "scripts": {
     "build": "yarn tsc --noEmit -P tsconfig.json",
     "dev": "ts-node-dev --respawn -r dotenv/config -r tsconfig-paths/register --inspect -- src/index.ts",
+    "lint": "eslint src/**/*.ts",
     "proxy": "ngrok start famshare famshare-ui",
     "start": "ts-node -r dotenv/config -r tsconfig-paths/register src/index.ts"
   }
