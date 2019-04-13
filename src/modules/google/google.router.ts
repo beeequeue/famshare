@@ -2,12 +2,12 @@ import { badRequest, unauthorized } from 'boom'
 import { Router } from 'express'
 
 import { ConnectionType } from '@/modules/connection/connection.model'
-import { Google } from '@/lib/google'
+import { Google } from '@/modules/google/google.lib'
 import { isNil } from '@/utils'
 
-export const router = Router()
+export const googleRouter = Router()
 
-router.get('/connect', (req, res) => {
+googleRouter.get('/connect', (req, res) => {
   if (isNil(req.session)) {
     throw unauthorized('You need to be logged in to connect a Google account.')
   }
@@ -19,7 +19,7 @@ interface ICallbackQuery {
   code?: string
 }
 
-router.get('/callback', async (req, res) => {
+googleRouter.get('/callback', async (req, res) => {
   if (isNil(req.session)) {
     throw unauthorized('You need to be logged in to connect a Google account.')
   }

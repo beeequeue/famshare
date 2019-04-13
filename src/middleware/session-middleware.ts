@@ -2,7 +2,7 @@ import { RequestHandler, Response } from 'express'
 import { unauthorized } from 'boom'
 import { Base64 } from 'js-base64'
 
-import { getUserById } from '@/lib/discord'
+import { getUserById } from '@/modules/discord/discord.lib'
 import { Session } from '@/modules/session/session.model'
 import { User } from '@/modules/user/user.model'
 import { isNil } from '@/utils'

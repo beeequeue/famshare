@@ -12,8 +12,8 @@ import {
   SessionMiddleware,
 } from '@/middleware/session-middleware'
 import { ErrorHandler } from '@/middleware/error-handler'
-import { router } from '@/routes'
 import { createGraphQLMiddleware } from '@/graphql'
+import { router } from './router'
 
 const { PORT } = process.env
 const app = Express()

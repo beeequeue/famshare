@@ -6,7 +6,7 @@ import {
   ConnectionConstructor,
 } from '@/modules/connection/connection.model'
 import { Subscription } from '@/modules/subscription/subscription.model'
-import { stripe } from '@/lib/stripe'
+import { stripe } from '@/modules/stripe/stripe.lib'
 import { isNil } from '@/utils'
 
 const table = () => knex('user')

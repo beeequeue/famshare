@@ -2,7 +2,7 @@ import { badRequest } from 'boom'
 import { Router } from 'express'
 import uuid from 'uuid/v4'
 
-import { getAccessToken, getUserFromToken } from '@/lib/discord'
+import { getAccessToken, getUserFromToken } from '@/modules/discord/discord.lib'
 import { User } from '@/modules/user/user.model'
 
 const { DISCORD_CLIENT } = process.env
@@ -12,9 +12,9 @@ const SCOPE = 'identify email'
 const getCallbackUrl = (hostname: string) =>
   `https://${hostname}/discord/callback`
 
-export const router = Router()
+export const discordRouter = Router()
 
-router.get('/login', (req, res) =>
+discordRouter.get('/login', (req, res) =>
   res.redirect(
     `${DISCORD}/oauth2/authorize` +
       `?client_id=${encodeURIComponent(DISCORD_CLIENT as string)}` +
@@ -28,7 +28,7 @@ interface ICallbackQuery {
   code?: string
 }
 
-router.get('/callback', async (req, res) => {
+discordRouter.get('/callback', async (req, res) => {
   const { code } = req.query as ICallbackQuery
 
   if (!code) {
