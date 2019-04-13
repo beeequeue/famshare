@@ -1,13 +1,13 @@
 import { Field, ID, ObjectType } from 'type-graphql'
 
-import { DatabaseTable, knex, Table, TableData, TableOptions } from '@/db'
+import { DatabaseTable, knex, Table, ITableData, ITableOptions } from '@/db'
 import { Plan } from '@/modules/plan/plan.model'
 import { User } from '@/modules/user/user.model'
 import { isNil } from '@/utils'
 
 const table = () => knex('invite')
 
-export interface InviteConstructor extends TableOptions {
+export interface InviteConstructor extends ITableOptions {
   shortId: string
   cancelled: boolean
   expiresAt: Date
@@ -46,7 +46,7 @@ export class Invite extends DatabaseTable {
     this.planUuid = options.planUuid
   }
 
-  public static fromSql = (sql: InviteData & TableData) =>
+  public static fromSql = (sql: InviteData & ITableData) =>
     new Invite({
       ...DatabaseTable._fromSql(sql),
       shortId: sql.short_id,
@@ -100,7 +100,7 @@ export class Invite extends DatabaseTable {
   public static getByPlan = async (planUuid: string): Promise<Invite[]> => {
     const query = { plan_uuid: planUuid }
 
-    const sql: Array<TableData & InviteData> = await table().where(query)
+    const sql: Array<ITableData & InviteData> = await table().where(query)
 
     return await sql.map(s => Invite.fromSql(s))
   }

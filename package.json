@@ -85,7 +85,7 @@
   "scripts": {
     "build": "yarn tsc --noEmit -P tsconfig.json",
     "dev": "ts-node-dev --respawn -r dotenv/config -r tsconfig-paths/register --inspect -- src/index.ts",
-    "lint": "eslint src/**/*.ts",
+    "lint": "eslint src/**/*.ts src/*.ts",
     "proxy": "ngrok start famshare famshare-ui",
     "start": "ts-node -r dotenv/config -r tsconfig-paths/register src/index.ts"
   }

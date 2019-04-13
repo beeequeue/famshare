@@ -1,6 +1,6 @@
 import { Field, ID, ObjectType, registerEnumType } from 'type-graphql'
 
-import { DatabaseTable, knex, TableData, TableOptions } from '@/db'
+import { DatabaseTable, knex, ITableData, ITableOptions } from '@/db'
 import {
   Connection,
   ConnectionConstructor,
@@ -19,7 +19,7 @@ registerEnumType(AccessLevel, {
   name: 'AccessLevel',
 })
 
-interface Constructor extends TableOptions {
+interface Constructor extends ITableOptions {
   uuid: string
   email: string
   accessLevel?: AccessLevel
@@ -65,7 +65,7 @@ export class User extends DatabaseTable {
     this.stripeId = params.stripeId || null
   }
 
-  public static fromSql = (sql: UserData & TableData) =>
+  public static fromSql = (sql: UserData & ITableData) =>
     new User({
       ...DatabaseTable._fromSql(sql),
       discordId: sql.discord_id,

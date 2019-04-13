@@ -16,13 +16,13 @@ export enum Table {
   INVITE = 'invite',
 }
 
-export interface TableOptions {
+export interface ITableOptions {
   uuid?: string
   createdAt?: Date
   updatedAt?: Date
 }
 
-export interface TableData {
+export interface ITableData {
   uuid: string
   created_at: Date
   updated_at: Date
@@ -38,7 +38,7 @@ export class DatabaseTable {
   public readonly createdAt: Date
   public readonly updatedAt: Date
 
-  constructor(options: TableOptions) {
+  public constructor(options: ITableOptions) {
     const now = new Date()
 
     this.__name = this.constructor.name.toLowerCase()
@@ -48,7 +48,7 @@ export class DatabaseTable {
     this.updatedAt = options.updatedAt || now
   }
 
-  protected static _fromSql = (sql: TableData): Required<TableOptions> => ({
+  protected static _fromSql = (sql: ITableData): Required<ITableOptions> => ({
     uuid: sql.uuid,
     createdAt: sql.created_at,
     updatedAt: sql.updated_at,
@@ -77,10 +77,12 @@ export class DatabaseTable {
 
   protected _save = async (extraData: any) => {
     const data = {
+      /* eslint-disable @typescript-eslint/camelcase */
       uuid: this.uuid,
       created_at: this.createdAt,
       updated_at: this.updatedAt,
       ...extraData,
+      /* eslint-enable @typescript-eslint/camelcase */
     }
 
     if (await this.exists()) {

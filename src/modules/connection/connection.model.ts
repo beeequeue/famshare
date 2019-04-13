@@ -1,6 +1,6 @@
 import { Field, ID, ObjectType, registerEnumType } from 'type-graphql'
 
-import { DatabaseTable, knex, TableData, TableOptions } from '@/db'
+import { DatabaseTable, knex, ITableData, ITableOptions } from '@/db'
 import { User } from '@/modules/user/user.model'
 import { isNil } from '@/utils'
 
@@ -14,7 +14,7 @@ registerEnumType(ConnectionType, {
   name: 'ConnectionType',
 })
 
-export interface ConnectionConstructor extends TableOptions {
+export interface ConnectionConstructor extends ITableOptions {
   type: ConnectionType
   ownerUuid: string
   userId: string
@@ -61,7 +61,7 @@ export class Connection extends DatabaseTable {
     this.link = options.link
   }
 
-  public static fromSql = (sql: ConnectionData & TableData) =>
+  public static fromSql = (sql: ConnectionData & ITableData) =>
     new Connection({
       ...DatabaseTable._fromSql(sql),
       type: sql.type as ConnectionType,

@@ -1,10 +1,10 @@
-import { DatabaseTable, knex, TableData, TableOptions } from '@/db'
+import { DatabaseTable, knex, ITableData, ITableOptions } from '@/db'
 import { User } from '../user/user.model'
 
 const WEEK = 1000 * 60 * 60 * 24 * 7
 const table = () => knex('session')
 
-interface Constructor extends TableOptions {
+interface Constructor extends ITableOptions {
   userUuid: string
   expiresAt?: Date
 }
@@ -25,7 +25,7 @@ export class Session extends DatabaseTable {
     this.expiresAt = options.expiresAt || new Date(Date.now() + WEEK)
   }
 
-  public static fromSql = (sql: SessionData & TableData) =>
+  public static fromSql = (sql: SessionData & ITableData) =>
     new Session({
       ...DatabaseTable._fromSql(sql),
       userUuid: sql.user_uuid,

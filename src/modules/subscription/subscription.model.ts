@@ -1,6 +1,6 @@
 import { Field, ObjectType, registerEnumType } from 'type-graphql'
 
-import { DatabaseTable, knex, TableData, TableOptions } from '@/db'
+import { DatabaseTable, knex, ITableData, ITableOptions } from '@/db'
 import { User } from '@/modules/user/user.model'
 import { Plan } from '@/modules/plan/plan.model'
 import { Invite } from '@/modules/invite/invite.model'
@@ -21,7 +21,7 @@ registerEnumType(SubscriptionStatus, {
   name: 'SubscriptionStatus',
 })
 
-export interface SubscriptionConstructor extends TableOptions {
+export interface SubscriptionConstructor extends ITableOptions {
   planUuid: string
   userUuid: string
   inviteUuid: string
@@ -58,7 +58,7 @@ export class Subscription extends DatabaseTable {
     this.status = options.status
   }
 
-  public static fromSql = (sql: SubscriptionData & TableData) =>
+  public static fromSql = (sql: SubscriptionData & ITableData) =>
     new Subscription({
       ...DatabaseTable._fromSql(sql),
       planUuid: sql.plan_uuid,

@@ -1,7 +1,7 @@
 import { Field, Int, ObjectType } from 'type-graphql'
 import { addMonths, isAfter, setDate } from 'date-fns'
 
-import { DatabaseTable, knex, Table, TableData, TableOptions } from '@/db'
+import { DatabaseTable, knex, Table, ITableData, ITableOptions } from '@/db'
 import { User } from '@/modules/user/user.model'
 import { Invite } from '@/modules/invite/invite.model'
 import {
@@ -11,7 +11,7 @@ import {
 
 const table = () => knex('plan')
 
-interface Constructor extends TableOptions {
+interface Constructor extends ITableOptions {
   name: string
   paymentDay: number
   amount: number
@@ -75,7 +75,7 @@ export class Plan extends DatabaseTable {
     return results.map(result => User.fromSql(result))
   }
 
-  public static fromSql = (sql: PlanData & TableData) =>
+  public static fromSql = (sql: PlanData & ITableData) =>
     new Plan({
       ...DatabaseTable._fromSql(sql),
       name: sql.name,
