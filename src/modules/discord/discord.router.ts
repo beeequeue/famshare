@@ -2,7 +2,7 @@ import { badRequest } from 'boom'
 import { Router } from 'express'
 import uuid from 'uuid/v4'
 
-import { getAccessToken, getUserFromToken } from '@/modules/discord/discord.lib'
+import { Discord } from '@/modules/discord/discord.lib'
 import { User } from '@/modules/user/user.model'
 
 const { DISCORD_CLIENT } = process.env
@@ -35,9 +35,9 @@ discordRouter.get('/callback', async (req, res) => {
     throw badRequest('Did not get a code back from Discord...')
   }
 
-  const token = await getAccessToken(code, getCallbackUrl(req.hostname))
+  const token = await Discord.getAccessToken(code, getCallbackUrl(req.hostname))
 
-  const discordUser = await getUserFromToken(token)
+  const discordUser = await Discord.getUserFromToken(token)
 
   if (!discordUser.email || !discordUser.verified) {
     throw badRequest(

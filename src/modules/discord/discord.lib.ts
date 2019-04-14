@@ -12,35 +12,6 @@ const T = () => true
 const isError = (response: superagent.Response) =>
   !response.ok || response.error
 
-export const getAccessToken = async (
-  code: string,
-  redirectUri: string,
-): Promise<string> => {
-  const response = await superagent
-    .post(`${DISCORD}/oauth2/token`)
-    .type('form')
-    .send({
-      /* eslint-disable @typescript-eslint/camelcase */
-      client_id: DISCORD_CLIENT,
-      client_secret: DISCORD_SECRET,
-      grant_type: 'authorization_code',
-      code,
-      redirect_uri: redirectUri,
-      scope: SCOPE,
-      /* eslint-enable @typescript-eslint/camelcase */
-    })
-    .ok(T)
-
-  if (isError(response)) {
-    throw badRequest(
-      'Could not get access token from Discord...',
-      response.body,
-    )
-  }
-
-  return response.body.access_token
-}
-
 interface IDiscordUser {
   id: string
   username: string
@@ -51,30 +22,61 @@ interface IDiscordUser {
   bot?: boolean
 }
 
-export const getUserFromToken = async (
-  token: string,
-): Promise<IDiscordUser> => {
-  const response = await superagent
-    .get(`${DISCORD}/v6/users/@me`)
-    .auth(token, { type: 'bearer' })
-    .ok(T)
+export class Discord {
+  public static getAccessToken = async (
+    code: string,
+    redirectUri: string,
+  ): Promise<string> => {
+    const response = await superagent
+      .post(`${DISCORD}/oauth2/token`)
+      .type('form')
+      .send({
+        /* eslint-disable @typescript-eslint/camelcase */
+        client_id: DISCORD_CLIENT,
+        client_secret: DISCORD_SECRET,
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: redirectUri,
+        scope: SCOPE,
+        /* eslint-enable @typescript-eslint/camelcase */
+      })
+      .ok(T)
 
-  if (isError(response)) {
-    throw badRequest('Could not get user from token...')
+    if (isError(response)) {
+      throw badRequest(
+        'Could not get access token from Discord...',
+        response.body,
+      )
+    }
+
+    return response.body.access_token
   }
 
-  return response.body
-}
+  public static getUserFromToken = async (
+    token: string,
+  ): Promise<IDiscordUser> => {
+    const response = await superagent
+      .get(`${DISCORD}/v6/users/@me`)
+      .auth(token, { type: 'bearer' })
+      .ok(T)
 
-export const getUserById = async (id: string): Promise<IDiscordUser> => {
-  const response = await superagent
-    .get(`${DISCORD}/v6/users/${id}`)
-    .set('Authorization', 'Bot ' + DISCORD_TOKEN)
-    .ok(T)
+    if (isError(response)) {
+      throw badRequest('Could not get user from token...')
+    }
 
-  if (isError(response)) {
-    throw badRequest(`Could not get Discord user ${id}...`)
+    return response.body
   }
 
-  return response.body
+  public static getUserById = async (id: string): Promise<IDiscordUser> => {
+    const response = await superagent
+      .get(`${DISCORD}/v6/users/${id}`)
+      .set('Authorization', 'Bot ' + DISCORD_TOKEN)
+      .ok(T)
+
+    if (isError(response)) {
+      throw badRequest(`Could not get Discord user ${id}...`)
+    }
+
+    return response.body
+  }
 }
