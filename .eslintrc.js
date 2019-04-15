@@ -30,6 +30,7 @@ module.exports = {
     'import/no-default-export': 2,
     '@typescript-eslint/explicit-function-return-type': 0,
     '@typescript-eslint/no-explicit-any': 0,
+    '@typescript-eslint/no-non-null-assertion': 0,
     '@typescript-eslint/interface-name-prefix': [2, 'always'],
     'prettier/prettier': 0,
   },
