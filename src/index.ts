@@ -4,6 +4,7 @@ import CORS from 'cors'
 import BodyParser from 'body-parser'
 import CookieParser from 'cookie-parser'
 import Helmet from 'helmet'
+import proxy from 'http-proxy-middleware'
 import { transports } from 'winston'
 import { logger as Logger } from 'express-winston'
 
@@ -15,7 +16,7 @@ import { ErrorHandler } from '@/middleware/error-handler'
 import { createGraphQLMiddleware } from '@/graphql'
 import { router } from './router'
 
-const { PORT } = process.env
+const { PORT, FRONTEND_URL } = process.env
 const app = Express()
 
 const start = async () => {
@@ -50,6 +51,13 @@ const start = async () => {
     res.contentType('text/graphql')
     res.send(schema)
   })
+
+  app.use(
+    proxy({
+      target: FRONTEND_URL,
+      changeOrigin: true,
+    }),
+  )
 
   app.use(ErrorHandler())
 
