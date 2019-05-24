@@ -55,7 +55,7 @@
     "@types/signale": "1.2.1",
     "@typescript-eslint/eslint-plugin": "1.6.0",
     "@typescript-eslint/parser": "1.6.0",
-    "actions-toolkit": "2.0.0",
+    "actions-toolkit": "2.1.0",
     "eslint": "5.16.0",
     "eslint-config-prettier": "4.1.0",
     "eslint-config-standard": "12.0.0",
