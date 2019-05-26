@@ -57,7 +57,7 @@ discordRouter.get('/callback', async (req, res) => {
     await user.save()
   }
 
-  req.authenticate(user.uuid)
+  await req.authenticate(user.uuid)
 
   res.redirect('/')
 })

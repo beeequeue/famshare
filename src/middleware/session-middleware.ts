@@ -19,15 +19,20 @@ declare module 'express-serve-static-core' {
   interface Request {
     session?: ISession
 
-    authenticate: (userUuid: string) => void
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    authenticate: ReturnType<typeof authenticate>
   }
 }
+
+const DOMAIN = process.env.DOMAIN!.startsWith('.')
+  ? process.env.DOMAIN
+  : `.${process.env.DOMAIN}`
 
 const authenticate = (res: Response) => async (userUuid: string) => {
   const session = await Session.generate(userUuid)
 
   res.cookie('session', Base64.encode(session.uuid), {
-    domain: '.' + process.env.DOMAIN,
+    domain: DOMAIN,
     expires: session.expiresAt,
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',

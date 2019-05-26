@@ -25,6 +25,7 @@ module.exports = {
     'prettier/@typescript-eslint',
   ],
   rules: {
+    'no-use-before-define': 0,
     'node/no-unsupported-features/es-syntax': 0,
     'node/prefer-promises/dns': 2,
     'node/prefer-promises/fs': 2,
