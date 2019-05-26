@@ -1,5 +1,3 @@
-const exts = ['.js', '.ts']
-
 module.exports = {
   root: true,
   env: {
@@ -21,6 +19,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:import/errors',
     'plugin:import/warnings',
+    'plugin:import/typescript',
     'plugin:prettier/recommended',
     'prettier/standard',
     'prettier/@typescript-eslint',
@@ -46,14 +45,8 @@ module.exports = {
     'prettier/prettier': 0,
   },
   settings: {
-    'import/extensions': exts,
-    'import/parsers': {
-      '@typescript-eslint/parser': exts,
-    },
     'import/resolver': {
-      node: {
-        extensions: exts,
-      },
+      // Has to exist for some reason, can't find the issue on GitHub
       typescript: {},
     },
   },
