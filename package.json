@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "author": "BeeeQueue",
   "engines": {
-    "node": ">=12.3.1"
+    "node": ">=11.15.0"
   },
   "dependencies": {
     "@types/body-parser": "1.17.0",
