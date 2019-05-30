@@ -54,10 +54,10 @@ export class DatabaseTable {
     updatedAt: sql.updated_at,
   })
 
-  public exists = async () => {
+  public exists = async <Q extends {}>(where?: Q) => {
     const result = await this.__table()
       .count()
-      .where({ uuid: this.uuid })
+      .where(where || { uuid: this.uuid })
       .first()
 
     return Number(result['count(*)']) === 1

@@ -56,9 +56,7 @@ export class Session extends DatabaseTable {
   }
 
   public exists = async () =>
-    ((await table()
-      .where({ uuid: this.uuid, user_uuid: this.userUuid })
-      .count()) as any) === 1
+    super.exists({ uuid: this.uuid, user_uuid: this.userUuid })
 
   public save = async () => {
     const data: SessionData = {
