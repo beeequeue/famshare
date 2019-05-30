@@ -127,7 +127,7 @@ export class Invite extends DatabaseTable {
       .count()
       .where({ short_id: shortId })
 
-    return Number(result['count(*)']) === 1
+    return Number(result['count(*)' as any]) === 1
   }
 
   public getUserOf = async () => {

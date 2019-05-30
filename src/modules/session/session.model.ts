@@ -3,7 +3,7 @@ import { DatabaseTable, knex, ITableData, ITableOptions } from '@/db'
 import { User } from '../user/user.model'
 
 const WEEK = 1000 * 60 * 60 * 24 * 7
-const table = () => knex('session')
+const table = () => knex<SessionData & ITableData>('session')
 
 interface Constructor extends ITableOptions {
   userUuid: string
@@ -56,9 +56,9 @@ export class Session extends DatabaseTable {
   }
 
   public exists = async () =>
-    (await table()
-      .count()
-      .where({ uuid: this.uuid, user_uuid: this.userUuid })) === 1
+    ((await table()
+      .where({ uuid: this.uuid, user_uuid: this.userUuid })
+      .count()) as any) === 1
 
   public save = async () => {
     const data: SessionData = {
