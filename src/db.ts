@@ -38,7 +38,7 @@ export class DatabaseTable {
   public readonly createdAt: Date
   public readonly updatedAt: Date
 
-  public constructor(options: ITableOptions) {
+  constructor(options: ITableOptions) {
     const now = new Date()
 
     this.__name = this.constructor.name.toLowerCase()

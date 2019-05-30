@@ -40,7 +40,7 @@ googleRouter.get('/callback', async (req, res) => {
     )
   }
 
-  const user = await req.session.user
+  const user = req.session.user
 
   await user.connectWith({
     type: ConnectionType.GOOGLE,

@@ -18,7 +18,7 @@ import { isNil } from '@/utils'
 @Resolver()
 export class UserResolver {
   @Query(() => User)
-  async user(@Arg('uuid', () => ID) uuid: string) {
+  public async user(@Arg('uuid', () => ID) uuid: string) {
     const user = await User.findByUuid(uuid)
 
     if (isNil(user)) {
@@ -29,16 +29,16 @@ export class UserResolver {
   }
 
   @Query(() => User)
-  async viewer(@Ctx() context: Request) {
+  public async viewer(@Ctx() context: Request) {
     return context.session!.user
   }
 
   @Mutation(() => User)
-  async connectStripe(
+  public async connectStripe(
     @Arg('token', () => ID) token: string,
     @Ctx() context: Request,
   ): Promise<User> {
-    const user = await context.session!.user
+    const user = context.session!.user
 
     await user.createStripeCustomer(token)
 
@@ -49,12 +49,12 @@ export class UserResolver {
 @Resolver(() => User)
 export class UserFieldResolver implements ResolverInterface<User> {
   @FieldResolver()
-  async connections(@Root() user: User) {
-    return await user.getConnections()
+  public async connections(@Root() user: User) {
+    return user.getConnections()
   }
 
   @FieldResolver()
-  async subscriptions(@Root() user: User) {
-    return await user.getSubscriptions()
+  public async subscriptions(@Root() user: User) {
+    return user.getSubscriptions()
   }
 }

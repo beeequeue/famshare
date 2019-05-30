@@ -21,7 +21,7 @@ import { isNil } from '@/utils'
 @Resolver()
 export class SubscriptionResolver {
   @Mutation(() => Plan)
-  async subscribe(
+  public async subscribe(
     @Arg('invitationId', () => ID) invitationId: string,
     @Ctx() context: Request,
   ): Promise<Plan> {
@@ -42,17 +42,17 @@ export class SubscriptionResolver {
 export class SubscriptionFieldResolver
   implements ResolverInterface<Subscription> {
   @FieldResolver()
-  async plan(@Root() subscription: Subscription) {
-    return await Plan.getByUuid(subscription.planUuid)
+  public async plan(@Root() subscription: Subscription) {
+    return Plan.getByUuid(subscription.planUuid)
   }
 
   @FieldResolver()
-  async user(@Root() subscription: Subscription) {
-    return await User.getByUuid(subscription.userUuid)
+  public async user(@Root() subscription: Subscription) {
+    return User.getByUuid(subscription.userUuid)
   }
 
   @FieldResolver()
-  async invite(@Root() subscription: Subscription) {
-    return await Invite.getByUuid(subscription.inviteUuid)
+  public async invite(@Root() subscription: Subscription) {
+    return Invite.getByUuid(subscription.inviteUuid)
   }
 }

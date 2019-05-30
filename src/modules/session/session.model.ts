@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import { DatabaseTable, knex, ITableData, ITableOptions } from '@/db'
 import { User } from '../user/user.model'
 

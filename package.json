@@ -34,7 +34,7 @@
     "helmet": "3.18.0",
     "http-proxy-middleware": "0.19.1",
     "js-base64": "2.5.1",
-    "knex": "0.16.5",
+    "knex": "0.17.0",
     "pg": "7.11.0",
     "reflect-metadata": "0.1.13",
     "stripe": "7.1.0",
@@ -42,7 +42,7 @@
     "ts-node": "8.2.0",
     "tsconfig-paths": "3.8.0",
     "type-graphql": "0.17.4",
-    "typescript": "3.4.5",
+    "typescript": "3.5.1",
     "uuid": "3.3.2",
     "winston": "3.2.1"
   },
@@ -87,7 +87,7 @@
   "scripts": {
     "build": "yarn tsc --noEmit -P tsconfig.json",
     "dev": "ts-node-dev --respawn -r dotenv/config -r tsconfig-paths/register --inspect -- src/index.ts",
-    "lint": "eslint src/**/*.ts src/*.ts",
+    "lint": "eslint 'src/**/*'",
     "proxy": "ngrok start famshare famshare-ui",
     "start": "ts-node -r dotenv/config -r tsconfig-paths/register src/index.ts"
   }

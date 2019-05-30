@@ -20,7 +20,7 @@ import { isNil, propEq } from '@/utils'
 @Resolver()
 export class ConnectionResolver {
   @Mutation(() => Connection)
-  async deleteConnection(
+  public async deleteConnection(
     @Arg('type') type: ConnectionType,
     @Ctx() context: Request,
   ): Promise<User> {
@@ -41,7 +41,7 @@ export class ConnectionResolver {
 @Resolver(() => Connection)
 export class ConnectionFieldResolver implements ResolverInterface<Connection> {
   @FieldResolver()
-  async owner(@Root() connection: Connection) {
-    return await connection.getOwner()
+  public async owner(@Root() connection: Connection) {
+    return connection.getOwner()
   }
 }

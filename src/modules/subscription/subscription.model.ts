@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import { Field, ObjectType, registerEnumType } from 'type-graphql'
 
 import { DatabaseTable, knex, ITableData, ITableOptions } from '@/db'

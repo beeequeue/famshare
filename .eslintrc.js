@@ -39,10 +39,14 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 0,
     '@typescript-eslint/no-explicit-any': 0,
     '@typescript-eslint/no-non-null-assertion': 0,
-    '@typescript-eslint/interface-name-prefix': [2, 'always'],
+    '@typescript-eslint/interface-name-prefix': 0,
     '@typescript-eslint/prefer-includes': 2,
     '@typescript-eslint/prefer-string-starts-ends-with': 2,
     '@typescript-eslint/await-thenable': 2,
+    '@typescript-eslint/explicit-member-accessibility': [
+      2,
+      { overrides: { constructors: 'no-public' } },
+    ],
     'prettier/prettier': 0,
   },
   settings: {

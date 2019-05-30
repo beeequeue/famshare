@@ -21,30 +21,30 @@ import { isNil } from '@/utils'
 @InputType()
 class CreatePlanOptions implements Partial<Plan> {
   @Field()
-  name!: string
+  public name!: string
 
   @Field(() => Int)
-  amount!: number
+  public amount!: number
 
   @Field(() => Int, {
     description: '1-indexed day in month payments are done.',
   })
-  paymentDay!: number
+  public paymentDay!: number
 }
 
 @InputType()
 class EditPlanOptions implements Partial<Plan> {
   @Field(() => ID)
-  uuid!: string
+  public uuid!: string
 
   @Field({ nullable: true })
-  name!: string
+  public name!: string
 }
 
 @Resolver()
 export class PlanResolver {
   @Query(() => Plan)
-  async plan(@Arg('uuid', () => ID) uuid: string) {
+  public async plan(@Arg('uuid', () => ID) uuid: string) {
     const plan = await Plan.findByUuid(uuid)
 
     if (isNil(plan)) {
@@ -55,7 +55,7 @@ export class PlanResolver {
   }
 
   @Mutation(() => Plan)
-  async createPlan(
+  public async createPlan(
     @Arg('options') options: CreatePlanOptions,
     @Ctx() context: Request,
   ): Promise<Plan> {
@@ -70,7 +70,7 @@ export class PlanResolver {
   }
 
   @Mutation(() => Plan)
-  async editPlan(
+  public async editPlan(
     @Arg('options') options: EditPlanOptions,
     @Ctx() context: Request,
   ): Promise<Plan> {
@@ -95,12 +95,12 @@ export class PlanResolver {
 @Resolver(() => Plan)
 export class PlanFieldResolver implements ResolverInterface<Plan> {
   @FieldResolver()
-  async owner(@Root() plan: Plan) {
-    return await plan.getOwner()
+  public async owner(@Root() plan: Plan) {
+    return plan.getOwner()
   }
 
   @FieldResolver()
-  async members(@Root() plan: Plan) {
-    return await plan.getMembers()
+  public async members(@Root() plan: Plan) {
+    return plan.getMembers()
   }
 }

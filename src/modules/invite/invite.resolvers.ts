@@ -20,7 +20,7 @@ import { isNil } from '@/utils'
 @Resolver()
 export class InviteResolver {
   @Query(() => Invite)
-  async invite(
+  public async invite(
     @Arg('uuid', () => ID, { nullable: true }) uuid?: string,
     @Arg('shortId', () => ID, { nullable: true }) shortId?: string,
   ): Promise<Invite> {
@@ -42,7 +42,7 @@ export class InviteResolver {
   }
 
   @Mutation(() => Invite)
-  async createInvite(
+  public async createInvite(
     @Arg('planUuid', () => ID) planUuid: string,
     @Arg('expiresAt', () => Date) expiresAt: Date,
     @Ctx() context: Request,
@@ -66,12 +66,12 @@ export class InviteResolver {
 @Resolver(() => Invite)
 export class InviteFieldResolver implements ResolverInterface<Invite> {
   @FieldResolver()
-  async plan(@Root() invite: Invite) {
-    return await Plan.getByUuid(invite.planUuid)
+  public async plan(@Root() invite: Invite) {
+    return Plan.getByUuid(invite.planUuid)
   }
 
   @FieldResolver()
-  async user(@Root() invite: Invite) {
-    return await invite.getUserOf()
+  public async user(@Root() invite: Invite) {
+    return invite.getUserOf()
   }
 }

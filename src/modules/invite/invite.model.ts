@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import { Field, ID, ObjectType } from 'type-graphql'
 
 import { DatabaseTable, knex, Table, ITableData, ITableOptions } from '@/db'
@@ -100,9 +101,9 @@ export class Invite extends DatabaseTable {
   public static getByPlan = async (planUuid: string): Promise<Invite[]> => {
     const query = { plan_uuid: planUuid }
 
-    const sql: Array<ITableData & InviteData> = await table().where(query)
+    const sql: (ITableData & InviteData)[] = await table().where(query)
 
-    return await sql.map(s => Invite.fromSql(s))
+    return sql.map(s => Invite.fromSql(s))
   }
 
   private static shortIdChars = 'abcdefghijklmnopqrstuvwxyz1234567890'
