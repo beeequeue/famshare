@@ -160,10 +160,10 @@
     "@types/node" "*"
     "@types/range-parser" "*"
 
-"@types/express-winston@3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@types/express-winston/-/express-winston-3.0.1.tgz#f88c7b3a6c155897c1b82f74f8731408c9a3d0b6"
-  integrity sha512-GTQavOxuEmU0NzdRaFTu18iLWSihxLRHHeEnCSPNkF14QlwTl/Sat2Kly2T2FZB1WG3R/mfNmX5H0fobTzuu4g==
+"@types/express-winston@3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@types/express-winston/-/express-winston-3.0.2.tgz#bd6ff8d944062b566cc14e2c4b92f46d54e7e1f7"
+  integrity sha512-+v1hT5TQOMDFUeD5Nzi7JdJvStoXebGOYog9RDGcZ8vY2LN8zd68bf9NiIna6TSxXul2Lli1tKz2C6oOyrGEOg==
   dependencies:
     "@types/express" "*"
     winston "^3.0.0"
