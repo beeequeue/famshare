@@ -160,10 +160,10 @@
     "@types/node" "*"
     "@types/range-parser" "*"
 
-"@types/express-winston@3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@types/express-winston/-/express-winston-3.0.1.tgz#f88c7b3a6c155897c1b82f74f8731408c9a3d0b6"
-  integrity sha512-GTQavOxuEmU0NzdRaFTu18iLWSihxLRHHeEnCSPNkF14QlwTl/Sat2Kly2T2FZB1WG3R/mfNmX5H0fobTzuu4g==
+"@types/express-winston@3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@types/express-winston/-/express-winston-3.0.2.tgz#bd6ff8d944062b566cc14e2c4b92f46d54e7e1f7"
+  integrity sha512-+v1hT5TQOMDFUeD5Nzi7JdJvStoXebGOYog9RDGcZ8vY2LN8zd68bf9NiIna6TSxXul2Lli1tKz2C6oOyrGEOg==
   dependencies:
     "@types/express" "*"
     winston "^3.0.0"
@@ -251,10 +251,10 @@
   resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.0.tgz#69a23a3ad29caf0097f06eda59b361ee2f0639f6"
   integrity sha1-aaI6OtKcrwCX8G7aWbNh7i8GOfY=
 
-"@types/node@*", "@types/node@12.0.2":
-  version "12.0.2"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.0.2.tgz#3452a24edf9fea138b48fad4a0a028a683da1e40"
-  integrity sha512-5tabW/i+9mhrfEOUcLDu2xBPsHJ+X5Orqy9FKpale3SjDA17j5AEpYq5vfy3oAeAHGcvANRCO3NV3d2D6q3NiA==
+"@types/node@*", "@types/node@12.0.4":
+  version "12.0.4"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.0.4.tgz#46832183115c904410c275e34cf9403992999c32"
+  integrity sha512-j8YL2C0fXq7IONwl/Ud5Kt0PeXw22zGERt+HSSnwbKOJVsAGkEz3sFCYwaF9IOuoG1HOtE0vKCj6sXF7Q0+Vaw==
 
 "@types/node@^11.13.7":
   version "11.13.11"
@@ -301,10 +301,10 @@
   resolved "https://registry.yarnpkg.com/@types/strip-json-comments/-/strip-json-comments-0.0.30.tgz#9aa30c04db212a9a0649d6ae6fd50accc40748a1"
   integrity sha512-7NQmHra/JILCd1QqpSzl8+mJRc8ZHz3uDm8YV1Ks9IhK0epEiTw8aIErbvH9PI+6XbqhyIQy3462nEsn7UVzjQ==
 
-"@types/stripe@6.26.2":
-  version "6.26.2"
-  resolved "https://registry.yarnpkg.com/@types/stripe/-/stripe-6.26.2.tgz#e1446abd04f0547a1ce8058405b9c32edee54e07"
-  integrity sha512-0mHsCD2rgT3sKuZMrng0fPnkQV/3S1ZTaNSeVrCKDphchRH6zNKmsVEHiXado6c1ntZ0WlhwtPq04MIc2PPiLg==
+"@types/stripe@6.26.5":
+  version "6.26.5"
+  resolved "https://registry.yarnpkg.com/@types/stripe/-/stripe-6.26.5.tgz#94ff3fb6cc9304e7ee5647d9f69a97ffac7e8e1a"
+  integrity sha512-L7yMWsmduBKjupcNL1N4GeLHcOKdqgPvhxuWUzf60Tda/O8yFkaNYtgeC0iqPID8a180NzjpnPN9bJbq1gCLxg==
   dependencies:
     "@types/node" "*"
 
@@ -892,10 +892,10 @@ color@3.0.x:
     color-convert "^1.9.1"
     color-string "^1.5.2"
 
-colorette@1.0.7:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/colorette/-/colorette-1.0.7.tgz#7adf43c445ee63a541b4a4aef7d13f03df1e0cc0"
-  integrity sha512-KeK4klsvAgdODAjFPm6QLzvStizJqlxMBtVo4KQMCgk5tt/tf9rAzxmxLHNRynJg3tJjkKGKbHx3j4HLox27Lw==
+colorette@1.0.8:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/colorette/-/colorette-1.0.8.tgz#421ff11c80b7414027ebed922396bc1833d1903c"
+  integrity sha512-X6Ck90ReaF+EfKdVGB7vdIQ3dr651BbIrBwY5YBKg13fjH+940sTtp7/Pkx33C6ntYfQcRumOs/aUQhaRPpbTQ==
 
 colornames@^1.1.1:
   version "1.1.1"
@@ -2028,10 +2028,10 @@ get-value@^2.0.3, get-value@^2.0.6:
   resolved "https://registry.yarnpkg.com/get-value/-/get-value-2.0.6.tgz#dc15ca1c672387ca76bd37ac0a395ba2042a2c28"
   integrity sha1-3BXKHGcjh8p2vTesCjlbogQqLCg=
 
-getopts@2.2.3:
-  version "2.2.3"
-  resolved "https://registry.yarnpkg.com/getopts/-/getopts-2.2.3.tgz#11d229775e2ec2067ed8be6fcc39d9b4bf39cf7d"
-  integrity sha512-viEcb8TpgeG05+Nqo5EzZ8QR0hxdyrYDp6ZSTZqe2M/h53Bk036NmqG38Vhf5RGirC/Of9Xql+v66B2gp256SQ==
+getopts@2.2.4:
+  version "2.2.4"
+  resolved "https://registry.yarnpkg.com/getopts/-/getopts-2.2.4.tgz#3137fe8a5fddf304904059a851bdc1c22f0f54fb"
+  integrity sha512-Rz7DGyomZjrenu9Jx4qmzdlvJgvrEFHXHvjK0FcZtcTC1U5FmES7OdZHUwMuSnEE6QvBvwse1JODKj7TgbSEjQ==
 
 getpass@^0.1.1:
   version "0.1.7"
@@ -2805,18 +2805,18 @@ kind-of@^6.0.0, kind-of@^6.0.2:
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.2.tgz#01146b36a6218e64e58f3a8d66de5d7fc6f6d051"
   integrity sha512-s5kLOcnH0XqDO+FvuaLX8DDjZ18CGFk7VygH40QoKPUQhW4e2rvM0rwUq0t8IQDOwYSeLK01U90OjzBTme2QqA==
 
-knex@*, knex@0.17.0:
-  version "0.17.0"
-  resolved "https://registry.yarnpkg.com/knex/-/knex-0.17.0.tgz#ac0de21eb8088284ba9343baf9d68e329f8a2d96"
-  integrity sha512-+jGBkpkgDpTEVtuF3FdWfIkjbYY/mdG4UOT6dU+Jq1ioBo43dtEs31IUXKnppKr3QN8jzPM9+5QbEZ628ssT5w==
+knex@*, knex@0.17.2:
+  version "0.17.2"
+  resolved "https://registry.yarnpkg.com/knex/-/knex-0.17.2.tgz#5fb7a4aed609b98ee44b767de16504d10be76baa"
+  integrity sha512-jyyss+ZYb79FgEHhv1tLs6eRrVCr9pJAh8+AoCDQxUz1k/Rxb/E2P4p62SE047WsOVTo4sLREr2LV1DVf5Z7Xg==
   dependencies:
     "@babel/polyfill" "^7.4.4"
     "@types/bluebird" "^3.5.27"
     bluebird "^3.5.5"
-    colorette "1.0.7"
+    colorette "1.0.8"
     commander "^2.20.0"
     debug "4.1.1"
-    getopts "2.2.3"
+    getopts "2.2.4"
     inherits "~2.0.3"
     interpret "^1.2.0"
     liftoff "3.1.0"
