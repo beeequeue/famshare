@@ -1,7 +1,6 @@
 import GraphQL from 'express-graphql'
 import { printSchema } from 'graphql'
-import { buildTypeDefsAndResolvers } from 'type-graphql'
-import { makeExecutableSchema } from 'graphql-tools'
+import { buildSchema } from 'type-graphql'
 
 import {
   ConnectionFieldResolver,
@@ -17,11 +16,11 @@ import {
   SubscriptionResolver,
 } from '@/modules/subscription/subscription.resolvers'
 import { UserFieldResolver, UserResolver } from '@/modules/user/user.resolvers'
-import { directives } from '@/graphql/directives'
+import { authChecker } from '@/modules/session/session.lib'
 import { IS_DEV } from '@/utils'
 
 export const createGraphQLMiddleware = async () => {
-  const { typeDefs, resolvers } = await buildTypeDefsAndResolvers({
+  const schema = await buildSchema({
     resolvers: [
       ConnectionResolver,
       ConnectionFieldResolver,
@@ -34,12 +33,7 @@ export const createGraphQLMiddleware = async () => {
       UserResolver,
       UserFieldResolver,
     ],
-  })
-
-  const schema = makeExecutableSchema({
-    typeDefs,
-    resolvers,
-    schemaDirectives: directives,
+    authChecker,
   })
 
   return {

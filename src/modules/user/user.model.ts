@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { Field, ID, ObjectType, registerEnumType } from 'type-graphql'
+import {
+  Authorized,
+  Field,
+  ID,
+  ObjectType,
+  registerEnumType,
+} from 'type-graphql'
 
 import { DatabaseTable, knex, ITableData, ITableOptions } from '@/db'
 import {
@@ -47,6 +53,8 @@ export class User extends DatabaseTable {
   public hasSetupStripe(): boolean {
     return !isNil(this.stripeId)
   }
+  @Authorized([AccessLevel.ADMIN])
+  @Field(() => ID, { nullable: true })
   public stripeId: string | null
 
   @Field(() => [Connection])

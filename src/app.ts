@@ -11,7 +11,7 @@ import { logger as Logger } from 'express-winston'
 import {
   assertLoggedIn,
   SessionMiddleware,
-} from '@/middleware/session-middleware'
+} from '@/modules/session/session.lib'
 import { ErrorHandler } from '@/middleware/error-handler'
 import { createGraphQLMiddleware } from '@/graphql'
 import { router } from './router'

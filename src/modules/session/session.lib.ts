@@ -1,10 +1,11 @@
-import { RequestHandler, Response } from 'express'
+import { Request, RequestHandler, Response } from 'express'
 import { unauthorized } from 'boom'
 import { Base64 } from 'js-base64'
+import { AuthChecker } from 'type-graphql'
 
 import { Discord } from '@/modules/discord/discord.lib'
 import { Session } from '@/modules/session/session.model'
-import { User } from '@/modules/user/user.model'
+import { AccessLevel, User } from '@/modules/user/user.model'
 import { isNil } from '@/utils'
 import { NOT_LOGGED_IN } from '@/errors'
 
@@ -75,4 +76,12 @@ export const assertLoggedIn = (): RequestHandler => (req, res, next) => {
 
   res.status(401)
   res.send(unauthorized(NOT_LOGGED_IN).output.payload)
+}
+
+export const authChecker: AuthChecker<Request, AccessLevel> = (
+  { context },
+  roles,
+) => {
+  console.log(context.session!.user.accessLevel, roles[0])
+  return context.session!.user.accessLevel === roles[0]
 }
