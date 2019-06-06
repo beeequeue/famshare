@@ -48,13 +48,15 @@ export class DatabaseTable {
     this.updatedAt = options.updatedAt || now
   }
 
-  protected static _fromSql = (sql: ITableData): Required<ITableOptions> => ({
-    uuid: sql.uuid,
-    createdAt: sql.created_at,
-    updatedAt: sql.updated_at,
-  })
+  protected static _fromSql(sql: ITableData): Required<ITableOptions> {
+    return {
+      uuid: sql.uuid,
+      createdAt: sql.created_at,
+      updatedAt: sql.updated_at,
+    }
+  }
 
-  public exists = async <Q extends {}>(where?: Q) => {
+  public async exists<Q extends {}>(where?: Q) {
     const result = await this.__table()
       .count()
       .where(where || { uuid: this.uuid })
@@ -63,7 +65,7 @@ export class DatabaseTable {
     return Number(result['count(*)']) === 1
   }
 
-  public delete = async () => {
+  public async delete() {
     if (!(await this.exists())) {
       throw new Error(
         `Tried to delete non-existant ${this.__name}-${this.uuid}`,
@@ -75,7 +77,7 @@ export class DatabaseTable {
       .where({ uuid: this.uuid })
   }
 
-  protected _save = async (extraData: any) => {
+  protected async _save(extraData: any) {
     const data = {
       /* eslint-disable @typescript-eslint/camelcase */
       uuid: this.uuid,

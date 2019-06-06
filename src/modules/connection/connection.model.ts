@@ -62,8 +62,8 @@ export class Connection extends DatabaseTable {
     this.link = options.link
   }
 
-  public static fromSql = (sql: ConnectionData & ITableData) =>
-    new Connection({
+  public static fromSql(sql: ConnectionData & ITableData) {
+    return new Connection({
       ...DatabaseTable._fromSql(sql),
       type: sql.type as ConnectionType,
       ownerUuid: sql.owner_uuid,
@@ -72,10 +72,9 @@ export class Connection extends DatabaseTable {
       picture: sql.picture,
       link: sql.link,
     })
+  }
 
-  public static findByUuid = async (
-    uuid: string,
-  ): Promise<Connection | null> => {
+  public static async findByUuid(uuid: string): Promise<Connection | null> {
     const sql = await table()
       .where({ uuid })
       .first()
@@ -87,17 +86,15 @@ export class Connection extends DatabaseTable {
     return Connection.fromSql(sql)
   }
 
-  public static getByUserUuid = async (
-    ownerUuid: string,
-  ): Promise<Connection[]> => {
+  public static async getByUserUuid(ownerUuid: string): Promise<Connection[]> {
     const query: any = { owner_uuid: ownerUuid }
 
     const sql: any[] = await table().where(query)
 
-    return sql.map(Connection.fromSql)
+    return sql.map(Connection.fromSql.bind(Connection))
   }
 
-  public save = async () => {
+  public async save() {
     const data: ConnectionData = {
       type: this.type,
       owner_uuid: this.ownerUuid,

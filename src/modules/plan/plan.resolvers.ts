@@ -19,7 +19,8 @@ import { Plan } from '@/modules/plan/plan.model'
 import { isNil } from '@/utils'
 
 @InputType()
-class CreatePlanOptions implements Partial<Plan> {
+class CreatePlanOptions
+  implements Pick<Plan, 'name' | 'amount' | 'paymentDay'> {
   @Field()
   public name!: string
 
@@ -33,7 +34,7 @@ class CreatePlanOptions implements Partial<Plan> {
 }
 
 @InputType()
-class EditPlanOptions implements Partial<Plan> {
+class EditPlanOptions implements Pick<Plan, 'name'> {
   @Field(() => ID)
   public uuid!: string
 

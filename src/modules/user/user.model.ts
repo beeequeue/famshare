@@ -74,16 +74,17 @@ export class User extends DatabaseTable {
     this.stripeId = params.stripeId || null
   }
 
-  public static fromSql = (sql: UserData & ITableData) =>
-    new User({
+  public static fromSql(sql: UserData & ITableData) {
+    return new User({
       ...DatabaseTable._fromSql(sql),
       discordId: sql.discord_id,
       email: sql.email,
       accessLevel: sql.access_level,
       stripeId: sql.stripe_id,
     })
+  }
 
-  public static getByUuid = async (uuid: string) => {
+  public static async getByUuid(uuid: string) {
     const user = await table()
       .where({ uuid })
       .first()
@@ -93,7 +94,7 @@ export class User extends DatabaseTable {
     return User.fromSql(user)
   }
 
-  public static findByUuid = async (uuid: string) => {
+  public static async findByUuid(uuid: string) {
     const user = await table()
       .where({ uuid })
       .first()
@@ -103,7 +104,7 @@ export class User extends DatabaseTable {
     return User.fromSql(user)
   }
 
-  public static findByDiscordId = async (id: string) => {
+  public static async findByDiscordId(id: string) {
     const user = await table()
       .where({ discord_id: id })
       .first()
@@ -113,7 +114,7 @@ export class User extends DatabaseTable {
     return User.fromSql(user)
   }
 
-  public createStripeCustomer = async (stripeToken: string) => {
+  public async createStripeCustomer(stripeToken: string) {
     const customer = await stripe.customers.create({
       email: this.email,
       source: stripeToken,
@@ -129,12 +130,12 @@ export class User extends DatabaseTable {
     await this.save()
   }
 
-  public connectWith = async (
+  public async connectWith(
     data: Omit<
       ConnectionConstructor,
       'uuid' | 'ownerUuid' | 'createdAt' | 'updatedAt'
     >,
-  ) => {
+  ) {
     const connection = new Connection({
       ...data,
       ownerUuid: this.uuid,
@@ -143,7 +144,7 @@ export class User extends DatabaseTable {
     return connection.save()
   }
 
-  public exists = async () => {
+  public async exists() {
     const result = await table()
       .count()
       .where({ uuid: this.uuid })
@@ -153,7 +154,7 @@ export class User extends DatabaseTable {
     return Number(result.count) === 1
   }
 
-  public save = async () => {
+  public async save() {
     const data: UserData = {
       discord_id: this.discordId,
       email: this.email,

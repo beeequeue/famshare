@@ -76,16 +76,17 @@ export class Plan extends DatabaseTable {
     return results.map(result => User.fromSql(result))
   }
 
-  public static fromSql = (sql: PlanData & ITableData) =>
-    new Plan({
+  public static fromSql(sql: PlanData & ITableData) {
+    return new Plan({
       ...DatabaseTable._fromSql(sql),
       name: sql.name,
       amount: sql.amount,
       paymentDay: sql.payment_day,
       ownerUuid: sql.owner_uuid,
     })
+  }
 
-  public static findByUuid = async (uuid: string) => {
+  public static async findByUuid(uuid: string) {
     const plan = await table()
       .where({ uuid })
       .first()
@@ -95,7 +96,7 @@ export class Plan extends DatabaseTable {
     return Plan.fromSql(plan)
   }
 
-  public static getByUuid = async (uuid: string) => {
+  public static async getByUuid(uuid: string) {
     const plan = await table()
       .where({ uuid })
       .first()
@@ -105,9 +106,7 @@ export class Plan extends DatabaseTable {
     return Plan.fromSql(plan)
   }
 
-  public getInvites = async () => Invite.getByPlan(this.uuid)
-
-  public createInvite = async (expiresAt: Date) => {
+  public async createInvite(expiresAt: Date) {
     const shortId = await Invite.generateShortId()
 
     const invite = new Invite({
@@ -122,7 +121,7 @@ export class Plan extends DatabaseTable {
     return invite
   }
 
-  public subscribeUser = async (userUuid: string, inviteUuid: string) => {
+  public async subscribeUser(userUuid: string, inviteUuid: string) {
     const subscription = new Subscription({
       planUuid: this.uuid,
       userUuid,
@@ -135,7 +134,7 @@ export class Plan extends DatabaseTable {
     return subscription
   }
 
-  public save = async () => {
+  public async save() {
     const data: PlanData = {
       name: this.name,
       amount: this.amount,

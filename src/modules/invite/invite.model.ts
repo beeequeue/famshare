@@ -47,18 +47,17 @@ export class Invite extends DatabaseTable {
     this.planUuid = options.planUuid
   }
 
-  public static fromSql = (sql: InviteData & ITableData) =>
-    new Invite({
+  public static fromSql(sql: InviteData & ITableData) {
+    return new Invite({
       ...DatabaseTable._fromSql(sql),
       shortId: sql.short_id,
       cancelled: sql.cancelled,
       expiresAt: sql.expires_at,
       planUuid: sql.plan_uuid,
     })
+  }
 
-  public static findByShortId = async (
-    shortId: string,
-  ): Promise<Invite | null> => {
+  public static async findByShortId(shortId: string): Promise<Invite | null> {
     const sql = await table()
       .where({ short_id: shortId })
       .first()
@@ -70,7 +69,7 @@ export class Invite extends DatabaseTable {
     return Invite.fromSql(sql)
   }
 
-  public static findByUuid = async (uuid: string): Promise<Invite | null> => {
+  public static async findByUuid(uuid: string): Promise<Invite | null> {
     const query = { uuid }
 
     const sql = await table()
@@ -84,7 +83,7 @@ export class Invite extends DatabaseTable {
     return Invite.fromSql(sql)
   }
 
-  public static getByUuid = async (uuid: string): Promise<Invite> => {
+  public static async getByUuid(uuid: string): Promise<Invite> {
     const query = { uuid }
 
     const sql = await table()
@@ -98,7 +97,7 @@ export class Invite extends DatabaseTable {
     return Invite.fromSql(sql)
   }
 
-  public static getByPlan = async (planUuid: string): Promise<Invite[]> => {
+  public static async getByPlan(planUuid: string): Promise<Invite[]> {
     const query = { plan_uuid: planUuid }
 
     const sql: (ITableData & InviteData)[] = await table().where(query)
@@ -107,7 +106,8 @@ export class Invite extends DatabaseTable {
   }
 
   private static shortIdChars = 'abcdefghijklmnopqrstuvwxyz1234567890'
-  public static generateShortId = async (): Promise<string> => {
+
+  public static async generateShortId(): Promise<string> {
     const chars = Invite.shortIdChars
     let id = ''
 
@@ -122,7 +122,7 @@ export class Invite extends DatabaseTable {
     return id
   }
 
-  private static doesShortIdExist = async (shortId: string) => {
+  private static async doesShortIdExist(shortId: string) {
     const result = await table()
       .count()
       .where({ short_id: shortId })
@@ -130,7 +130,7 @@ export class Invite extends DatabaseTable {
     return Number(result['count(*)' as any]) === 1
   }
 
-  public getUserOf = async () => {
+  public async getUserOf() {
     const result: any = await knex(Table.USER)
       .select('user.*')
       .innerJoin(Table.SUBSCRIPTION, function() {
@@ -149,7 +149,7 @@ export class Invite extends DatabaseTable {
     return User.fromSql(result)
   }
 
-  public save = async () => {
+  public async save() {
     const data: InviteData = {
       short_id: this.shortId,
       cancelled: this.cancelled,

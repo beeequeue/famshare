@@ -26,14 +26,15 @@ export class Session extends DatabaseTable {
     this.expiresAt = options.expiresAt || new Date(Date.now() + WEEK)
   }
 
-  public static fromSql = (sql: SessionData & ITableData) =>
-    new Session({
+  public static fromSql(sql: SessionData & ITableData) {
+    return new Session({
       ...DatabaseTable._fromSql(sql),
       userUuid: sql.user_uuid,
       expiresAt: sql.expires_at,
     })
+  }
 
-  public static generate = async (userUuid: string) => {
+  public static async generate(userUuid: string) {
     const session = new Session({ userUuid })
 
     await session.save()
@@ -41,7 +42,7 @@ export class Session extends DatabaseTable {
     return session
   }
 
-  public static findByUuid = async (uuid: string) => {
+  public static async findByUuid(uuid: string) {
     const session = await table()
       .where({ uuid })
       .first()
@@ -51,14 +52,15 @@ export class Session extends DatabaseTable {
     return Session.fromSql(session)
   }
 
-  public getUser = async () => {
+  public async getUser() {
     return User.getByUuid(this.userUuid)
   }
 
-  public exists = async () =>
-    super.exists({ uuid: this.uuid, user_uuid: this.userUuid })
+  public async exists() {
+    return super.exists({ uuid: this.uuid, user_uuid: this.userUuid })
+  }
 
-  public save = async () => {
+  public async save() {
     const data: SessionData = {
       user_uuid: this.userUuid,
       expires_at: this.expiresAt,
