@@ -151,7 +151,7 @@ export class User extends DatabaseTable {
       .orWhere({ discord_id: this.discordId })
       .first()
 
-    return Number(result.count) === 1
+    return Number(result!.count) === 1
   }
 
   public async save() {

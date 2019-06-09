@@ -1,0 +1,4 @@
+#!/bin/bash
+
+export FAMSHARE_TOKEN=$(ts-node $(dirname "$0")/get-token.ts $1)
+echo FAMSHARE_TOKEN=$FAMSHARE_TOKEN
