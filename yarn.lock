@@ -1061,10 +1061,10 @@ dasherize@2.0.0:
   resolved "https://registry.yarnpkg.com/dasherize/-/dasherize-2.0.0.tgz#6d809c9cd0cf7bb8952d80fc84fa13d47ddb1308"
   integrity sha1-bYCcnNDPe7iVLYD8hPoT1H3bEwg=
 
-date-fns@2.0.0-alpha.27:
-  version "2.0.0-alpha.27"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.0.0-alpha.27.tgz#5ecd4204ef0e7064264039570f6e8afbc014481c"
-  integrity sha512-cqfVLS+346P/Mpj2RpDrBv0P4p2zZhWWvfY5fuWrXNR/K38HaAGEkeOwb47hIpQP9Jr/TIxjZ2/sNMQwdXuGMg==
+date-fns@2.0.0-alpha.33:
+  version "2.0.0-alpha.33"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.0.0-alpha.33.tgz#c2f73c3cc50ac301c9217eb93603c9bc40e891bf"
+  integrity sha512-tqUVEk3oxnJuNIvwAMKHAMo4uFRG0zXvjxZQll+BonoPt+m4NMcUgO14NDxbHuy7uYcrVErd2GdSsw02EDZQ7w==
 
 date-fns@^1.27.2:
   version "1.30.1"
