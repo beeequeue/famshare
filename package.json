@@ -69,7 +69,7 @@
     "prettier": "1.17.1",
     "sqlite3": "4.0.9",
     "ts-jest": "24.0.2",
-    "ts-node-dev": "1.0.0-pre.39"
+    "ts-node-dev": "1.0.0-pre.40"
   },
   "engines": {
     "node": ">=11.15.0"
