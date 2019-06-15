@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { Field, ID, ObjectType } from 'type-graphql'
 
-import { DatabaseTable, knex, Table, ITableData, ITableOptions } from '@/db'
+import { DatabaseTable, knex, ITableData, ITableOptions } from '@/db'
 import { Plan } from '@/modules/plan/plan.model'
 import { User } from '@/modules/user/user.model'
 import { isNil } from '@/utils'
+import { Table } from '@/constants'
 
 const table = () => knex('invite')
 

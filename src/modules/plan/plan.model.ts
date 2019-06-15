@@ -2,13 +2,14 @@
 import { Field, Int, ObjectType } from 'type-graphql'
 import { addMonths, isAfter, setDate } from 'date-fns'
 
-import { DatabaseTable, knex, Table, ITableData, ITableOptions } from '@/db'
+import { DatabaseTable, knex, ITableData, ITableOptions } from '@/db'
 import { User } from '@/modules/user/user.model'
 import { Invite } from '@/modules/invite/invite.model'
 import {
   Subscription,
   SubscriptionStatus,
 } from '@/modules/subscription/subscription.model'
+import { Table } from '@/constants'
 
 const table = () => knex('plan')
 

@@ -13,7 +13,3 @@ declare module '*/knexfile' {
 
   export = config
 }
-
-// For @types/superagent
-type Blob = any
-type XMLHttpRequest = any

@@ -1,20 +1,13 @@
-import Knex, { CreateTableBuilder, QueryBuilder } from 'knex'
+import Knex, { QueryBuilder } from 'knex'
 import { Field, ID, ObjectType } from 'type-graphql'
 import uuid from 'uuid/v4'
 
-import config from '@/../knexfile'
+import { config } from '../knexfile'
 
 const { NODE_ENV } = process.env
-export const knex = Knex(config[NODE_ENV as 'development' | 'production'])
-
-export enum Table {
-  USER = 'user',
-  SESSION = 'session',
-  PLAN = 'plan',
-  CONNECTION = 'connection',
-  SUBSCRIPTION = 'subscription',
-  INVITE = 'invite',
-}
+export const knex = Knex(
+  config[NODE_ENV as 'development' | 'production' | 'test'],
+)
 
 export interface ITableOptions {
   uuid?: string
@@ -51,8 +44,8 @@ export class DatabaseTable {
   protected static _fromSql(sql: ITableData): Required<ITableOptions> {
     return {
       uuid: sql.uuid,
-      createdAt: sql.created_at,
-      updatedAt: sql.updated_at,
+      createdAt: new Date(sql.created_at),
+      updatedAt: new Date(sql.updated_at),
     }
   }
 
@@ -98,102 +91,3 @@ export class DatabaseTable {
     await this.__table().insert(data)
   }
 }
-
-/**
- * Checks if a table exists, and creates it if it doesn't.
- * Always adds a `uuid` column.
- */
-const createTableIfDoesNotExist = async (
-  name: Table,
-  cb: (tableBuilder: CreateTableBuilder) => void,
-) => {
-  try {
-    await knex(name).count('uuid')
-  } catch (e) {
-    console.log(`Creating table ${name}`)
-
-    await knex.schema.createTable(name, table => {
-      table.uuid('uuid').primary()
-
-      cb(table)
-
-      table.timestamps(false, true)
-    })
-  }
-}
-
-const initialize = async () => {
-  const promises: Promise<any>[] = []
-
-  promises.push(
-    createTableIfDoesNotExist(Table.USER, table => {
-      table
-        .string('discord_id', 50)
-        .notNullable()
-        .unique()
-
-      table
-        .string('email', 100)
-        .notNullable()
-        .unique()
-
-      table.string('access_level', 25)
-
-      table.string('stripe_id', 50)
-    }),
-
-    createTableIfDoesNotExist(Table.SESSION, table => {
-      table.uuid('user_uuid').notNullable()
-
-      table.timestamp('expires_at').notNullable()
-    }),
-
-    createTableIfDoesNotExist(Table.PLAN, table => {
-      table.string('name', 100).notNullable()
-
-      table.integer('amount').notNullable()
-
-      table.integer('payment_day').notNullable()
-
-      table.uuid('owner_uuid').notNullable()
-    }),
-
-    createTableIfDoesNotExist(Table.CONNECTION, table => {
-      table.string('type', 25).notNullable()
-
-      table.uuid('owner_uuid').notNullable()
-
-      table.string('user_id', 100).notNullable()
-
-      table.string('identifier', 100).notNullable()
-
-      table.string('picture')
-
-      table.string('link')
-    }),
-
-    createTableIfDoesNotExist(Table.SUBSCRIPTION, table => {
-      table.uuid('plan_uuid').notNullable()
-
-      table.uuid('user_uuid').notNullable()
-
-      table.uuid('invite_uuid').notNullable()
-
-      table.string('status', 25).notNullable()
-    }),
-
-    createTableIfDoesNotExist(Table.INVITE, table => {
-      table.string('short_id', 20).notNullable()
-
-      table.boolean('cancelled').notNullable()
-
-      table.timestamp('expires_at').notNullable()
-
-      table.uuid('plan_uuid').notNullable()
-    }),
-  )
-
-  await Promise.all(promises)
-}
-
-initialize()

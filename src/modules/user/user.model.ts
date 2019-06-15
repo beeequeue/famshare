@@ -16,8 +16,6 @@ import { Subscription } from '@/modules/subscription/subscription.model'
 import { stripe } from '@/modules/stripe/stripe.lib'
 import { isNil } from '@/utils'
 
-const table = () => knex('user')
-
 export enum AccessLevel {
   ADMIN = 'ADMIN',
 }
@@ -27,14 +25,13 @@ registerEnumType(AccessLevel, {
 })
 
 interface Constructor extends ITableOptions {
-  uuid: string
   email: string
   accessLevel?: AccessLevel
   discordId?: string
   stripeId?: string
 }
 
-interface UserData {
+export interface DatabaseUser extends ITableData {
   email: string
   access_level?: AccessLevel
   discord_id?: string
@@ -43,6 +40,8 @@ interface UserData {
 
 @ObjectType()
 export class User extends DatabaseTable {
+  public static readonly table = () => knex<DatabaseUser>('user')
+
   @Field(() => ID)
   public readonly discordId: string
   @Field()
@@ -74,7 +73,7 @@ export class User extends DatabaseTable {
     this.stripeId = params.stripeId || null
   }
 
-  public static fromSql(sql: UserData & ITableData) {
+  public static fromSql(sql: DatabaseUser) {
     return new User({
       ...DatabaseTable._fromSql(sql),
       discordId: sql.discord_id,
@@ -85,7 +84,7 @@ export class User extends DatabaseTable {
   }
 
   public static async getByUuid(uuid: string) {
-    const user = await table()
+    const user = await this.table()
       .where({ uuid })
       .first()
 
@@ -95,7 +94,7 @@ export class User extends DatabaseTable {
   }
 
   public static async findByUuid(uuid: string) {
-    const user = await table()
+    const user = await this.table()
       .where({ uuid })
       .first()
 
@@ -105,7 +104,7 @@ export class User extends DatabaseTable {
   }
 
   public static async findByDiscordId(id: string) {
-    const user = await table()
+    const user = await this.table()
       .where({ discord_id: id })
       .first()
 
@@ -145,17 +144,17 @@ export class User extends DatabaseTable {
   }
 
   public async exists() {
-    const result = await table()
+    const result = await User.table()
       .count()
       .where({ uuid: this.uuid })
       .orWhere({ discord_id: this.discordId })
       .first()
 
-    return Number(result!.count) === 1
+    return result!['count(*)'] === 1
   }
 
   public async save() {
-    const data: UserData = {
+    const data: Omit<DatabaseUser, keyof ITableData> = {
       discord_id: this.discordId,
       email: this.email,
       access_level: this.accessLevel || undefined,

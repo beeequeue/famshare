@@ -3,9 +3,6 @@
   "description": "Easily set up recurring payments based on plans.",
   "version": "0.0.1",
   "author": "BeeeQueue",
-  "engines": {
-    "node": ">=11.15.0"
-  },
   "dependencies": {
     "@types/body-parser": "1.17.0",
     "@types/boom": "7.2.1",
@@ -51,6 +48,7 @@
     "@types/execa": "0.9.0",
     "@types/helmet": "0.0.43",
     "@types/http-proxy-middleware": "0.19.2",
+    "@types/jest": "24.0.14",
     "@types/minimist": "1.2.0",
     "@types/signale": "1.2.1",
     "@typescript-eslint/eslint-plugin": "1.9.0",
@@ -66,10 +64,15 @@
     "eslint-plugin-promise": "4.1.1",
     "eslint-plugin-standard": "4.0.0",
     "husky": "2.4.0",
+    "jest": "24.8.0",
     "lint-staged": "8.2.0",
     "prettier": "1.17.1",
-    "sqlite3": "4.0.8",
+    "sqlite3": "4.0.9",
+    "ts-jest": "24.0.2",
     "ts-node-dev": "1.0.0-pre.39"
+  },
+  "engines": {
+    "node": ">=11.15.0"
   },
   "husky": {
     "hooks": {
@@ -88,6 +91,10 @@
     "build": "yarn tsc --noEmit -P tsconfig.json",
     "dev": "ts-node-dev --respawn -r dotenv/config -r tsconfig-paths/register --inspect -- src/index.ts",
     "lint": "eslint 'src/**/*'",
+    "migrate": "knex migrate:latest --knexfile knexfile.ts",
+    "migrate:create": "knex migrate:make --knexfile knexfile.ts -x ts",
+    "prestart": "yarn run migrate",
+    "pretest": "NODE_ENV=test yarn run migrate",
     "proxy": "ngrok start famshare famshare-ui",
     "start": "ts-node -r dotenv/config -r tsconfig-paths/register src/index.ts"
   }
