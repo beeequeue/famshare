@@ -11,8 +11,6 @@ import {
 } from '@/modules/subscription/subscription.model'
 import { Table } from '@/constants'
 
-const table = () => knex('plan')
-
 interface Constructor extends ITableOptions {
   name: string
   paymentDay: number
@@ -20,7 +18,7 @@ interface Constructor extends ITableOptions {
   ownerUuid: string
 }
 
-interface PlanData {
+interface DatabasePlan extends ITableData {
   name: string
   payment_day: number
   amount: number
@@ -28,15 +26,8 @@ interface PlanData {
 }
 
 @ObjectType()
-export class Plan extends DatabaseTable {
-  constructor(options: Constructor) {
-    super(options)
-
-    this.name = options.name
-    this.amount = options.amount
-    this.paymentDay = options.paymentDay
-    this.ownerUuid = options.ownerUuid
-  }
+export class Plan extends DatabaseTable<DatabasePlan> {
+  public static readonly table = () => knex<DatabasePlan>(Table.PLAN)
 
   @Field()
   public name: string
@@ -77,7 +68,16 @@ export class Plan extends DatabaseTable {
     return results.map(result => User.fromSql(result))
   }
 
-  public static fromSql(sql: PlanData & ITableData) {
+  constructor(options: Constructor) {
+    super(options)
+
+    this.name = options.name
+    this.amount = options.amount
+    this.paymentDay = options.paymentDay
+    this.ownerUuid = options.ownerUuid
+  }
+
+  public static fromSql(sql: DatabasePlan & ITableData) {
     return new Plan({
       ...DatabaseTable._fromSql(sql),
       name: sql.name,
@@ -88,7 +88,7 @@ export class Plan extends DatabaseTable {
   }
 
   public static async findByUuid(uuid: string) {
-    const plan = await table()
+    const plan = await this.table()
       .where({ uuid })
       .first()
 
@@ -98,7 +98,7 @@ export class Plan extends DatabaseTable {
   }
 
   public static async getByUuid(uuid: string) {
-    const plan = await table()
+    const plan = await this.table()
       .where({ uuid })
       .first()
 
@@ -136,13 +136,11 @@ export class Plan extends DatabaseTable {
   }
 
   public async save() {
-    const data: PlanData = {
+    return this._save({
       name: this.name,
       amount: this.amount,
       payment_day: this.paymentDay,
       owner_uuid: this.ownerUuid,
-    }
-
-    return this._save(data)
+    })
   }
 }

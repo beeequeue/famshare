@@ -1,21 +1,22 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { DatabaseTable, knex, ITableData, ITableOptions } from '@/db'
+import { Table } from '@/constants'
 import { User } from '../user/user.model'
 
 const WEEK = 1000 * 60 * 60 * 24 * 7
-const table = () => knex<SessionData & ITableData>('session')
-
 interface Constructor extends ITableOptions {
   userUuid: string
   expiresAt?: Date
 }
 
-interface SessionData {
+interface DatabaseSession extends ITableData {
   user_uuid: string
   expires_at: Date
 }
 
-export class Session extends DatabaseTable {
+export class Session extends DatabaseTable<DatabaseSession> {
+  public static readonly table = () => knex<DatabaseSession>(Table.SESSION)
+
   public userUuid: string
   public expiresAt: Date
 
@@ -26,7 +27,7 @@ export class Session extends DatabaseTable {
     this.expiresAt = options.expiresAt || new Date(Date.now() + WEEK)
   }
 
-  public static fromSql(sql: SessionData & ITableData) {
+  public static fromSql(sql: DatabaseSession) {
     return new Session({
       ...DatabaseTable._fromSql(sql),
       userUuid: sql.user_uuid,
@@ -43,7 +44,7 @@ export class Session extends DatabaseTable {
   }
 
   public static async findByUuid(uuid: string) {
-    const session = await table()
+    const session = await this.table()
       .where({ uuid })
       .first()
 
@@ -61,11 +62,9 @@ export class Session extends DatabaseTable {
   }
 
   public async save() {
-    const data: SessionData = {
+    return this._save({
       user_uuid: this.userUuid,
       expires_at: this.expiresAt,
-    }
-
-    return this._save(data)
+    })
   }
 }

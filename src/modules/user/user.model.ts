@@ -40,7 +40,7 @@ export interface DatabaseUser extends ITableData {
 }
 
 @ObjectType()
-export class User extends DatabaseTable {
+export class User extends DatabaseTable<DatabaseUser> {
   public static readonly table = () => knex<DatabaseUser>(Table.USER)
 
   @Field(() => ID)
@@ -155,13 +155,11 @@ export class User extends DatabaseTable {
   }
 
   public async save() {
-    const data: Omit<DatabaseUser, keyof ITableData> = {
+    return this._save({
       discord_id: this.discordId,
       email: this.email,
       access_level: this.accessLevel || undefined,
       stripe_id: this.stripeId as any,
-    }
-
-    return this._save(data)
+    })
   }
 }

@@ -22,7 +22,7 @@ export interface ITableData {
 }
 
 @ObjectType({ description: 'Not used - is base for all models.' })
-export class DatabaseTable {
+export class DatabaseTable<DB extends {}> {
   private readonly __name: string
   private readonly __table: () => QueryBuilder
 
@@ -70,7 +70,7 @@ export class DatabaseTable {
       .where({ uuid: this.uuid })
   }
 
-  protected async _save(extraData: any) {
+  protected async _save(extraData: Omit<DB, keyof ITableData>) {
     const data = {
       /* eslint-disable @typescript-eslint/camelcase */
       uuid: this.uuid,

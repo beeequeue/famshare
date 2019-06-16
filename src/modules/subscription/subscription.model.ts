@@ -6,8 +6,7 @@ import { User } from '@/modules/user/user.model'
 import { Plan } from '@/modules/plan/plan.model'
 import { Invite } from '@/modules/invite/invite.model'
 import { isNil } from '@/utils'
-
-const table = () => knex('subscription')
+import { Table } from '@/constants'
 
 export enum SubscriptionStatus {
   INVITED = 'INVITED',
@@ -29,7 +28,7 @@ export interface SubscriptionConstructor extends ITableOptions {
   status: SubscriptionStatus
 }
 
-interface SubscriptionData {
+interface DatabaseSubscription extends ITableData {
   plan_uuid: string
   user_uuid: string
   invite_uuid: string
@@ -37,7 +36,10 @@ interface SubscriptionData {
 }
 
 @ObjectType()
-export class Subscription extends DatabaseTable {
+export class Subscription extends DatabaseTable<DatabaseSubscription> {
+  public static readonly table = () =>
+    knex<DatabaseSubscription>(Table.SUBSCRIPTION)
+
   @Field(() => Plan)
   public readonly plan!: Plan
   public readonly planUuid: string
@@ -59,7 +61,7 @@ export class Subscription extends DatabaseTable {
     this.status = options.status
   }
 
-  public static fromSql = (sql: SubscriptionData & ITableData) =>
+  public static fromSql = (sql: DatabaseSubscription) =>
     new Subscription({
       ...DatabaseTable._fromSql(sql),
       planUuid: sql.plan_uuid,
@@ -68,10 +70,8 @@ export class Subscription extends DatabaseTable {
       status: sql.status,
     })
 
-  public static findByUuid = async (
-    uuid: string,
-  ): Promise<Subscription | null> => {
-    const sql = await table()
+  public static async findByUuid(uuid: string): Promise<Subscription | null> {
+    const sql = await this.table()
       .where({ uuid })
       .first()
 
@@ -82,24 +82,27 @@ export class Subscription extends DatabaseTable {
     return Subscription.fromSql(sql)
   }
 
-  public static getByUserUuid = async (
-    userUuid: string,
-  ): Promise<Subscription[]> => {
-    const query: Partial<SubscriptionData> = { user_uuid: userUuid }
-
-    const sql: any[] = await table().where(query)
+  public static async getByUserUuid(userUuid: string): Promise<Subscription[]> {
+    const sql = await this.table().where({ user_uuid: userUuid })
 
     return sql.map(Subscription.fromSql)
   }
 
-  public save = async () => {
-    const data: SubscriptionData = {
+  public async exists() {
+    const result = await Subscription.table()
+      .count()
+      .where({ plan_uuid: this.planUuid, user_uuid: this.userUuid })
+      .first()
+
+    return result!['count(*)'] === 1
+  }
+
+  public async save() {
+    return this._save({
       user_uuid: this.userUuid,
       plan_uuid: this.planUuid,
       invite_uuid: this.inviteUuid,
       status: this.status,
-    }
-
-    return this._save(data)
+    })
   }
 }

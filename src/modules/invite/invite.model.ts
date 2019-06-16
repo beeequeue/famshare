@@ -7,8 +7,6 @@ import { User } from '@/modules/user/user.model'
 import { isNil } from '@/utils'
 import { Table } from '@/constants'
 
-const table = () => knex('invite')
-
 export interface InviteConstructor extends ITableOptions {
   shortId: string
   cancelled: boolean
@@ -16,7 +14,7 @@ export interface InviteConstructor extends ITableOptions {
   planUuid: string
 }
 
-interface InviteData {
+interface DatabaseInvite extends ITableData {
   short_id: string
   cancelled: boolean
   expires_at: Date
@@ -24,7 +22,9 @@ interface InviteData {
 }
 
 @ObjectType()
-export class Invite extends DatabaseTable {
+export class Invite extends DatabaseTable<DatabaseInvite> {
+  public static readonly table = () => knex<DatabaseInvite>(Table.INVITE)
+
   @Field(() => ID)
   public readonly shortId: string
   @Field()
@@ -48,7 +48,7 @@ export class Invite extends DatabaseTable {
     this.planUuid = options.planUuid
   }
 
-  public static fromSql(sql: InviteData & ITableData) {
+  public static fromSql(sql: DatabaseInvite & ITableData) {
     return new Invite({
       ...DatabaseTable._fromSql(sql),
       shortId: sql.short_id,
@@ -59,7 +59,7 @@ export class Invite extends DatabaseTable {
   }
 
   public static async findByShortId(shortId: string): Promise<Invite | null> {
-    const sql = await table()
+    const sql = await this.table()
       .where({ short_id: shortId })
       .first()
 
@@ -73,7 +73,7 @@ export class Invite extends DatabaseTable {
   public static async findByUuid(uuid: string): Promise<Invite | null> {
     const query = { uuid }
 
-    const sql = await table()
+    const sql = await this.table()
       .where(query)
       .first()
 
@@ -87,7 +87,7 @@ export class Invite extends DatabaseTable {
   public static async getByUuid(uuid: string): Promise<Invite> {
     const query = { uuid }
 
-    const sql = await table()
+    const sql = await this.table()
       .where(query)
       .first()
 
@@ -101,7 +101,7 @@ export class Invite extends DatabaseTable {
   public static async getByPlan(planUuid: string): Promise<Invite[]> {
     const query = { plan_uuid: planUuid }
 
-    const sql: (ITableData & InviteData)[] = await table().where(query)
+    const sql: (ITableData & DatabaseInvite)[] = await this.table().where(query)
 
     return sql.map(s => Invite.fromSql(s))
   }
@@ -124,7 +124,7 @@ export class Invite extends DatabaseTable {
   }
 
   private static async doesShortIdExist(shortId: string) {
-    const result = await table()
+    const result = await this.table()
       .count()
       .where({ short_id: shortId })
 
@@ -151,13 +151,11 @@ export class Invite extends DatabaseTable {
   }
 
   public async save() {
-    const data: InviteData = {
+    return this._save({
       short_id: this.shortId,
       cancelled: this.cancelled,
       expires_at: this.expiresAt,
       plan_uuid: this.planUuid,
-    }
-
-    return this._save(data)
+    })
   }
 }
