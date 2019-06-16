@@ -11,14 +11,6 @@ export const mapAsync = async <T, R>(
   return Promise.all(promises)
 }
 
-export const mapToGraphQL = async <T extends { toGraphQL: Function }>(
-  items: T[],
-) => {
-  const promises = items.map(item => item.toGraphQL())
-
-  return Promise.all(promises)
-}
-
 export const enumToArray = <T>(Enum: any): T[] =>
   Object.keys(Enum).map(key => Enum[key])
 
