@@ -2,8 +2,9 @@
 import { Field, ID, ObjectType, registerEnumType } from 'type-graphql'
 
 import { DatabaseTable, knex, ITableData, ITableOptions } from '@/db'
-import { User } from '@/modules/user/user.model'
+import { DatabaseUser, User } from '@/modules/user/user.model'
 import { isNil } from '@/utils'
+import { Table } from '@/constants'
 
 const table = () => knex('connection')
 
@@ -35,6 +36,8 @@ interface ConnectionData {
 
 @ObjectType()
 export class Connection extends DatabaseTable {
+  public static readonly table = () => knex<DatabaseUser>(Table.CONNECTION)
+
   @Field(() => ConnectionType)
   public readonly type: ConnectionType
   @Field(() => ID)

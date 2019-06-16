@@ -15,6 +15,7 @@ import {
 import { Subscription } from '@/modules/subscription/subscription.model'
 import { stripe } from '@/modules/stripe/stripe.lib'
 import { isNil } from '@/utils'
+import { Table } from '@/constants'
 
 export enum AccessLevel {
   ADMIN = 'ADMIN',
@@ -40,7 +41,7 @@ export interface DatabaseUser extends ITableData {
 
 @ObjectType()
 export class User extends DatabaseTable {
-  public static readonly table = () => knex<DatabaseUser>('user')
+  public static readonly table = () => knex<DatabaseUser>(Table.USER)
 
   @Field(() => ID)
   public readonly discordId: string
