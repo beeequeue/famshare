@@ -1,25 +1,25 @@
+import uuid from 'uuid/v4'
+
 import { knex } from '@/db'
+import { Subscription, SubscriptionStatus } from './subscription.model'
+import { assertObjectEquals } from '@/utils/tests'
 
-import { DatabaseUser, User } from '../user/user.model'
-import { Subscription } from './subscription.model'
+const createSubscription = async (save = true, userUuid?: string) => {
+  const subscription = new Subscription({
+    userUuid: userUuid || uuid(),
+    planUuid: uuid(),
+    inviteUuid: uuid(),
+    status: SubscriptionStatus.JOINED,
+  })
 
-const assertUserEquals = (result: DatabaseUser, user: User) => {
-  expect(result.uuid).toEqual(user.uuid)
-  expect(result.email).toEqual(user.email)
-  expect(result.discord_id).toEqual(user.discordId)
-  expect(result.stripe_id).toEqual(user.stripeId)
-  expect(result.access_level).toEqual(user.accessLevel)
-  expect(new Date(result.created_at)).toEqual(user.createdAt)
-  expect(new Date(result.updated_at)).toEqual(user.updatedAt)
+  if (save) {
+    await subscription.save()
+  }
+
+  return subscription
 }
 
-const assertObjectEquals = <T extends {}>(result: T, user: T) => {
-  expect(JSON.stringify(result, null, 2)).toEqual(JSON.stringify(user, null, 2))
-}
-
-afterEach(() =>
-  Promise.all([Subscription.table().delete(), User.table().delete()]),
-)
+afterEach(() => Promise.all([Subscription.table().delete()]))
 
 afterAll(done => {
   jest.resetAllMocks()
@@ -29,186 +29,87 @@ afterAll(done => {
 
 describe('subscription.model', () => {
   test('.save()', async () => {
-    const user = await insertUser()
+    const subscription = await createSubscription()
 
-    const result = await User.table()
-      .where({ uuid: user.uuid })
+    const result = await Subscription.table()
+      .where({ uuid: subscription.uuid })
       .first()
 
     expect(result).toBeDefined()
 
-    assertUserEquals(result!, user)
+    expect(result!.uuid).toEqual(subscription.uuid)
+    expect(result!.user_uuid).toEqual(subscription.userUuid)
+    expect(result!.plan_uuid).toEqual(subscription.planUuid)
+    expect(result!.invite_uuid).toEqual(subscription.inviteUuid)
+    expect(result!.status).toEqual(subscription.status)
+    expect(new Date(result!.created_at)).toEqual(subscription.createdAt)
+    expect(new Date(result!.updated_at)).toEqual(subscription.updatedAt)
   })
 
   test('.fromSql()', async () => {
-    const user = await insertUser()
+    const subscription = await createSubscription()
 
-    const result = await User.table()
-      .where({ uuid: user.uuid })
+    const result = await Subscription.table()
+      .where({ uuid: subscription.uuid })
       .first()
 
     expect(result).toBeDefined()
 
-    const newUser = User.fromSql(result!)
+    const newSubscription = Subscription.fromSql(result!)
 
-    assertObjectEquals(newUser, user)
+    assertObjectEquals(newSubscription, subscription)
   })
 
   describe('.exists()', () => {
-    test('returns true when uuid exists', async () => {
-      const user = await insertUser()
+    test('returns true when subscription with user and plan uuids exists', async () => {
+      const subscription = await createSubscription()
 
-      expect(user.exists()).resolves.toEqual(true)
+      expect(subscription.exists()).resolves.toEqual(true)
     })
 
-    test('returns true when discordId exists', async () => {
-      let discordId = 'cool_discord_id'
-      await insertUser(undefined, discordId)
+    test('returns false when does not exist', async () => {
+      const subscription = await createSubscription(false)
 
-      const user = await insertUser('anything', discordId)
-
-      expect(user.exists()).resolves.toEqual(true)
-    })
-
-    test('returns false when does not exist', () => {
-      const nonExistantUser = new User({
-        email: 'email@gmail.com',
-        discordId: 'discord_id',
-      })
-
-      expect(nonExistantUser.exists()).resolves.toEqual(false)
+      expect(subscription.exists()).resolves.toEqual(false)
     })
   })
 
-  describe('.getByUuid()', () => {
-    test('gets user', async () => {
-      const dbUser = await insertUser()
+  describe('.getByUserUuid()', () => {
+    test('gets subscriptions', async () => {
+      const subscription = await createSubscription()
+      const subscription2 = await createSubscription(
+        true,
+        subscription.userUuid,
+      )
 
-      const user = await User.getByUuid(dbUser.uuid)
+      const gottenSubscriptions = await Subscription.getByUserUuid(
+        subscription.userUuid,
+      )
 
-      assertObjectEquals(user, dbUser)
+      assertObjectEquals(gottenSubscriptions[0], subscription)
+      assertObjectEquals(gottenSubscriptions[1], subscription2)
     })
 
-    test('reject when not found', async () => {
-      expect(User.getByUuid('😜')).rejects.toMatchObject({
-        message: 'Could not find User:😜',
-      })
+    test('returns empty array when not found', async () => {
+      expect(Subscription.getByUserUuid('😜')).resolves.toEqual([])
     })
   })
 
   describe('.findByUuid()', () => {
-    test('finds user', async () => {
-      const dbUser = await insertUser()
+    test('finds subscription', async () => {
+      const subscription = await createSubscription()
 
-      const result = await User.findByUuid(dbUser.uuid)
-
-      expect(result).toBeDefined()
-
-      assertObjectEquals(result!, dbUser)
-    })
-
-    test('returns null if not found', async () => {
-      const nonExistantUser = new User({
-        email: 'email@gmail.com',
-        discordId: 'discord_id',
-      })
-
-      expect(User.findByUuid(nonExistantUser.uuid)).resolves.toBeNull()
-    })
-  })
-
-  describe('.findByDiscordId()', () => {
-    test('finds user', async () => {
-      const dbUser = await insertUser()
-
-      const result = await User.findByDiscordId(dbUser.discordId)
+      const result = await Subscription.findByUuid(subscription.uuid)
 
       expect(result).toBeDefined()
 
-      assertObjectEquals(result!, dbUser)
+      assertObjectEquals(result!, subscription)
     })
 
     test('returns null if not found', async () => {
-      const nonExistantUser = new User({
-        email: 'email@gmail.com',
-        discordId: 'discord_id',
-      })
+      const subscription = await createSubscription(false)
 
-      expect(
-        User.findByDiscordId(nonExistantUser.discordId),
-      ).resolves.toBeNull()
-    })
-  })
-
-  describe('.createStripeCustomer()', () => {
-    test('creates stripe customer and saves id to db', async () => {
-      stripe.customers.create.mockResolvedValueOnce({ id: 'stripe_id' } as any)
-      const user = await insertUser()
-
-      await user.createStripeCustomer('stripe_token')
-
-      const dbUser = await User.table()
-        .where({ uuid: user.uuid })
-        .first()
-
-      expect(user.stripeId).toEqual('stripe_id')
-      expect(dbUser!.stripe_id).toEqual('stripe_id')
-    })
-
-    test('throws error if fails', async () => {
-      stripe.customers.create.mockRejectedValue('failed')
-      const user = await insertUser()
-
-      const onError = jest.fn()
-      return user
-        .createStripeCustomer('stripe_token')
-        .catch(onError)
-        .then(() => {
-          expect(onError).toHaveBeenCalledTimes(1)
-        })
-    })
-  })
-
-  describe('.connectWith()', () => {
-    test('creates connection', async () => {
-      const user = await insertUser()
-
-      const connectionData = {
-        userId: 'user_id',
-        identifier: 'username',
-        link: 'https://google.com',
-        picture: 'https://i.imgur.com/foMcMUg.jpg',
-        type: ConnectionType.GOOGLE,
-      }
-      await user.connectWith(connectionData)
-
-      const connections = await user.getConnections()
-
-      expect(connections[0]).toMatchObject(connectionData)
-    })
-
-    test('creates connection of already connected type', async () => {
-      const user = await insertUser()
-
-      const connectionData = {
-        userId: 'user_id',
-        identifier: 'username',
-        link: 'https://google.com',
-        picture: 'https://i.imgur.com/foMcMUg.jpg',
-        type: ConnectionType.GOOGLE,
-      }
-      await user.connectWith(connectionData)
-
-      const connectionData2 = {
-        ...connectionData,
-        userId: 'user_id_2',
-      }
-      await user.connectWith(connectionData2)
-
-      const connections = await user.getConnections()
-
-      expect(connections[0]).toMatchObject(connectionData)
-      expect(connections[1]).toMatchObject(connectionData2)
+      expect(Subscription.findByUuid(subscription.uuid)).resolves.toBeNull()
     })
   })
 })

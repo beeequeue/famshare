@@ -2,11 +2,12 @@ import { mocked } from 'ts-jest/utils'
 
 import { knex } from '@/db'
 import { stripe as _stripe } from '@/modules/stripe/stripe.lib'
-import { AccessLevel, DatabaseUser, User } from './user.model'
+import { DatabaseUser, User } from './user.model'
 import {
   Connection,
   ConnectionType,
 } from '@/modules/connection/connection.model'
+import { assertObjectEquals, insertUser } from '@/utils/tests'
 
 jest.mock('@/modules/stripe/stripe.lib')
 const stripe = mocked(_stripe, true)
@@ -19,27 +20,6 @@ const assertUserEquals = (result: DatabaseUser, user: User) => {
   expect(result.access_level).toEqual(user.accessLevel)
   expect(new Date(result.created_at)).toEqual(user.createdAt)
   expect(new Date(result.updated_at)).toEqual(user.updatedAt)
-}
-
-const assertClassEquals = (result: User, user: User) => {
-  expect(JSON.stringify(result, null, 2)).toEqual(JSON.stringify(user, null, 2))
-}
-
-const insertUser = async (
-  email?: string,
-  discord?: string,
-  stripe?: string,
-) => {
-  const user = new User({
-    email: email || 'email@gmail.com',
-    discordId: discord || 'discord_id',
-    stripeId: stripe || 'stripe_id',
-    accessLevel: AccessLevel.ADMIN,
-  })
-
-  await user.save()
-
-  return user
 }
 
 afterEach(() =>
@@ -76,7 +56,7 @@ describe('user.model', () => {
 
     const newUser = User.fromSql(result!)
 
-    assertClassEquals(newUser, user)
+    assertObjectEquals(newUser, user)
   })
 
   describe('.exists()', () => {
@@ -111,7 +91,7 @@ describe('user.model', () => {
 
       const user = await User.getByUuid(dbUser.uuid)
 
-      assertClassEquals(user, dbUser)
+      assertObjectEquals(user, dbUser)
     })
 
     test('reject when not found', async () => {
@@ -129,7 +109,7 @@ describe('user.model', () => {
 
       expect(result).toBeDefined()
 
-      assertClassEquals(result!, dbUser)
+      assertObjectEquals(result!, dbUser)
     })
 
     test('returns null if not found', async () => {
@@ -150,7 +130,7 @@ describe('user.model', () => {
 
       expect(result).toBeDefined()
 
-      assertClassEquals(result!, dbUser)
+      assertObjectEquals(result!, dbUser)
     })
 
     test('returns null if not found', async () => {
