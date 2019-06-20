@@ -2,12 +2,9 @@ import { mocked } from 'ts-jest/utils'
 
 import { knex } from '@/db'
 import { stripe as _stripe } from '@/modules/stripe/stripe.lib'
+import { ConnectionType } from '@/modules/connection/connection.model'
+import { assertObjectEquals, cleanupDatabases, insertUser } from '@/utils/tests'
 import { DatabaseUser, User } from './user.model'
-import {
-  Connection,
-  ConnectionType,
-} from '@/modules/connection/connection.model'
-import { assertObjectEquals, insertUser } from '@/utils/tests'
 
 jest.mock('@/modules/stripe/stripe.lib')
 const stripe = mocked(_stripe, true)
@@ -22,9 +19,7 @@ const assertUserEquals = (result: DatabaseUser, user: User) => {
   expect(new Date(result.updated_at)).toEqual(user.updatedAt)
 }
 
-afterEach(() =>
-  Promise.all([User.table().delete(), Connection.table().delete()]),
-)
+afterEach(cleanupDatabases)
 
 afterAll(done => {
   jest.resetAllMocks()

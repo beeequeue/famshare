@@ -1,6 +1,20 @@
-import { AccessLevel, User } from '@/modules/user/user.model'
+import { Connection } from '@/modules/connection/connection.model'
+import { Invite } from '@/modules/invite/invite.model'
 import { Plan } from '@/modules/plan/plan.model'
+import { Session } from '@/modules/session/session.model'
+import { Subscription } from '@/modules/subscription/subscription.model'
+import { AccessLevel, User } from '@/modules/user/user.model'
 import { isNil } from '@/utils/functional'
+
+export const cleanupDatabases = () =>
+  Promise.all([
+    Connection.table().delete(),
+    Invite.table().delete(),
+    Plan.table().delete(),
+    Session.table().delete(),
+    Subscription.table().delete(),
+    User.table().delete(),
+  ])
 
 export const insertUser = async (
   email?: string,
@@ -29,7 +43,7 @@ export const insertPlan = async ({
   ownerUuid,
   name,
   amount,
-}: InsertPlanOptions) => {
+}: InsertPlanOptions = {}) => {
   if (isNil(ownerUuid)) {
     ownerUuid = (await insertUser()).uuid
   }

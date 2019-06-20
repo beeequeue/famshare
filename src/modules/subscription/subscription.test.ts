@@ -1,8 +1,15 @@
+import { addDays } from 'date-fns'
 import uuid from 'uuid/v4'
 
 import { knex } from '@/db'
 import { Subscription, SubscriptionStatus } from './subscription.model'
-import { assertObjectEquals } from '@/utils/tests'
+import {
+  assertObjectEquals,
+  cleanupDatabases,
+  insertPlan,
+  insertUser,
+} from '@/utils/tests'
+import { Invite } from '@/modules/invite/invite.model'
 
 const createSubscription = async (save = true, userUuid?: string) => {
   const subscription = new Subscription({
@@ -19,7 +26,7 @@ const createSubscription = async (save = true, userUuid?: string) => {
   return subscription
 }
 
-afterEach(() => Promise.all([Subscription.table().delete()]))
+afterEach(cleanupDatabases)
 
 afterAll(done => {
   jest.resetAllMocks()
@@ -110,6 +117,59 @@ describe('subscription.model', () => {
       const subscription = await createSubscription(false)
 
       expect(Subscription.findByUuid(subscription.uuid)).resolves.toBeNull()
+    })
+  })
+
+  describe('getters', () => {
+    test('.getPlan()', async () => {
+      const plan = await insertPlan()
+
+      const subscription = new Subscription({
+        planUuid: plan.uuid,
+        userUuid: uuid(),
+        inviteUuid: uuid(),
+        status: SubscriptionStatus.JOINED,
+      })
+
+      const gottenPlan = await subscription.getPlan()
+
+      assertObjectEquals(gottenPlan, plan)
+    })
+
+    test('.getUser()', async () => {
+      const user = await insertUser()
+
+      const subscription = new Subscription({
+        planUuid: uuid(),
+        userUuid: user.uuid,
+        inviteUuid: uuid(),
+        status: SubscriptionStatus.JOINED,
+      })
+
+      const gottenUser = await subscription.getUser()
+
+      assertObjectEquals(gottenUser, user)
+    })
+
+    test('.getInvite()', async () => {
+      const invite = new Invite({
+        shortId: 'abcdefgh',
+        cancelled: false,
+        expiresAt: addDays(new Date(), 7),
+        planUuid: uuid(),
+      })
+      await invite.save()
+
+      const subscription = new Subscription({
+        planUuid: uuid(),
+        userUuid: uuid(),
+        inviteUuid: invite.uuid,
+        status: SubscriptionStatus.JOINED,
+      })
+
+      const gottenInvite = await subscription.getInvite()
+
+      assertObjectEquals(gottenInvite, invite)
     })
   })
 })
