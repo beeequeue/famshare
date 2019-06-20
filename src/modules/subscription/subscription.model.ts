@@ -40,17 +40,23 @@ export class Subscription extends DatabaseTable<DatabaseSubscription> {
   public static readonly table = () =>
     knex<DatabaseSubscription>(Table.SUBSCRIPTION)
 
+  @Field(() => SubscriptionStatus)
+  public readonly status: SubscriptionStatus
+
   @Field(() => Plan)
   public readonly plan!: Plan
   public readonly planUuid: string
+  public getPlan = () => Plan.getByUuid(this.planUuid)
+
   @Field(() => User)
   public readonly user!: User
   public readonly userUuid: string
+  public getUser = () => User.getByUuid(this.userUuid)
+
   @Field(() => Invite)
   public readonly invite!: Invite
   public readonly inviteUuid: string
-  @Field(() => SubscriptionStatus)
-  public readonly status: SubscriptionStatus
+  public getInvite = () => Invite.getByUuid(this.inviteUuid)
 
   constructor(options: SubscriptionConstructor) {
     super(options)

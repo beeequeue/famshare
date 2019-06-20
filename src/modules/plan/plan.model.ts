@@ -13,15 +13,15 @@ import { Table } from '@/constants'
 
 interface Constructor extends ITableOptions {
   name: string
-  paymentDay: number
   amount: number
+  paymentDay: number
   ownerUuid: string
 }
 
 interface DatabasePlan extends ITableData {
   name: string
-  payment_day: number
   amount: number
+  payment_day: number
   owner_uuid: string
 }
 

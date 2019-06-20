@@ -11,10 +11,7 @@ import {
   InviteResolver,
 } from '@/modules/invite/invite.resolvers'
 import { PlanFieldResolver, PlanResolver } from '@/modules/plan/plan.resolvers'
-import {
-  SubscriptionFieldResolver,
-  SubscriptionResolver,
-} from '@/modules/subscription/subscription.resolvers'
+import { SubscriptionResolver } from '@/modules/subscription/subscription.resolvers'
 import { UserFieldResolver, UserResolver } from '@/modules/user/user.resolvers'
 import { authChecker } from '@/modules/session/session.lib'
 import { IS_DEV } from '@/utils'
@@ -29,7 +26,6 @@ export const createGraphQLMiddleware = async () => {
       PlanResolver,
       PlanFieldResolver,
       SubscriptionResolver,
-      SubscriptionFieldResolver,
       UserResolver,
       UserFieldResolver,
     ],
