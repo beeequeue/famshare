@@ -5,5 +5,5 @@ test('mapAsync()', () => {
 
   const result = mapAsync(values, async n => n * 2)
 
-  expect(result).toEqual(values.map(n => n * 2))
+  expect(result).resolves.toEqual(values.map(n => n * 2))
 })
