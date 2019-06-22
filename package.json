@@ -99,7 +99,6 @@
     "proxy": "ngrok start famshare famshare-ui",
     "start": "ts-node -r dotenv/config -r tsconfig-paths/register src/index.ts",
     "test": "jest -i --forceExit",
-    "test:ci": "yarn run test:coverage --coverageReporters=text-lcov | coveralls",
     "test:coverage": "yarn run test --coverage"
   }
 }

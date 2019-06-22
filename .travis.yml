@@ -5,4 +5,5 @@ cache:
   directories:
   - node_modules
 script:
-- yarn run test:ci
+- yarn run test:coverage
+- cat coverage/lcov.info | yarn coveralls
