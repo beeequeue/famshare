@@ -9,7 +9,9 @@ import {
   Subscription,
   SubscriptionStatus,
 } from '@/modules/subscription/subscription.model'
+import { INVITE_NOT_FOUND, USER_NOT_FOUND } from '@/errors'
 import { Table } from '@/constants'
+import { isNil } from '@/utils'
 
 interface Constructor extends ITableOptions {
   name: string
@@ -108,10 +110,8 @@ export class Plan extends DatabaseTable<DatabasePlan> {
   }
 
   public async createInvite(expiresAt: Date) {
-    const shortId = await Invite.generateShortId()
-
     const invite = new Invite({
-      shortId,
+      shortId: await Invite.generateShortId(),
       cancelled: false,
       expiresAt,
       planUuid: this.uuid,
@@ -122,11 +122,21 @@ export class Plan extends DatabaseTable<DatabasePlan> {
     return invite
   }
 
-  public async subscribeUser(userUuid: string, inviteUuid: string) {
+  public async subscribeUser(userUuid: string, inviteShortId: string) {
+    const invite = await Invite.findByShortId(inviteShortId)
+
+    if (isNil(await User.findByUuid(userUuid))) {
+      throw new Error(USER_NOT_FOUND)
+    }
+
+    if (isNil(invite)) {
+      throw new Error(INVITE_NOT_FOUND)
+    }
+
     const subscription = new Subscription({
       planUuid: this.uuid,
       userUuid,
-      inviteUuid,
+      inviteUuid: invite.uuid,
       status: SubscriptionStatus.JOINED,
     })
 

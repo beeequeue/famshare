@@ -1,3 +1,5 @@
+import { addDays } from 'date-fns'
+
 import { Connection } from '@/modules/connection/connection.model'
 import { Invite } from '@/modules/invite/invite.model'
 import { Plan } from '@/modules/plan/plan.model'
@@ -58,6 +60,27 @@ export const insertPlan = async ({
   await plan.save()
 
   return plan
+}
+
+interface InsertInviteOptions {
+  planUuid?: string
+}
+
+export const insertInvite = async ({ planUuid }: InsertInviteOptions) => {
+  if (isNil(planUuid)) {
+    planUuid = (await insertPlan()).uuid
+  }
+
+  const invite = new Invite({
+    shortId: await Invite.generateShortId(),
+    cancelled: false,
+    planUuid,
+    expiresAt: addDays(new Date(), 7),
+  })
+
+  await invite.save()
+
+  return invite
 }
 
 export const assertObjectEquals = <T extends {}>(result: T, user: T) => {

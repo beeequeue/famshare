@@ -1,17 +1,25 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import uuid from 'uuid/v4'
+import { addDays } from 'date-fns'
 
 import { Plan } from '@/modules/plan/plan.model'
-import { assertObjectEquals, cleanupDatabases } from '@/utils/tests'
-// import { assertObjectEquals, insertPlan, insertUser } from '@/utils/tests'
+import { Subscription } from '@/modules/subscription/subscription.model'
+import { INVITE_NOT_FOUND, USER_NOT_FOUND } from '@/errors'
+import {
+  assertObjectEquals,
+  cleanupDatabases,
+  insertInvite,
+  insertUser,
+} from '@/utils/tests'
 
 afterEach(cleanupDatabases)
 
-const createPlan = async (save = true) => {
+const createPlan = async (save = true, ownerUuid?: string) => {
   const plan = new Plan({
     name: 'plan_name',
     paymentDay: 30,
     amount: 1000_00,
-    ownerUuid: uuid(),
+    ownerUuid: ownerUuid || uuid(),
   })
 
   if (save) {
@@ -68,19 +76,86 @@ describe('plan.model', () => {
     })
   })
 
-  // test('.subscribeUser()', async () => {
-  //   const user = await insertUser()
-  //   const plan = await insertPlan({ ownerUuid: user.uuid })
-  //   const invite = await plan.createInvite()
+  describe('.getByUuid()', () => {
+    test('gets plan', async () => {
+      const dbPlan = await createPlan()
 
-  //   const subscription = await plan.subscribeUser(user.uuid, invite.uuid)
+      const plan = await Plan.getByUuid(dbPlan.uuid)
 
-  //   const result = await Subscription.table()
-  //     .where({ uuid: user.uuid })
-  //     .first()
+      assertObjectEquals(plan, dbPlan)
+    })
 
-  //   expect(result).toBeDefined()
+    test('reject when not found', async () => {
+      expect(Plan.getByUuid('😜')).rejects.toMatchObject({
+        message: 'Could not find Plan:😜',
+      })
+    })
+  })
 
-  //   assertObjectEquals(result!, user)
-  // })
+  describe('.findByUuid()', () => {
+    test('finds plan', async () => {
+      const dbPlan = await createPlan()
+
+      const result = await Plan.findByUuid(dbPlan.uuid)
+
+      expect(result).toBeDefined()
+
+      assertObjectEquals(result!, dbPlan)
+    })
+
+    test('returns null if not found', async () => {
+      const nonExistantPlan = await createPlan(false)
+
+      expect(Plan.findByUuid(nonExistantPlan.uuid)).resolves.toBeNull()
+    })
+  })
+
+  test('.createInvite()', async () => {
+    const plan = await createPlan()
+
+    const expiresAt = addDays(new Date(), 7)
+    const invite = await plan.createInvite(expiresAt)
+
+    expect(invite).toMatchObject({
+      cancelled: false,
+      expiresAt,
+      planUuid: plan.uuid,
+    })
+  })
+
+  describe('.subscribeUser()', () => {
+    test('subscribes user', async () => {
+      const user = await insertUser()
+      const plan = await createPlan()
+      const invite = await insertInvite({ planUuid: plan.uuid })
+
+      const subscription = await plan.subscribeUser(user.uuid, invite.shortId)
+
+      const result = await Subscription.table()
+        .where({ user_uuid: user.uuid })
+        .first()
+
+      expect(result).toBeDefined()
+
+      expect(result!.uuid).toEqual(subscription.uuid)
+      expect(result!.plan_uuid).toEqual(subscription.planUuid)
+    })
+
+    test('rejects if user does not exist', async () => {
+      const plan = await createPlan()
+
+      expect(plan.subscribeUser(uuid(), 'hahaha')).rejects.toMatchObject({
+        message: USER_NOT_FOUND,
+      })
+    })
+
+    test('rejects if invite does not exist', async () => {
+      const user = await insertUser()
+      const plan = await createPlan()
+
+      expect(plan.subscribeUser(user.uuid, 'hahaha')).rejects.toMatchObject({
+        message: INVITE_NOT_FOUND,
+      })
+    })
+  })
 })
