@@ -52,8 +52,8 @@ export class Invite extends DatabaseTable<DatabaseInvite> {
     return new Invite({
       ...DatabaseTable._fromSql(sql),
       shortId: sql.short_id,
-      cancelled: sql.cancelled,
-      expiresAt: sql.expires_at,
+      cancelled: Boolean(sql.cancelled),
+      expiresAt: new Date(sql.expires_at),
       planUuid: sql.plan_uuid,
     })
   }
@@ -98,15 +98,13 @@ export class Invite extends DatabaseTable<DatabaseInvite> {
     return Invite.fromSql(sql)
   }
 
-  public static async getByPlan(planUuid: string): Promise<Invite[]> {
-    const query = { plan_uuid: planUuid }
-
-    const sql: (ITableData & DatabaseInvite)[] = await this.table().where(query)
+  public static async findByPlan(planUuid: string): Promise<Invite[]> {
+    const sql = await this.table().where({ plan_uuid: planUuid })
 
     return sql.map(s => Invite.fromSql(s))
   }
 
-  private static shortIdChars = 'abcdefghijklmnopqrstuvwxyz1234567890'
+  private static shortIdChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
 
   public static async generateShortId(): Promise<string> {
     const chars = Invite.shortIdChars
