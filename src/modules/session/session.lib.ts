@@ -53,7 +53,7 @@ export const SessionMiddleware = (): RequestHandler => async (
 
   const session = await Session.findByUuid(Base64.decode(cookie))
 
-  if (!session) {
+  if (isNil(session)) {
     res.clearCookie('session')
 
     return next()
@@ -62,6 +62,7 @@ export const SessionMiddleware = (): RequestHandler => async (
   const user = await User.getByUuid(session.userUuid)
   const discordUser = await Discord.getUserById(user.discordId)
 
+  // eslint-disable-next-line require-atomic-updates
   req.session = {
     session,
     user,
