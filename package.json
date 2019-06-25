@@ -55,7 +55,7 @@
     "@typescript-eslint/parser": "1.11.0",
     "actions-toolkit": "2.1.0",
     "coveralls": "3.0.4",
-    "eslint": "6.0.0",
+    "eslint": "6.0.1",
     "eslint-config-prettier": "5.0.0",
     "eslint-config-standard": "12.0.0",
     "eslint-import-resolver-typescript": "1.1.1",
