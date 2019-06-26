@@ -3,7 +3,14 @@ language: node_js
 cache:
   yarn: true
   directories:
-  - node_modules
+    - node_modules
 script:
-- yarn run test:coverage
-- cat coverage/lcov.info | yarn coveralls
+jobs:
+  include:
+    - stage: "Compile & Lint"
+      script: yarn build
+    - script: yarn lint
+    - stage: "Test"
+      script:
+        - yarn run test:coverage
+        - cat coverage/lcov.info | yarn coveralls
