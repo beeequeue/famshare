@@ -1,5 +1,6 @@
 import uuid from 'uuid/v4'
 
+import { knex } from '@/db'
 import {
   Connection,
   ConnectionType,
@@ -24,6 +25,12 @@ const createConnection = async (save = true, ownerUuid?: string) => {
 }
 
 afterEach(cleanupDatabases)
+
+afterAll(done => {
+  jest.resetAllMocks()
+
+  knex.destroy(done)
+})
 
 describe('connection.model', () => {
   test('.save()', async () => {

@@ -63,9 +63,9 @@ describe('user.model', () => {
 
     test('returns true when discordId exists', async () => {
       let discordId = 'cool_discord_id'
-      await insertUser(undefined, discordId)
+      await insertUser({ index: 0, discord: discordId })
 
-      const user = await insertUser('anything', discordId)
+      const user = await insertUser({ index: 1, discord: discordId })
 
       expect(user.exists()).resolves.toEqual(true)
     })

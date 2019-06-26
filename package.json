@@ -99,7 +99,7 @@
     "pretest": "NODE_ENV=test yarn run migrate",
     "proxy": "ngrok start famshare famshare-ui",
     "start": "ts-node -r dotenv/config -r tsconfig-paths/register src/index.ts",
-    "test": "jest -i --forceExit",
+    "test": "jest -i",
     "test:coverage": "yarn run test --coverage"
   }
 }

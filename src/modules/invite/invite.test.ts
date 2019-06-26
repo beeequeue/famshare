@@ -1,6 +1,7 @@
 import { addDays } from 'date-fns'
 import uuid from 'uuid/v4'
 
+import { knex } from '@/db'
 import { Invite } from '@/modules/invite/invite.model'
 import {
   assertObjectEquals,
@@ -29,6 +30,12 @@ const createInvite = async (save = true, planUuid?: string) => {
 }
 
 afterEach(cleanupDatabases)
+
+afterAll(done => {
+  jest.resetAllMocks()
+
+  knex.destroy(done)
+})
 
 describe('invite.model', () => {
   test('.save()', async () => {

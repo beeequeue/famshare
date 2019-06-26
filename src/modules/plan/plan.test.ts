@@ -3,6 +3,7 @@ import uuid from 'uuid/v4'
 import { addDays, isEqual, parse } from 'date-fns'
 import MockDate from 'mockdate'
 
+import { knex } from '@/db'
 import { Plan } from '@/modules/plan/plan.model'
 import { Subscription } from '@/modules/subscription/subscription.model'
 import { INVITE_NOT_FOUND, USER_NOT_FOUND } from '@/errors'
@@ -12,8 +13,6 @@ import {
   insertInvite,
   insertUser,
 } from '@/utils/tests'
-
-afterEach(cleanupDatabases)
 
 const createPlan = async (
   save = true,
@@ -38,6 +37,14 @@ const createDate = (year: number, month: number, day: number) =>
   parse(`${year}-${month}-${day} +00`, 'yyyy-M-d x', new Date(), {
     weekStartsOn: 1,
   })
+
+afterEach(cleanupDatabases)
+
+afterAll(done => {
+  jest.resetAllMocks()
+
+  knex.destroy(done)
+})
 
 describe('plan.model', () => {
   test('.save()', async () => {
@@ -163,8 +170,12 @@ describe('plan.model', () => {
       const user = await insertUser()
       const plan = await createPlan()
 
-      expect(plan.subscribeUser(user.uuid, 'hahaha')).rejects.toMatchObject({
-        message: INVITE_NOT_FOUND,
+      return new Promise(resolve => {
+        plan.subscribeUser(user.uuid, 'hahaha').catch(err => {
+          expect(err).toMatchObject({ message: INVITE_NOT_FOUND })
+
+          resolve()
+        })
       })
     })
   })
@@ -197,6 +208,12 @@ describe('plan.model', () => {
       gottenMembers.forEach((member, i) => {
         assertObjectEquals(member, members[i])
       })
+    })
+
+    test('returns empty array if no members exist', async () => {
+      const plan = await createPlan()
+
+      expect(plan.getMembers()).resolves.toEqual([])
     })
   })
 
