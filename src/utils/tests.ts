@@ -18,15 +18,23 @@ export const cleanupDatabases = () =>
     User.table().delete(),
   ])
 
-export const insertUser = async (
-  email?: string,
-  discord?: string,
-  stripe?: string,
-) => {
+interface InsertUserOptions {
+  index?: number
+  email?: string
+  discord?: string
+  stripe?: string
+}
+
+export const insertUser = async ({
+  index = 0,
+  email,
+  discord,
+  stripe,
+}: InsertUserOptions = {}) => {
   const user = new User({
-    email: email || 'email@gmail.com',
-    discordId: discord || 'discord_id',
-    stripeId: stripe || 'stripe_id',
+    email: email || `email_${index}@gmail.com`,
+    discordId: discord || `discord_id_${index}`,
+    stripeId: stripe || `stripe_id_${index}`,
     accessLevel: AccessLevel.ADMIN,
   })
 

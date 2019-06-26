@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import uuid from 'uuid/v4'
-import { addDays } from 'date-fns'
+import { addDays, isEqual, parse } from 'date-fns'
+import MockDate from 'mockdate'
 
 import { Plan } from '@/modules/plan/plan.model'
 import { Subscription } from '@/modules/subscription/subscription.model'
@@ -14,10 +15,14 @@ import {
 
 afterEach(cleanupDatabases)
 
-const createPlan = async (save = true, ownerUuid?: string) => {
+const createPlan = async (
+  save = true,
+  ownerUuid?: string,
+  paymentDay?: number,
+) => {
   const plan = new Plan({
     name: 'plan_name',
-    paymentDay: 30,
+    paymentDay: paymentDay || 12,
     amount: 1000_00,
     ownerUuid: ownerUuid || uuid(),
   })
@@ -28,6 +33,11 @@ const createPlan = async (save = true, ownerUuid?: string) => {
 
   return plan
 }
+
+const createDate = (year: number, month: number, day: number) =>
+  parse(`${year}-${month}-${day} +00`, 'yyyy-M-d x', new Date(), {
+    weekStartsOn: 1,
+  })
 
 describe('plan.model', () => {
   test('.save()', async () => {
@@ -156,6 +166,69 @@ describe('plan.model', () => {
       expect(plan.subscribeUser(user.uuid, 'hahaha')).rejects.toMatchObject({
         message: INVITE_NOT_FOUND,
       })
+    })
+  })
+
+  test('.getOwner()', async () => {
+    const owner = await insertUser()
+    const plan = await createPlan(true, owner.uuid)
+
+    assertObjectEquals(await plan.getOwner(), owner)
+  })
+
+  describe('.getMembers()', () => {
+    test('gets members', async () => {
+      const plan = await createPlan()
+      const members = await Promise.all([
+        insertUser({ index: 0 }),
+        insertUser({ index: 1 }),
+        insertUser({ index: 2 }),
+      ])
+
+      await Promise.all(
+        members.map(async member => {
+          const invite = await plan.createInvite(addDays(new Date(), 7))
+          return plan.subscribeUser(member.uuid, invite.shortId)
+        }),
+      )
+
+      const gottenMembers = await plan.getMembers()
+
+      gottenMembers.forEach((member, i) => {
+        assertObjectEquals(member, members[i])
+      })
+    })
+  })
+
+  describe('.nextPaymentDate()', () => {
+    let plan: Plan
+
+    beforeAll(async () => {
+      plan = await createPlan()
+    })
+
+    afterEach(async () => {
+      MockDate.reset()
+    })
+
+    test('returns correct date if before payment day', async () => {
+      MockDate.set(createDate(2019, 6, 6))
+
+      expect(isEqual(plan.nextPaymentDate(), createDate(2019, 6, 12)))
+    })
+
+    test("returns next month's date if after payment day", async () => {
+      MockDate.set(createDate(2019, 6, 15))
+
+      expect(isEqual(plan.nextPaymentDate(), createDate(2019, 7, 12)))
+    })
+
+    test('backs up if payment date does not exist in month', async () => {
+      const latePlan = await createPlan(true, undefined, 30)
+
+      MockDate.set(createDate(2019, 2, 1))
+
+      expect(isEqual(latePlan.nextPaymentDate(), createDate(2019, 2, 28)))
     })
   })
 })

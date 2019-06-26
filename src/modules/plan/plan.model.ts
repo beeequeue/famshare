@@ -65,7 +65,7 @@ export class Plan extends DatabaseTable<DatabasePlan> {
       .innerJoin(Table.SUBSCRIPTION, function() {
         this.on('user.uuid', '=', 'subscription.user_uuid')
       })
-      .where({ 'subscription.uuid': this.uuid })
+      .where({ 'subscription.plan_uuid': this.uuid })
 
     return results.map(result => User.fromSql(result))
   }
