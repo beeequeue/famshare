@@ -4,7 +4,6 @@ cache:
   yarn: true
   directories:
     - node_modules
-script:
 jobs:
   include:
     - stage: "Compile, Lint, and Test"
