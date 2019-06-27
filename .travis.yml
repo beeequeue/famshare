@@ -7,10 +7,9 @@ cache:
 script:
 jobs:
   include:
-    - stage: "Compile & Lint"
+    - stage: "Compile, Lint, and Test"
       script: yarn build
     - script: yarn lint
-    - stage: "Test"
-      script:
+    - script:
         - yarn run test:coverage
         - cat coverage/lcov.info | yarn coveralls
