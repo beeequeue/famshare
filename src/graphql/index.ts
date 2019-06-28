@@ -39,6 +39,13 @@ export const createGraphQLMiddleware = async () => {
         schema,
         graphiql,
         pretty: IS_DEV,
+        extensions: () => {
+          if (process.env.NODE_ENV === 'production') return {}
+
+          return {
+            env: process.env.NODE_ENV,
+          }
+        },
       })
     },
   }
