@@ -45,13 +45,22 @@ export const SessionMiddleware = (): RequestHandler => async (
   res,
   next,
 ) => {
-  const cookie = req.cookies.session
+  let encodedToken: string = req.cookies.session
 
   req.authenticate = authenticate(res)
 
-  if (!cookie) return next()
+  if (isNil(encodedToken)) {
+    const header = req.header('Authorization') || ''
+    const match = /^Bearer (.*);?$/.exec(header)
 
-  const session = await Session.findByUuid(Base64.decode(cookie))
+    if (isNil(match) || isNil(match[1])) {
+      return next()
+    }
+
+    encodedToken = match[1] as string
+  }
+
+  const session = await Session.findByUuid(Base64.decode(encodedToken))
 
   if (isNil(session)) {
     res.clearCookie('session')
