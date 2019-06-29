@@ -13,3 +13,6 @@ declare module '*/knexfile' {
 
   export = config
 }
+
+declare type XMLHttpRequest = unknown
+declare type Blob = unknown
