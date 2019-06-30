@@ -3,7 +3,12 @@ import { mocked } from 'ts-jest/utils'
 import { knex } from '@/db'
 import { stripe as _stripe } from '@/modules/stripe/stripe.lib'
 import { ConnectionType } from '@/modules/connection/connection.model'
-import { assertObjectEquals, cleanupDatabases, insertUser } from '@/utils/tests'
+import {
+  assertObjectEquals,
+  cleanupDatabases,
+  insertPlan,
+  insertUser,
+} from '@/utils/tests'
 import { DatabaseUser, User } from './user.model'
 
 jest.mock('@/modules/stripe/stripe.lib')
@@ -210,5 +215,18 @@ describe('user.model', () => {
       expect(connections[0]).toMatchObject(connectionData)
       expect(connections[1]).toMatchObject(connectionData2)
     })
+  })
+
+  test('.getPlans()', async () => {
+    const user = await insertUser()
+    const plans = await Promise.all([
+      insertPlan({ ownerUuid: user.uuid }),
+      insertPlan({ ownerUuid: user.uuid }),
+      insertPlan({ ownerUuid: user.uuid }),
+    ])
+
+    const gottenPlans = await user.getPlans()
+
+    assertObjectEquals(gottenPlans, plans)
   })
 })

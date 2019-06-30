@@ -217,6 +217,19 @@ describe('plan.model', () => {
     })
   })
 
+  test('.getByOwnerUuid()', async () => {
+    const owner = await insertUser()
+    const plans = await Promise.all([
+      createPlan(true, owner.uuid),
+      createPlan(true, owner.uuid),
+      createPlan(true, owner.uuid),
+    ])
+
+    const gottenPlans = await Plan.getByOwnerUuid(owner.uuid)
+
+    assertObjectEquals(gottenPlans, plans)
+  })
+
   describe('.nextPaymentDate()', () => {
     let plan: Plan
 

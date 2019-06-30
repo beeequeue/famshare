@@ -109,6 +109,12 @@ export class Plan extends DatabaseTable<DatabasePlan> {
     return Plan.fromSql(plan)
   }
 
+  public static async getByOwnerUuid(uuid: string) {
+    const plan = await this.table().where({ owner_uuid: uuid })
+
+    return plan.map(Plan.fromSql)
+  }
+
   public async createInvite(expiresAt: Date) {
     const invite = new Invite({
       shortId: await Invite.generateShortId(),

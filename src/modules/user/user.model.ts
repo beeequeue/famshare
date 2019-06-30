@@ -12,6 +12,7 @@ import {
   Connection,
   ConnectionConstructor,
 } from '@/modules/connection/connection.model'
+import { Plan } from '@/modules/plan/plan.model'
 import { Subscription } from '@/modules/subscription/subscription.model'
 import { stripe } from '@/modules/stripe/stripe.lib'
 import { isNil } from '@/utils'
@@ -49,6 +50,7 @@ export class User extends DatabaseTable<DatabaseUser> {
   public readonly email: string
   @Field(() => AccessLevel, { nullable: true })
   public readonly accessLevel: AccessLevel | null
+
   @Field()
   public hasSetupStripe(): boolean {
     return !isNil(this.stripeId)
@@ -64,6 +66,11 @@ export class User extends DatabaseTable<DatabaseUser> {
   @Field(() => [Subscription])
   public readonly subscriptions!: Subscription[]
   public getSubscriptions = async () => Subscription.getByUserUuid(this.uuid)
+
+  @Field(() => [Plan], { description: 'Plans owned by this user' })
+  public async plans(): Promise<Plan[]> {
+    return Plan.getByOwnerUuid(this.uuid)
+  }
 
   constructor(params: Constructor) {
     super(params)
