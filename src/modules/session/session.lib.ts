@@ -91,7 +91,4 @@ export const assertLoggedIn = (): RequestHandler => (req, res, next) => {
 export const authChecker: AuthChecker<Request, AccessLevel> = (
   { context },
   roles,
-) => {
-  console.log(context.session!.user.accessLevel, roles[0])
-  return context.session!.user.accessLevel === roles[0]
-}
+) => context.session!.user.accessLevel === roles[0]

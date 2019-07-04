@@ -10,6 +10,7 @@ const start = async () => {
   const server = http.createServer(app)
 
   server.listen(PORT || 3100, () => {
+    // eslint-disable-next-line no-console
     console.log('Listening on ' + (PORT || 3100))
   })
 }

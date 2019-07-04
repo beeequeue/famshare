@@ -16,9 +16,11 @@ export const ErrorHandler = (): ErrorRequestHandler => async (
       err.output.statusCode < 500 &&
       err.output.statusCode !== 404
     ) {
+      // eslint-disable-next-line no-console
       console.error(err.message)
     }
   } else {
+    // eslint-disable-next-line no-console
     console.error(err.message)
   }
 
