@@ -217,7 +217,7 @@ describe('user.model', () => {
     })
   })
 
-  test('.getPlans()', async () => {
+  test('.plans', async () => {
     const user = await insertUser()
     const plans = await Promise.all([
       insertPlan({ ownerUuid: user.uuid }),
@@ -225,7 +225,7 @@ describe('user.model', () => {
       insertPlan({ ownerUuid: user.uuid }),
     ])
 
-    const gottenPlans = await user.getPlans()
+    const gottenPlans = await user.plans()
 
     assertObjectEquals(gottenPlans, plans)
   })
