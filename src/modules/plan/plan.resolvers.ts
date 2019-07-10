@@ -2,15 +2,12 @@ import {
   Arg,
   Ctx,
   Field,
-  FieldResolver,
   ID,
   InputType,
   Int,
   Mutation,
   Query,
   Resolver,
-  ResolverInterface,
-  Root,
 } from 'type-graphql'
 import { Request } from 'express'
 import { forbidden, notFound } from 'boom'
@@ -44,15 +41,9 @@ class EditPlanOptions implements Pick<Plan, 'name'> {
 
 @Resolver()
 export class PlanResolver {
-  @Query(() => Plan)
-  public async plan(@Arg('uuid', () => ID) uuid: string) {
-    const plan = await Plan.findByUuid(uuid)
-
-    if (isNil(plan)) {
-      throw notFound()
-    }
-
-    return plan
+  @Query(() => Plan, { nullable: true })
+  public async plan(@Arg('uuid', () => ID) uuid: string): Promise<Plan | null> {
+    return Plan.findByUuid(uuid)
   }
 
   @Mutation(() => Plan)
@@ -90,18 +81,5 @@ export class PlanResolver {
     await plan.save()
 
     return plan
-  }
-}
-
-@Resolver(() => Plan)
-export class PlanFieldResolver implements ResolverInterface<Plan> {
-  @FieldResolver()
-  public async owner(@Root() plan: Plan) {
-    return plan.getOwner()
-  }
-
-  @FieldResolver()
-  public async members(@Root() plan: Plan) {
-    return plan.getMembers()
   }
 }

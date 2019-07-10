@@ -33,11 +33,15 @@ export class Invite extends DatabaseTable<DatabaseInvite> {
   public readonly expiresAt: Date
 
   @Field(() => Plan)
-  public readonly plan!: Plan
+  public async plan(): Promise<Plan> {
+    return Plan.getByUuid(this.planUuid)
+  }
   public readonly planUuid: string
 
   @Field(() => User, { nullable: true })
-  public readonly user!: User | null
+  public async user(): Promise<User | null> {
+    return this.getUser()
+  }
 
   constructor(options: InviteConstructor) {
     super(options)
@@ -129,7 +133,7 @@ export class Invite extends DatabaseTable<DatabaseInvite> {
     return Number(result['count(*)' as any]) === 1
   }
 
-  public async getUserOf() {
+  private async getUser() {
     const result: any = await knex(Table.USER)
       .select('user.*')
       .innerJoin(Table.SUBSCRIPTION, function() {

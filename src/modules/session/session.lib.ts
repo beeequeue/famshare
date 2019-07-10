@@ -68,7 +68,7 @@ export const SessionMiddleware = (): RequestHandler => async (
     return next()
   }
 
-  const user = await User.getByUuid(session.userUuid)
+  const user = await session.getUser()
   const discordUser = await Discord.getUserById(user.discordId)
 
   // eslint-disable-next-line require-atomic-updates

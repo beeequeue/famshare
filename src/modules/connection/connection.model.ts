@@ -49,9 +49,10 @@ export class Connection extends DatabaseTable<DatabaseConnection> {
   public readonly link?: string
 
   @Field(() => User)
-  public readonly owner!: User
+  public async owner(): Promise<User> {
+    return User.getByUuid(this.ownerUuid)
+  }
   public readonly ownerUuid: string
-  public getOwner = async () => User.getByUuid(this.ownerUuid)
 
   constructor(options: ConnectionConstructor) {
     super(options)

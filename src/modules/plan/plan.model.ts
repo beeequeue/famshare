@@ -53,13 +53,13 @@ export class Plan extends DatabaseTable<DatabasePlan> {
   }
 
   @Field(() => User)
-  public readonly owner!: User
+  public async owner(): Promise<User> {
+    return User.getByUuid(this.ownerUuid)
+  }
   public readonly ownerUuid: string
-  public getOwner = async () => User.getByUuid(this.ownerUuid)
 
   @Field(() => [User])
-  public readonly members!: User[]
-  public getMembers = async () => {
+  public async members(): Promise<User[]> {
     const results: any[] = await knex(Table.USER)
       .select('user.*')
       .innerJoin(Table.SUBSCRIPTION, function() {

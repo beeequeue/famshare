@@ -1,15 +1,5 @@
 import { Request } from 'express'
-import {
-  Arg,
-  Ctx,
-  FieldResolver,
-  ID,
-  Mutation,
-  Query,
-  Resolver,
-  ResolverInterface,
-  Root,
-} from 'type-graphql'
+import { Arg, Ctx, ID, Mutation, Query, Resolver } from 'type-graphql'
 import { forbidden, notFound } from 'boom'
 
 import { Plan } from '@/modules/plan/plan.model'
@@ -19,11 +9,11 @@ import { isNil } from '@/utils'
 
 @Resolver()
 export class InviteResolver {
-  @Query(() => Invite)
+  @Query(() => Invite, { nullable: true })
   public async invite(
     @Arg('uuid', () => ID, { nullable: true }) uuid?: string,
     @Arg('shortId', () => ID, { nullable: true }) shortId?: string,
-  ): Promise<Invite> {
+  ): Promise<Invite | null> {
     let invite: Invite | null = null
 
     if (!isNil(uuid)) {
@@ -32,10 +22,6 @@ export class InviteResolver {
       invite = await Invite.findByShortId(shortId)
     } else {
       throw new Error('Need to specify `uuid` or `shortId`!')
-    }
-
-    if (isNil(invite)) {
-      throw notFound()
     }
 
     return invite
@@ -60,18 +46,5 @@ export class InviteResolver {
     await plan.createInvite(expiresAt)
 
     return plan
-  }
-}
-
-@Resolver(() => Invite)
-export class InviteFieldResolver implements ResolverInterface<Invite> {
-  @FieldResolver()
-  public async plan(@Root() invite: Invite) {
-    return Plan.getByUuid(invite.planUuid)
-  }
-
-  @FieldResolver()
-  public async user(@Root() invite: Invite) {
-    return invite.getUserOf()
   }
 }

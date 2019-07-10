@@ -1,12 +1,4 @@
-import {
-  Arg,
-  Ctx,
-  FieldResolver,
-  Mutation,
-  Resolver,
-  ResolverInterface,
-  Root,
-} from 'type-graphql'
+import { Arg, Ctx, Mutation, Resolver } from 'type-graphql'
 import { Request } from 'express'
 import { notFound } from 'boom'
 
@@ -35,13 +27,5 @@ export class ConnectionResolver {
     await connection.delete()
 
     return user
-  }
-}
-
-@Resolver(() => Connection)
-export class ConnectionFieldResolver implements ResolverInterface<Connection> {
-  @FieldResolver()
-  public async owner(@Root() connection: Connection) {
-    return connection.getOwner()
   }
 }
