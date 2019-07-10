@@ -180,14 +180,14 @@ describe('plan.model', () => {
     })
   })
 
-  test('.getOwner()', async () => {
+  test('.owner()', async () => {
     const owner = await insertUser()
     const plan = await createPlan(true, owner.uuid)
 
-    assertObjectEquals(await plan.getOwner(), owner)
+    assertObjectEquals(await plan.owner(), owner)
   })
 
-  describe('.getMembers()', () => {
+  describe('.members()', () => {
     test('gets members', async () => {
       const plan = await createPlan()
       const members = await Promise.all([
@@ -203,7 +203,7 @@ describe('plan.model', () => {
         }),
       )
 
-      const gottenMembers = await plan.getMembers()
+      const gottenMembers = await plan.members()
 
       gottenMembers.forEach((member, i) => {
         assertObjectEquals(member, members[i])
@@ -213,7 +213,7 @@ describe('plan.model', () => {
     test('returns empty array if no members exist', async () => {
       const plan = await createPlan()
 
-      expect(plan.getMembers()).resolves.toEqual([])
+      expect(plan.members()).resolves.toEqual([])
     })
   })
 

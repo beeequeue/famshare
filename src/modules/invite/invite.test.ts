@@ -152,7 +152,7 @@ describe('invite.model', () => {
     })
   })
 
-  describe('.getUserOf()', () => {
+  describe('.user()', () => {
     test('gets user', async () => {
       const user = await insertUser()
       const plan = await insertPlan()
@@ -167,7 +167,7 @@ describe('invite.model', () => {
 
       await subscription.save()
 
-      const gottenUser = await invite.getUserOf()
+      const gottenUser = await invite.user()
 
       assertObjectEquals(gottenUser!, user)
     })
@@ -175,7 +175,7 @@ describe('invite.model', () => {
     test('returns null if not used yet', async () => {
       const invite = await createInvite()
 
-      expect(invite.getUserOf()).resolves.toBeNull()
+      expect(invite.user()).resolves.toBeNull()
     })
   })
 })
