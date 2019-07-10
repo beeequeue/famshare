@@ -1,9 +1,7 @@
 import { badRequest } from 'boom'
 import superagent from 'superagent'
 
-const { GOOGLE_CLIENT, GOOGLE_SECRET } = process.env as {
-  [key: string]: string
-}
+const { GOOGLE_CLIENT, GOOGLE_SECRET } = process.env
 const SCOPE = 'email profile'
 
 const T = () => true
@@ -29,7 +27,7 @@ export class Google {
 
   public static getConnectUrl = (hostname: string) =>
     'https://accounts.google.com/o/oauth2/v2/auth' +
-    `?client_id=${encodeURIComponent(GOOGLE_CLIENT as string)}` +
+    `?client_id=${encodeURIComponent(GOOGLE_CLIENT!)}` +
     `&redirect_uri=${encodeURIComponent(Google.getCallbackUrl(hostname))}` +
     '&access_type=online' +
     '&include_granted_scopes=true' +
@@ -45,8 +43,8 @@ export class Google {
       .query({
         code,
         /* eslint-disable @typescript-eslint/camelcase */
-        client_id: GOOGLE_CLIENT,
-        client_secret: GOOGLE_SECRET,
+        client_id: GOOGLE_CLIENT!,
+        client_secret: GOOGLE_SECRET!,
         redirect_uri: Google.getCallbackUrl(hostname),
         grant_type: 'authorization_code',
         /* eslint-enable @typescript-eslint/camelcase */

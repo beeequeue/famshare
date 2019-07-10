@@ -1,15 +1,28 @@
-import { Router } from 'express'
+import { NextFunction, Request, Router } from 'express'
 import { User } from '@/modules/user/user.model'
 import { isNil } from '@/utils'
+import { badRequest, notFound } from 'boom'
+
+const assertGoodRequest = (req: Request, next: NextFunction) => {
+  if (req.connection.remoteAddress !== req.connection.localAddress) {
+    return next()
+  }
+
+  if (isNil(req.query.userUuid)) {
+    throw badRequest('Missing User UUID.')
+  }
+}
 
 export const sessionRouter = Router()
 
 if (process.env.NODE_ENV === 'development') {
-  sessionRouter.get('/dev_session', async (req, res) => {
+  sessionRouter.get('/dev_session', async (req, res, next) => {
+    assertGoodRequest(req, next)
+
     const user = await User.findByUuid(req.query.userUuid)
 
     if (isNil(user)) {
-      return res.status(400).json({ message: 'not found' })
+      throw notFound()
     }
 
     await req.authenticate(user.uuid)
@@ -17,11 +30,13 @@ if (process.env.NODE_ENV === 'development') {
     res.redirect('/')
   })
 
-  sessionRouter.get('/dev_token', async (req, res) => {
+  sessionRouter.get('/dev_token', async (req, res, next) => {
+    assertGoodRequest(req, next)
+
     const user = await User.findByUuid(req.query.userUuid)
 
     if (isNil(user)) {
-      return res.status(400).send(null)
+      throw notFound()
     }
 
     await req.authenticate(user.uuid)
