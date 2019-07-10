@@ -4,6 +4,7 @@ defaults: &defaults
   working_directory: ~/repo
 
 version: 2
+
 jobs:
   checkout_code:
     <<: *defaults
@@ -27,7 +28,7 @@ jobs:
 
   dependencies:
     <<: *defaults
-    steps:
+    jobs:
       - attach_workspace:
           at: .
       - restore_cache:
@@ -49,7 +50,7 @@ jobs:
 
   build:
     <<: *defaults
-    steps:
+    jobs:
       - attach_workspace:
           at: .
       - run:
@@ -58,7 +59,7 @@ jobs:
 
   test:
     <<: *defaults
-    steps:
+    jobs:
       - attach_workspace:
           at: .
       - run:
@@ -67,7 +68,7 @@ jobs:
 
   lint:
     <<: *defaults
-    steps:
+    jobs:
       - attach_workspace:
           at: .
       - run:
