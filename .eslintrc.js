@@ -28,6 +28,8 @@ module.exports = {
   rules: {
     'no-console': 2,
     'no-use-before-define': 0,
+    'lines-between-class-members': 0,
+    'import/named': 0,
     'node/no-unsupported-features/es-syntax': 0,
     'node/prefer-promises/dns': 2,
     'node/prefer-promises/fs': 2,
