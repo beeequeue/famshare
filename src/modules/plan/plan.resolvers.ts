@@ -53,6 +53,7 @@ export class PlanResolver {
   ): Promise<Plan> {
     const plan = new Plan({
       ...options,
+      feeBasisPoints: 15_00,
       ownerUuid: context.session!.user.uuid,
     })
 

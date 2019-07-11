@@ -20,6 +20,7 @@ import { isNil } from '@/utils'
 interface Constructor extends ITableOptions {
   name: string
   amount: number
+  feeBasisPoints: number
   paymentDay: number
   ownerUuid: string
 }
@@ -27,6 +28,7 @@ interface Constructor extends ITableOptions {
 interface DatabasePlan extends ITableData {
   name: string
   amount: number
+  fee_basis_points: number
   payment_day: number
   owner_uuid: string
 }
@@ -39,6 +41,8 @@ export class Plan extends DatabaseTable<DatabasePlan> {
   public name: string
   @Field(() => Int)
   public readonly amount: number
+  @Field(() => Int)
+  public readonly feeBasisPoints: number
   @Field(() => Int, {
     description: '1-indexed day in month payments are done.',
   })
@@ -79,15 +83,17 @@ export class Plan extends DatabaseTable<DatabasePlan> {
 
     this.name = options.name
     this.amount = options.amount
+    this.feeBasisPoints = options.feeBasisPoints
     this.paymentDay = options.paymentDay
     this.ownerUuid = options.ownerUuid
   }
 
-  public static fromSql(sql: DatabasePlan & ITableData) {
+  public static fromSql(sql: DatabasePlan) {
     return new Plan({
       ...DatabaseTable._fromSql(sql),
       name: sql.name,
       amount: sql.amount,
+      feeBasisPoints: sql.fee_basis_points,
       paymentDay: sql.payment_day,
       ownerUuid: sql.owner_uuid,
     })
@@ -162,6 +168,7 @@ export class Plan extends DatabaseTable<DatabasePlan> {
     return this._save({
       name: this.name,
       amount: this.amount,
+      fee_basis_points: this.feeBasisPoints,
       payment_day: this.paymentDay,
       owner_uuid: this.ownerUuid,
     })
