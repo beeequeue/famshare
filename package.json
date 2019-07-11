@@ -102,7 +102,7 @@
     "proxy": "ngrok start famshare famshare-ui",
     "start": "ts-node -r dotenv/config -r tsconfig-paths/register src/index.ts",
     "test": "jest -i",
-    "test:ci": "yarn run test --ci",
+    "test:ci": "yarn run test:coverage --ci",
     "test:coverage": "yarn run test --coverage"
   }
 }
