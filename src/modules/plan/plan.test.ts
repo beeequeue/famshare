@@ -27,6 +27,7 @@ const createPlan = async (
     name: 'plan_name',
     paymentDay: paymentDay || 12,
     amount: 1000_00,
+    feeBasisPoints: 15_00,
     ownerUuid: ownerUuid || uuid(),
   })
 

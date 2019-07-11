@@ -61,6 +61,7 @@ export const insertPlan = async ({
   const plan = new Plan({
     name: name || 'plan',
     amount: amount || 12_99,
+    feeBasisPoints: 15_00,
     paymentDay: 1,
     ownerUuid,
   })
@@ -82,7 +83,7 @@ export const insertInvite = async ({ planUuid }: InsertInviteOptions) => {
   const invite = new Invite({
     shortId: await Invite.generateShortId(),
     cancelled: false,
-    planUuid,
+    planUuid: planUuid!,
     expiresAt: addDays(new Date(), 7),
   })
 

@@ -42,6 +42,8 @@ export const up = async (knex: Knex): Promise<any> => {
 
       table.integer('amount').notNullable()
 
+      table.integer('fee_basis_points').notNullable()
+
       table.integer('payment_day').notNullable()
 
       table.uuid('owner_uuid').notNullable()
