@@ -94,6 +94,7 @@
     "build": "yarn tsc -P tsconfig.json",
     "dev": "ts-node-dev --respawn -r dotenv/config -r tsconfig-paths/register --inspect -- src/index.ts",
     "lint": "eslint 'src/**/*'",
+    "lint:ci": "yarn run lint -f junit -o test-results/eslint/results.xml",
     "migrate": "knex migrate:latest --knexfile knexfile.ts",
     "migrate:create": "knex migrate:make --knexfile knexfile.ts -x ts",
     "prestart": "yarn run migrate",
@@ -101,6 +102,7 @@
     "proxy": "ngrok start famshare famshare-ui",
     "start": "ts-node -r dotenv/config -r tsconfig-paths/register src/index.ts",
     "test": "jest -i",
+    "test:ci": "yarn run test --ci",
     "test:coverage": "yarn run test --coverage"
   }
 }
