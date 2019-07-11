@@ -1,32 +1,22 @@
-defaults: &defaults
-  docker:
-    - image: circleci/node:12.3.1
+executors:
+  node:
+    docker:
+      - image: circleci/node:12.3.1
+    working_directory: /app
 
 version: 2
 
 jobs:
   checkout_code:
-    <<: *defaults
+    executor: node
     steps:
-      - restore_cache:
-          name: Restore git history
-          keys:
-            - git-v1-{{ .Branch }}-{{ .Revision }}
-            - git-v1-{{ .Branch }}-
-            - git-v1-
       - checkout
-      - save_cache:
-          name: Cache git history
-          key: git-v1-{{ .Branch }}-{{ .Revision }}
-          paths:
-            - '.git'
       - persist_to_workspace:
-          root: .
           paths:
             - .git
 
   dependencies:
-    <<: *defaults
+    executor: node
     steps:
       - attach_workspace:
           at: .
@@ -48,7 +38,7 @@ jobs:
             - node_modules
 
   build:
-    <<: *defaults
+    executor: node
     steps:
       - attach_workspace:
           at: .
@@ -57,7 +47,7 @@ jobs:
           command: yarn run build
 
   test:
-    <<: *defaults
+    executor: node
     steps:
       - attach_workspace:
           at: .
@@ -66,7 +56,7 @@ jobs:
           command: yarn run test:coverage
 
   lint:
-    <<: *defaults
+    executor: node
     steps:
       - attach_workspace:
           at: .
