@@ -18,7 +18,7 @@ export class SubscriptionResolver {
     if (isNil(invite)) {
       throw badRequest('Invalid invitation!')
     }
-    const { plan } = invite
+    const plan = await invite.plan()
 
     await plan.subscribeUser(context.session!.user.uuid, invitationId)
 
