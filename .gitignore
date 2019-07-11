@@ -4,6 +4,7 @@
 .env
 !.gitkeep
 sqlite/*.sqlite3
+test-results
 
 # Cached builds
 .awcache

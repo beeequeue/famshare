@@ -4,7 +4,7 @@ executors:
   node:
     docker:
       - image: circleci/node:12.3.1
-    working_directory: /app
+    working_directory: ~/app
 
 jobs:
   checkout_code:
@@ -12,28 +12,20 @@ jobs:
     steps:
       - checkout
       - persist_to_workspace:
+          root: ~/app
           paths:
-            - .git
+            - ./*
 
   dependencies:
     executor: node
     steps:
       - attach_workspace:
           at: .
-      - restore_cache:
-          keys:
-            - node-deps-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - node-deps-v1-{{ .Branch }}
-            - node-deps-v1-
       - run:
           name: Install NPM dependencies
           command: yarn install --frozen-lockfile
-      - save_cache:
-          key: node-deps-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
-          paths:
-            - node_modules
       - persist_to_workspace:
-          root: .
+          root: ~/app
           paths:
             - node_modules
 
@@ -53,7 +45,13 @@ jobs:
           at: .
       - run:
           name: Run tests
-          command: yarn run test:coverage
+          command: yarn run test:ci
+      - run:
+          name: Send coverage report
+          command: cat coverage/lcov.info | yarn coveralls
+      - store_test_results:
+          when: always
+          path: test-results
 
   lint:
     executor: node
@@ -62,7 +60,10 @@ jobs:
           at: .
       - run:
           name: Run linting
-          command: yarn run lint
+          command: yarn run lint:ci
+      - store_test_results:
+          when: always
+          path: test-results
 
 workflows:
   version: 2

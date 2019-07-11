@@ -17,4 +17,14 @@ module.exports = {
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
     prefix: '<rootDir>/',
   }),
+  reporters: [
+    'default',
+    [
+      'jest-junit',
+      {
+        outputDirectory: 'test-results/jest',
+        outputName: 'results.xml',
+      },
+    ],
+  ],
 }
