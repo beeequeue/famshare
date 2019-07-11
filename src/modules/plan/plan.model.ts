@@ -9,7 +9,11 @@ import {
   Subscription,
   SubscriptionStatus,
 } from '@/modules/subscription/subscription.model'
-import { INVITE_NOT_FOUND, USER_NOT_FOUND } from '@/errors'
+import {
+  INVITE_NOT_FOUND,
+  OWNER_OF_PLAN_SUBSCRIBE,
+  USER_NOT_FOUND,
+} from '@/errors'
 import { Table } from '@/constants'
 import { isNil } from '@/utils'
 
@@ -129,12 +133,15 @@ export class Plan extends DatabaseTable<DatabasePlan> {
   }
 
   public async subscribeUser(userUuid: string, inviteShortId: string) {
-    const invite = await Invite.findByShortId(inviteShortId)
+    if (userUuid === this.ownerUuid) {
+      throw new Error(OWNER_OF_PLAN_SUBSCRIBE)
+    }
 
     if (isNil(await User.findByUuid(userUuid))) {
       throw new Error(USER_NOT_FOUND)
     }
 
+    const invite = await Invite.findByShortId(inviteShortId)
     if (isNil(invite)) {
       throw new Error(INVITE_NOT_FOUND)
     }

@@ -6,7 +6,11 @@ import MockDate from 'mockdate'
 import { knex } from '@/db'
 import { Plan } from '@/modules/plan/plan.model'
 import { Subscription } from '@/modules/subscription/subscription.model'
-import { INVITE_NOT_FOUND, USER_NOT_FOUND } from '@/errors'
+import {
+  INVITE_NOT_FOUND,
+  OWNER_OF_PLAN_SUBSCRIBE,
+  USER_NOT_FOUND,
+} from '@/errors'
 import {
   assertObjectEquals,
   cleanupDatabases,
@@ -163,6 +167,17 @@ describe('plan.model', () => {
 
       expect(plan.subscribeUser(uuid(), 'hahaha')).rejects.toMatchObject({
         message: USER_NOT_FOUND,
+      })
+    })
+
+    test('rejects if user is owner of plan', async () => {
+      const plan = await createPlan()
+      const invite = await insertInvite({ planUuid: plan.uuid })
+
+      expect(
+        plan.subscribeUser(plan.ownerUuid, invite.shortId),
+      ).rejects.toMatchObject({
+        message: OWNER_OF_PLAN_SUBSCRIBE,
       })
     })
 
