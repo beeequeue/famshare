@@ -91,7 +91,7 @@
   },
   "private": true,
   "scripts": {
-    "build": "yarn tsc --noEmit -P tsconfig.json",
+    "build": "yarn tsc -P tsconfig.json",
     "dev": "ts-node-dev --respawn -r dotenv/config -r tsconfig-paths/register --inspect -- src/index.ts",
     "lint": "eslint 'src/**/*'",
     "migrate": "knex migrate:latest --knexfile knexfile.ts",
