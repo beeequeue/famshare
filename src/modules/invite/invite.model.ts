@@ -4,8 +4,9 @@ import { Field, ID, ObjectType } from 'type-graphql'
 import { DatabaseTable, knex, ITableData, ITableOptions } from '@/db'
 import { Plan } from '@/modules/plan/plan.model'
 import { User } from '@/modules/user/user.model'
-import { isNil } from '@/utils'
 import { Table } from '@/constants'
+import { INVITE_ALREADY_USED } from '@/errors'
+import { isNil } from '@/utils'
 
 export interface InviteConstructor extends ITableOptions {
   shortId: string
@@ -153,6 +154,13 @@ export class Invite extends DatabaseTable<DatabaseInvite> {
   }
 
   public async cancel() {
+    if (this.cancelled) return this
+
+    const isClaimed = !isNil(await this.user())
+    if (isClaimed) {
+      throw new Error(INVITE_ALREADY_USED)
+    }
+
     const invite = new Invite({ ...this, cancelled: true })
     await invite.save()
 

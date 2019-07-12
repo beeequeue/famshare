@@ -4,15 +4,16 @@ import uuid from 'uuid/v4'
 import { knex } from '@/db'
 import { Invite } from '@/modules/invite/invite.model'
 import {
+  Subscription,
+  SubscriptionStatus,
+} from '@/modules/subscription/subscription.model'
+import {
   assertObjectEquals,
   cleanupDatabases,
   insertPlan,
   insertUser,
 } from '@/utils/tests'
-import {
-  Subscription,
-  SubscriptionStatus,
-} from '@/modules/subscription/subscription.model'
+import { INVITE_ALREADY_USED } from '@/errors'
 
 const createInvite = async (save = true, planUuid?: string) => {
   const invite = new Invite({
@@ -152,14 +153,33 @@ describe('invite.model', () => {
     })
   })
 
-  test('.cancel()', async () => {
-    const invite = await createInvite()
+  describe('.cancel()', () => {
+    test('cancels invite', async () => {
+      const invite = await createInvite()
 
-    const returned = await invite.cancel()
-    const result = await Invite.getByUuid(invite.uuid)
+      const returned = await invite.cancel()
+      const result = await Invite.getByUuid(invite.uuid)
 
-    expect(returned.cancelled).toBe(true)
-    expect(result.cancelled).toBe(true)
+      expect(returned.cancelled).toBe(true)
+      expect(result.cancelled).toBe(true)
+    })
+
+    test('fails to cancel claimed invite', async () => {
+      const owner = await insertUser({ index: 0 })
+      const plan = await insertPlan({ ownerUuid: owner.uuid })
+      const invite = await createInvite(true, plan.uuid)
+      const user = await insertUser({ index: 1 })
+      await plan.subscribeUser(user.uuid, invite.shortId)
+
+      const rejectFn = jest.fn()
+
+      return invite
+        .cancel()
+        .catch(rejectFn)
+        .then(() => {
+          expect(rejectFn).toHaveBeenCalledWith(new Error(INVITE_ALREADY_USED))
+        })
+    })
   })
 
   describe('.user()', () => {

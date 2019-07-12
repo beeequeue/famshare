@@ -7,6 +7,8 @@ export const IS_NOT_PLAN_OWNER =
 
 export const INVITE_NOT_FOUND = 'Invite does not exist.'
 
+export const INVITE_ALREADY_USED = 'This invite has already been used.'
+
 export const USER_NOT_FOUND = 'User does not exist.'
 
 export const OWNER_OF_PLAN_SUBSCRIBE =

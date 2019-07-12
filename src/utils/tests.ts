@@ -75,7 +75,7 @@ interface InsertInviteOptions {
   planUuid?: string
 }
 
-export const insertInvite = async ({ planUuid }: InsertInviteOptions) => {
+export const insertInvite = async ({ planUuid }: InsertInviteOptions = {}) => {
   if (isNil(planUuid)) {
     planUuid = (await insertPlan()).uuid
   }
