@@ -78,6 +78,11 @@ export class Plan extends DatabaseTable<DatabasePlan> {
     return results.map(result => User.fromSql(result))
   }
 
+  @Field(() => [Invite])
+  public async invites(): Promise<Invite[]> {
+    return Invite.findByPlan(this.uuid)
+  }
+
   constructor(options: Constructor) {
     super(options)
 

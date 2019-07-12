@@ -233,6 +233,29 @@ describe('plan.model', () => {
     })
   })
 
+  describe('.invites()', () => {
+    test('gets invites', async () => {
+      const plan = await createPlan()
+      const invites = await Promise.all([
+        insertInvite({ planUuid: plan.uuid }),
+        insertInvite({ planUuid: plan.uuid }),
+        insertInvite({ planUuid: plan.uuid }),
+      ])
+
+      const gottenMembers = await plan.invites()
+
+      gottenMembers.forEach((member, i) => {
+        assertObjectEquals(member, invites[i])
+      })
+    })
+
+    test('returns empty array if no invites exist', async () => {
+      const plan = await createPlan()
+
+      expect(plan.invites()).resolves.toEqual([])
+    })
+  })
+
   test('.getByOwnerUuid()', async () => {
     const owner = await insertUser()
     const plans = await Promise.all([
