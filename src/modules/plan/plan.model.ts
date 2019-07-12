@@ -10,6 +10,7 @@ import {
   SubscriptionStatus,
 } from '@/modules/subscription/subscription.model'
 import {
+  INVITE_ALREADY_USED,
   INVITE_NOT_FOUND,
   OWNER_OF_PLAN_SUBSCRIBE,
   USER_NOT_FOUND,
@@ -32,7 +33,9 @@ interface DatabasePlan extends ITableData {
   payment_day: number
   owner_uuid: string
 }
-
+/*
+ * fees and payments
+ */
 @ObjectType()
 export class Plan extends DatabaseTable<DatabasePlan> {
   public static readonly table = () => knex<DatabasePlan>(Table.PLAN)
@@ -155,6 +158,11 @@ export class Plan extends DatabaseTable<DatabasePlan> {
     const invite = await Invite.findByShortId(inviteShortId)
     if (isNil(invite)) {
       throw new Error(INVITE_NOT_FOUND)
+    }
+
+    const isClaimed = !isNil(await invite.user())
+    if (isClaimed) {
+      throw new Error(INVITE_ALREADY_USED)
     }
 
     const subscription = new Subscription({

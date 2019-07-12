@@ -7,6 +7,7 @@ import { knex } from '@/db'
 import { Plan } from '@/modules/plan/plan.model'
 import { Subscription } from '@/modules/subscription/subscription.model'
 import {
+  INVITE_ALREADY_USED,
   INVITE_NOT_FOUND,
   OWNER_OF_PLAN_SUBSCRIBE,
   USER_NOT_FOUND,
@@ -15,6 +16,7 @@ import {
   assertObjectEquals,
   cleanupDatabases,
   insertInvite,
+  insertPlan,
   insertUser,
 } from '@/utils/tests'
 
@@ -193,6 +195,25 @@ describe('plan.model', () => {
           resolve()
         })
       })
+    })
+
+    test('rejects if invite is already claimed', async () => {
+      const users = await Promise.all([
+        insertUser({ index: 0 }),
+        insertUser({ index: 1 }),
+      ])
+      const plan = await insertPlan()
+      const invite = await insertInvite({ planUuid: plan.uuid })
+      await plan.subscribeUser(users[0].uuid, invite.shortId)
+
+      const rejectFn = jest.fn()
+
+      return plan
+        .subscribeUser(users[1].uuid, invite.shortId)
+        .catch(rejectFn)
+        .then(() => {
+          expect(rejectFn).toHaveBeenCalledWith(new Error(INVITE_ALREADY_USED))
+        })
     })
   })
 
