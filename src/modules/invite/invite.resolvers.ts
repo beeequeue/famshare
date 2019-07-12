@@ -32,7 +32,7 @@ export class InviteResolver {
     @Arg('planUuid', () => ID) planUuid: string,
     @Arg('expiresAt', () => Date) expiresAt: Date,
     @Ctx() context: Request,
-  ): Promise<Plan> {
+  ): Promise<Invite> {
     const plan = await Plan.findByUuid(planUuid)
 
     if (isNil(plan)) {
@@ -43,9 +43,7 @@ export class InviteResolver {
       throw forbidden('You are not the owner of this Plan.')
     }
 
-    await plan.createInvite(expiresAt)
-
-    return plan
+    return plan.createInvite(expiresAt)
   }
 
   @Mutation(() => Invite)
