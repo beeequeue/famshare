@@ -152,6 +152,16 @@ describe('invite.model', () => {
     })
   })
 
+  test('.cancel()', async () => {
+    const invite = await createInvite()
+
+    const returned = await invite.cancel()
+    const result = await Invite.getByUuid(invite.uuid)
+
+    expect(returned.cancelled).toBe(true)
+    expect(result.cancelled).toBe(true)
+  })
+
   describe('.user()', () => {
     test('gets user', async () => {
       const user = await insertUser()

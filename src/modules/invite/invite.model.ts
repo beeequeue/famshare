@@ -152,6 +152,13 @@ export class Invite extends DatabaseTable<DatabaseInvite> {
     return User.fromSql(result)
   }
 
+  public async cancel() {
+    const invite = new Invite({ ...this, cancelled: true })
+    await invite.save()
+
+    return invite
+  }
+
   public async save() {
     return this._save({
       short_id: this.shortId,

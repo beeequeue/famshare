@@ -12,6 +12,7 @@ import { IS_DEV } from '@/utils'
 
 export const createGraphQLMiddleware = async () => {
   const schema = await buildSchema({
+    validate: false,
     resolvers: [
       ConnectionResolver,
       InviteResolver,

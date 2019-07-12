@@ -47,4 +47,23 @@ export class InviteResolver {
 
     return plan
   }
+
+  @Mutation(() => Invite)
+  public async cancelInvite(
+    @Arg('inviteUuid', () => ID) inviteUuid: string,
+    @Ctx() context: Request,
+  ): Promise<Invite> {
+    const invite = await Invite.findByUuid(inviteUuid)
+
+    if (isNil(invite)) {
+      throw notFound()
+    }
+
+    const { ownerUuid } = await invite.plan()
+    if (ownerUuid !== context.session!.user.uuid) {
+      throw forbidden('You are not the owner of this Plan.')
+    }
+
+    return invite.cancel()
+  }
 }
