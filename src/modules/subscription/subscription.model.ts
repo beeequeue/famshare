@@ -44,19 +44,22 @@ export class Subscription extends DatabaseTable<DatabaseSubscription> {
   public readonly status: SubscriptionStatus
 
   @Field(() => Plan)
-  public readonly plan!: Plan
+  public async plan(): Promise<Plan> {
+    return Plan.getByUuid(this.planUuid)
+  }
   public readonly planUuid: string
-  public getPlan = () => Plan.getByUuid(this.planUuid)
 
   @Field(() => User)
-  public readonly user!: User
+  public async user(): Promise<User> {
+    return User.getByUuid(this.userUuid)
+  }
   public readonly userUuid: string
-  public getUser = () => User.getByUuid(this.userUuid)
 
   @Field(() => Invite)
-  public readonly invite!: Invite
+  public async invite(): Promise<Invite> {
+    return Invite.getByUuid(this.inviteUuid)
+  }
   public readonly inviteUuid: string
-  public getInvite = () => Invite.getByUuid(this.inviteUuid)
 
   constructor(options: SubscriptionConstructor) {
     super(options)

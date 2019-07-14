@@ -121,7 +121,7 @@ describe('subscription.model', () => {
   })
 
   describe('getters', () => {
-    test('.getPlan()', async () => {
+    test('.plan()', async () => {
       const plan = await insertPlan()
 
       const subscription = new Subscription({
@@ -131,12 +131,12 @@ describe('subscription.model', () => {
         status: SubscriptionStatus.JOINED,
       })
 
-      const gottenPlan = await subscription.getPlan()
+      const gottenPlan = await subscription.plan()
 
       assertObjectEquals(gottenPlan, plan)
     })
 
-    test('.getUser()', async () => {
+    test('.user()', async () => {
       const user = await insertUser()
 
       const subscription = new Subscription({
@@ -146,12 +146,12 @@ describe('subscription.model', () => {
         status: SubscriptionStatus.JOINED,
       })
 
-      const gottenUser = await subscription.getUser()
+      const gottenUser = await subscription.user()
 
       assertObjectEquals(gottenUser, user)
     })
 
-    test('.getInvite()', async () => {
+    test('.invite()', async () => {
       const invite = new Invite({
         shortId: 'abcdefgh',
         cancelled: false,
@@ -167,7 +167,7 @@ describe('subscription.model', () => {
         status: SubscriptionStatus.JOINED,
       })
 
-      const gottenInvite = await subscription.getInvite()
+      const gottenInvite = await subscription.invite()
 
       assertObjectEquals(gottenInvite, invite)
     })
