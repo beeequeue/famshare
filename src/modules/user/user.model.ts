@@ -60,12 +60,14 @@ export class User extends DatabaseTable<DatabaseUser> {
   public stripeId: string | null
 
   @Field(() => [Connection])
-  public readonly connections!: Connection[]
-  public getConnections = async () => Connection.getByUserUuid(this.uuid)
+  public async connections(): Promise<Connection[]> {
+    return Connection.getByUserUuid(this.uuid)
+  }
 
   @Field(() => [Subscription])
-  public readonly subscriptions!: Subscription[]
-  public getSubscriptions = async () => Subscription.getByUserUuid(this.uuid)
+  public async subscriptions(): Promise<Subscription[]> {
+    return Subscription.getByUserUuid(this.uuid)
+  }
 
   @Field(() => [Plan], { description: 'Plans owned by this user' })
   public async plans(): Promise<Plan[]> {
@@ -148,7 +150,9 @@ export class User extends DatabaseTable<DatabaseUser> {
       ownerUuid: this.uuid,
     })
 
-    return connection.save()
+    await connection.save()
+
+    return connection
   }
 
   public async exists() {

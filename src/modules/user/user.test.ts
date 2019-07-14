@@ -6,6 +6,7 @@ import { ConnectionType } from '@/modules/connection/connection.model'
 import {
   assertObjectEquals,
   cleanupDatabases,
+  insertInvite,
   insertPlan,
   insertUser,
 } from '@/utils/tests'
@@ -76,12 +77,12 @@ describe('user.model', () => {
     })
 
     test('returns false when does not exist', () => {
-      const nonExistantUser = new User({
+      const nonExistentUser = new User({
         email: 'email@gmail.com',
         discordId: 'discord_id',
       })
 
-      expect(nonExistantUser.exists()).resolves.toEqual(false)
+      expect(nonExistentUser.exists()).resolves.toEqual(false)
     })
   })
 
@@ -113,12 +114,12 @@ describe('user.model', () => {
     })
 
     test('returns null if not found', async () => {
-      const nonExistantUser = new User({
+      const nonExistentUser = new User({
         email: 'email@gmail.com',
         discordId: 'discord_id',
       })
 
-      expect(User.findByUuid(nonExistantUser.uuid)).resolves.toBeNull()
+      expect(User.findByUuid(nonExistentUser.uuid)).resolves.toBeNull()
     })
   })
 
@@ -134,13 +135,13 @@ describe('user.model', () => {
     })
 
     test('returns null if not found', async () => {
-      const nonExistantUser = new User({
+      const nonExistentUser = new User({
         email: 'email@gmail.com',
         discordId: 'discord_id',
       })
 
       expect(
-        User.findByDiscordId(nonExistantUser.discordId),
+        User.findByDiscordId(nonExistentUser.discordId),
       ).resolves.toBeNull()
     })
   })
@@ -187,7 +188,7 @@ describe('user.model', () => {
       }
       await user.connectWith(connectionData)
 
-      const connections = await user.getConnections()
+      const connections = await user.connections()
 
       expect(connections[0]).toMatchObject(connectionData)
     })
@@ -210,11 +211,36 @@ describe('user.model', () => {
       }
       await user.connectWith(connectionData2)
 
-      const connections = await user.getConnections()
+      const connections = await user.connections()
 
       expect(connections[0]).toMatchObject(connectionData)
       expect(connections[1]).toMatchObject(connectionData2)
     })
+  })
+
+  test('.connections', async () => {
+    const user = await insertUser()
+    const connection = await user.connectWith({
+      userId: 'dgfhjkhlödgf',
+      identifier: 'zdfhuoöödoifg',
+      type: ConnectionType.GOOGLE,
+    })
+
+    const connections = await user.connections()
+
+    assertObjectEquals(connections, [connection])
+  })
+
+  test('.subscriptions', async () => {
+    const user = await insertUser()
+    const plan = await insertPlan()
+    const invite = await insertInvite({ planUuid: plan.uuid })
+
+    const subscription = await plan.subscribeUser(user.uuid, invite.shortId)
+
+    const subscriptions = await user.subscriptions()
+
+    assertObjectEquals(subscriptions, [subscription])
   })
 
   test('.plans', async () => {

@@ -1,14 +1,4 @@
-import {
-  Arg,
-  Ctx,
-  FieldResolver,
-  ID,
-  Mutation,
-  Query,
-  Resolver,
-  ResolverInterface,
-  Root,
-} from 'type-graphql'
+import { Arg, Ctx, ID, Mutation, Query, Resolver } from 'type-graphql'
 import { Request } from 'express'
 import { notFound } from 'boom'
 
@@ -43,18 +33,5 @@ export class UserResolver {
     await user.createStripeCustomer(token)
 
     return user
-  }
-}
-
-@Resolver(() => User)
-export class UserFieldResolver implements ResolverInterface<User> {
-  @FieldResolver()
-  public async connections(@Root() user: User) {
-    return user.getConnections()
-  }
-
-  @FieldResolver()
-  public async subscriptions(@Root() user: User) {
-    return user.getSubscriptions()
   }
 }
