@@ -118,7 +118,7 @@ export class Invite extends DatabaseTable<DatabaseInvite> {
     do {
       id = ''
 
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 10; i++) {
         id += chars[Math.floor(Math.random() * chars.length)]
       }
     } while (await Invite.doesShortIdExist(id))
