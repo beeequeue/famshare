@@ -72,13 +72,15 @@ export const up = async (knex: Knex): Promise<any> => {
     knex.schema.createTable(Table.SUBSCRIPTION, table => {
       table.uuid('uuid').primary()
 
+      table.string('status', 25).notNullable()
+
+      table.string('stripe_id', 35).notNullable()
+
       table.uuid('plan_uuid').notNullable()
 
       table.uuid('user_uuid').notNullable()
 
       table.uuid('invite_uuid').notNullable()
-
-      table.string('status', 25).notNullable()
 
       table.timestamps(false, true)
     }),
