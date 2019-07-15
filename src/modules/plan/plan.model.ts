@@ -3,6 +3,7 @@ import { Field, Int, ObjectType } from 'type-graphql'
 import { addMonths, isAfter, setDate } from 'date-fns'
 
 import { DatabaseTable, knex, ITableData, ITableOptions } from '@/db'
+import { stripe } from '@/modules/stripe/stripe.lib'
 import { User } from '@/modules/user/user.model'
 import { Invite } from '@/modules/invite/invite.model'
 import {
@@ -133,6 +134,26 @@ export class Plan extends DatabaseTable<DatabasePlan> {
     return plan.map(Plan.fromSql)
   }
 
+  private async registerToStripe() {
+    const product = await stripe.products.create({
+      id: this.uuid,
+      name: this.name,
+      type: 'service',
+      statement_descriptor: `famshare-${this.name.toUpperCase().substr(0, 10)}`,
+    })
+
+    await stripe.plans.create({
+      id: this.uuid,
+      product: product.id,
+      nickname: this.name,
+      currency: 'eur',
+      interval: 'month',
+      usage_type: 'licensed',
+      billing_scheme: 'per_unit',
+      amount: this.amount,
+    })
+  }
+
   public async createInvite(expiresAt: Date) {
     const invite = new Invite({
       shortId: await Invite.generateShortId(),
@@ -178,6 +199,14 @@ export class Plan extends DatabaseTable<DatabasePlan> {
   }
 
   public async save() {
+    if (!(await this.exists())) {
+      try {
+        await this.registerToStripe()
+      } catch (e) {
+        throw new Error('Could not create Stripe Product and Plan.')
+      }
+    }
+
     return this._save({
       name: this.name,
       amount: this.amount,
