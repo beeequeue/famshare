@@ -224,6 +224,8 @@ describe('user.model', () => {
       userId: 'dgfhjkhlödgf',
       identifier: 'zdfhuoöödoifg',
       type: ConnectionType.GOOGLE,
+      picture: '235vgny890p',
+      link: 'öldfhgöouhp94836',
     })
 
     const connections = await user.connections()

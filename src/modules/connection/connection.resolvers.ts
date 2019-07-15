@@ -17,7 +17,7 @@ export class ConnectionResolver {
     @Ctx() context: Request,
   ): Promise<User> {
     const user = await User.getByUuid(context.session!.user.uuid)
-    const connections = await user.getConnections()
+    const connections = await user.connections()
     const connection = connections.find(propEq('type', type))
 
     if (isNil(connection)) {
