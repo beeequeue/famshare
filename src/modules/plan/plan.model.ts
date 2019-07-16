@@ -23,9 +23,7 @@ interface DatabasePlan extends ITableData {
   payment_day: number
   owner_uuid: string
 }
-/*
- * fees and payments
- */
+
 @ObjectType()
 export class Plan extends DatabaseTable<DatabasePlan> {
   public static readonly table = () => knex<DatabasePlan>(Table.PLAN)
