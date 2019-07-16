@@ -1,9 +1,10 @@
 import { Request } from 'express'
 import { Arg, Ctx, ID, Mutation, Resolver } from 'type-graphql'
 import { badRequest } from 'boom'
+
+import { Subscription } from '@/modules/subscription/subscription.model'
 import { Plan } from '@/modules/plan/plan.model'
 import { Invite } from '@/modules/invite/invite.model'
-
 import { isNil } from '@/utils'
 
 @Resolver()
@@ -20,7 +21,7 @@ export class SubscriptionResolver {
     }
     const plan = await invite.plan()
 
-    await plan.subscribeUser(context.session!.user.uuid, invitationId)
+    await Subscription.subscribeUser(plan, context.session!.user, invite)
 
     return plan
   }
