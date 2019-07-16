@@ -1,13 +1,18 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { Field, ObjectType, registerEnumType } from 'type-graphql'
 
-import { DatabaseTable, knex, ITableData, ITableOptions } from '@/db'
+import { DatabaseTable, ITableData, ITableOptions, knex } from '@/db'
 import { stripe } from '@/modules/stripe/stripe.lib'
 import { User } from '@/modules/user/user.model'
 import { Plan } from '@/modules/plan/plan.model'
 import { Invite } from '@/modules/invite/invite.model'
 import { isNil } from '@/utils'
 import { Table } from '@/constants'
+import {
+  INVITE_ALREADY_USED,
+  OWNER_OF_PLAN_SUBSCRIBE,
+  USER_NOT_FOUND,
+} from '@/errors'
 
 export enum SubscriptionStatus {
   INVITED = 'INVITED',
@@ -104,6 +109,32 @@ export class Subscription extends DatabaseTable<DatabaseSubscription> {
     return sql.map(Subscription.fromSql)
   }
 
+  public static async subscribeUser(plan: Plan, user: User, invite: Invite) {
+    if (user.uuid === plan.ownerUuid) {
+      throw new Error(OWNER_OF_PLAN_SUBSCRIBE)
+    }
+
+    if (isNil(await User.findByUuid(user.uuid))) {
+      throw new Error(USER_NOT_FOUND)
+    }
+
+    const isClaimed = !isNil(await invite.user())
+    if (isClaimed) {
+      throw new Error(INVITE_ALREADY_USED)
+    }
+
+    const subscription = new Subscription({
+      planUuid: plan.uuid,
+      userUuid: user.uuid,
+      inviteUuid: invite.uuid,
+      status: SubscriptionStatus.JOINED,
+    })
+
+    await subscription.save()
+
+    return subscription
+  }
+
   private async registerToStripe() {
     const user = await this.user()
     const plan = await this.plan()
@@ -121,6 +152,8 @@ export class Subscription extends DatabaseTable<DatabaseSubscription> {
 
     this.stripeId = stripeSub.id
   }
+
+  // private async updateStripeSubscription() {}
 
   public async exists() {
     const result = await Subscription.table()

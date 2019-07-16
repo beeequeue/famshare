@@ -2,22 +2,11 @@
 import { Field, Int, ObjectType } from 'type-graphql'
 import { addMonths, isAfter, setDate } from 'date-fns'
 
-import { DatabaseTable, knex, ITableData, ITableOptions } from '@/db'
+import { DatabaseTable, ITableData, ITableOptions, knex } from '@/db'
 import { stripe } from '@/modules/stripe/stripe.lib'
 import { User } from '@/modules/user/user.model'
 import { Invite } from '@/modules/invite/invite.model'
-import {
-  Subscription,
-  SubscriptionStatus,
-} from '@/modules/subscription/subscription.model'
-import {
-  INVITE_ALREADY_USED,
-  INVITE_NOT_FOUND,
-  OWNER_OF_PLAN_SUBSCRIBE,
-  USER_NOT_FOUND,
-} from '@/errors'
 import { Table } from '@/constants'
-import { isNil } from '@/utils'
 
 interface Constructor extends ITableOptions {
   name: string
@@ -165,37 +154,6 @@ export class Plan extends DatabaseTable<DatabasePlan> {
     await invite.save()
 
     return invite
-  }
-
-  public async subscribeUser(userUuid: string, inviteShortId: string) {
-    if (userUuid === this.ownerUuid) {
-      throw new Error(OWNER_OF_PLAN_SUBSCRIBE)
-    }
-
-    if (isNil(await User.findByUuid(userUuid))) {
-      throw new Error(USER_NOT_FOUND)
-    }
-
-    const invite = await Invite.findByShortId(inviteShortId)
-    if (isNil(invite)) {
-      throw new Error(INVITE_NOT_FOUND)
-    }
-
-    const isClaimed = !isNil(await invite.user())
-    if (isClaimed) {
-      throw new Error(INVITE_ALREADY_USED)
-    }
-
-    const subscription = new Subscription({
-      planUuid: this.uuid,
-      userUuid,
-      inviteUuid: invite.uuid,
-      status: SubscriptionStatus.JOINED,
-    })
-
-    await subscription.save()
-
-    return subscription
   }
 
   public async save() {
