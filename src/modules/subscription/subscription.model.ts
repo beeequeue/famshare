@@ -8,11 +8,7 @@ import { Plan } from '@/modules/plan/plan.model'
 import { Invite } from '@/modules/invite/invite.model'
 import { isNil } from '@/utils'
 import { Table } from '@/constants'
-import {
-  INVITE_ALREADY_USED,
-  OWNER_OF_PLAN_SUBSCRIBE,
-  USER_NOT_FOUND,
-} from '@/errors'
+import { INVITE_ALREADY_USED, OWNER_OF_PLAN_SUBSCRIBE } from '@/errors'
 
 export enum SubscriptionStatus {
   INVITED = 'INVITED',
@@ -114,10 +110,6 @@ export class Subscription extends DatabaseTable<DatabaseSubscription> {
       throw new Error(OWNER_OF_PLAN_SUBSCRIBE)
     }
 
-    if (isNil(await User.findByUuid(user.uuid))) {
-      throw new Error(USER_NOT_FOUND)
-    }
-
     const isClaimed = !isNil(await invite.user())
     if (isClaimed) {
       throw new Error(INVITE_ALREADY_USED)
@@ -129,6 +121,8 @@ export class Subscription extends DatabaseTable<DatabaseSubscription> {
       inviteUuid: invite.uuid,
       status: SubscriptionStatus.JOINED,
     })
+
+    await plan.updateStripePlan('add')
 
     await subscription.save()
 
@@ -152,8 +146,6 @@ export class Subscription extends DatabaseTable<DatabaseSubscription> {
 
     this.stripeId = stripeSub.id
   }
-
-  // private async updateStripeSubscription() {}
 
   public async exists() {
     const result = await Subscription.table()

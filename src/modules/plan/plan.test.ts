@@ -10,6 +10,7 @@ import {
   assertObjectEquals,
   cleanupDatabases,
   insertInvite,
+  insertPlan,
   insertUser,
 } from '@/utils/tests'
 
@@ -138,6 +139,31 @@ describe('plan.model', () => {
       expiresAt,
       planUuid: plan.uuid,
     })
+  })
+
+  test('.getPaymentAmount()', async () => {
+    const plan = await insertPlan({ amount: 9_99 })
+    const members = await Promise.all([
+      await insertUser({ index: 1 }),
+      await insertUser({ index: 2 }),
+      await insertUser({ index: 3 }),
+    ])
+    const invites = await Promise.all([
+      await insertInvite({ planUuid: plan.uuid }),
+      await insertInvite({ planUuid: plan.uuid }),
+      await insertInvite({ planUuid: plan.uuid }),
+    ])
+
+    expect(plan.getPaymentAmount(0)).toBe(11_49)
+
+    await Subscription.subscribeUser(plan, members[0], invites[0])
+    expect(plan.getPaymentAmount((await plan.members()).length)).toBe(574)
+
+    await Subscription.subscribeUser(plan, members[1], invites[1])
+    expect(plan.getPaymentAmount((await plan.members()).length)).toBe(383)
+
+    await Subscription.subscribeUser(plan, members[2], invites[2])
+    expect(plan.getPaymentAmount((await plan.members()).length)).toBe(287)
   })
 
   test('.owner()', async () => {

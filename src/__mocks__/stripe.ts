@@ -6,6 +6,7 @@ export default class Stripe {
 
   public plans = {
     create: (options: any) => options,
+    del: () => {},
   }
 
   public subscriptions = {

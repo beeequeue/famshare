@@ -7,6 +7,7 @@ import { stripe } from '@/modules/stripe/stripe.lib'
 import { User } from '@/modules/user/user.model'
 import { Invite } from '@/modules/invite/invite.model'
 import { Table } from '@/constants'
+import { unBasisPoints } from '@/utils'
 
 interface Constructor extends ITableOptions {
   name: string
@@ -121,24 +122,53 @@ export class Plan extends DatabaseTable<DatabasePlan> {
     return plan.map(Plan.fromSql)
   }
 
-  private async registerToStripe() {
-    const product = await stripe.products.create({
+  private getStripePlanOptions(amount: number) {
+    return {
+      id: this.uuid,
+      product: this.uuid,
+      nickname: this.name,
+      currency: 'eur',
+      interval: 'month',
+      usage_type: 'licensed',
+      billing_scheme: 'per_unit',
+      amount: amount,
+    } as const
+  }
+
+  private async registerToStripe(amount: number) {
+    await stripe.products.create({
       id: this.uuid,
       name: this.name,
       type: 'service',
       statement_descriptor: `famshare-${this.name.toUpperCase().substr(0, 10)}`,
     })
 
-    await stripe.plans.create({
-      id: this.uuid,
-      product: product.id,
-      nickname: this.name,
-      currency: 'eur',
-      interval: 'month',
-      usage_type: 'licensed',
-      billing_scheme: 'per_unit',
-      amount: this.amount,
-    })
+    await stripe.plans.create(this.getStripePlanOptions(amount))
+  }
+
+  public getPaymentAmount(members: number) {
+    // Members + owner
+    const nominator = members + 1
+
+    return Math.round(
+      (this.amount / nominator) * (unBasisPoints(this.feeBasisPoints) + 1),
+    )
+  }
+
+  public async updateStripePlan(type: 'add' | 'remove') {
+    const members = await this.members()
+
+    const newMemberAmount = members + type === 'add' ? 1 : -1
+    const oldAmount = this.getPaymentAmount(members.length)
+    const newAmount = this.getPaymentAmount(newMemberAmount)
+
+    await stripe.plans.del(this.uuid)
+
+    try {
+      await stripe.plans.create(this.getStripePlanOptions(newAmount))
+    } catch (e) {
+      await stripe.plans.create(this.getStripePlanOptions(oldAmount))
+    }
   }
 
   public async createInvite(expiresAt: Date) {
@@ -157,7 +187,7 @@ export class Plan extends DatabaseTable<DatabasePlan> {
   public async save() {
     if (!(await this.exists())) {
       try {
-        await this.registerToStripe()
+        await this.registerToStripe(this.getPaymentAmount(0))
       } catch (e) {
         throw new Error('Could not create Stripe Product and Plan.')
       }

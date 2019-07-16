@@ -33,3 +33,13 @@ export const pick = <T extends {}, K extends (keyof T)[]>(
       (obj, [key, val]) => Object.assign(obj, { [key]: val }),
       {} as any,
     )
+
+export const roundToTwoDecimals = (n: number) => Number(n.toFixed(2))
+
+export const fractionize = (n: number) => roundToTwoDecimals(n * 100)
+
+export const defractionize = (n: number) => roundToTwoDecimals(n / 100)
+
+export const basisPoints = (n: number) => roundToTwoDecimals(n * 10000)
+
+export const unBasisPoints = (n: number) => roundToTwoDecimals(n / 10000)
