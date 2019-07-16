@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import { addDays } from 'date-fns'
 import uuid from 'uuid/v4'
 
@@ -6,16 +7,34 @@ import { Subscription, SubscriptionStatus } from './subscription.model'
 import {
   assertObjectEquals,
   cleanupDatabases,
+  insertInvite,
   insertPlan,
   insertUser,
 } from '@/utils/tests'
 import { Invite } from '@/modules/invite/invite.model'
+import { INVITE_ALREADY_USED, OWNER_OF_PLAN_SUBSCRIBE } from '@/errors'
+import { isNil } from '@/utils'
 
-const createSubscription = async (save = true, userUuid?: string) => {
+const createSubscription = async (
+  save = true,
+  userUuid?: string,
+  planUuid?: string,
+  inviteUuid?: string,
+) => {
+  if (isNil(userUuid)) {
+    userUuid = (await insertUser()).uuid
+  }
+  if (isNil(planUuid)) {
+    planUuid = (await insertPlan()).uuid
+  }
+  if (isNil(inviteUuid)) {
+    inviteUuid = (await insertInvite({ planUuid })).uuid
+  }
+
   const subscription = new Subscription({
-    userUuid: userUuid || uuid(),
-    planUuid: uuid(),
-    inviteUuid: uuid(),
+    userUuid: userUuid,
+    planUuid: planUuid,
+    inviteUuid: inviteUuid,
     status: SubscriptionStatus.JOINED,
   })
 
@@ -117,6 +136,55 @@ describe('subscription.model', () => {
       const subscription = await createSubscription(false)
 
       expect(Subscription.findByUuid(subscription.uuid)).resolves.toBeNull()
+    })
+  })
+
+  describe('.subscribeUser()', () => {
+    test('subscribes user', async () => {
+      const user = await insertUser()
+      const plan = await insertPlan()
+      const invite = await insertInvite({ planUuid: plan.uuid })
+
+      const subscription = await Subscription.subscribeUser(plan, user, invite)
+
+      const result = await Subscription.table()
+        .where({ user_uuid: user.uuid })
+        .first()
+
+      expect(result).toBeDefined()
+
+      expect(result!.uuid).toEqual(subscription.uuid)
+      expect(result!.plan_uuid).toEqual(subscription.planUuid)
+    })
+
+    test('rejects if user is owner of plan', async () => {
+      const plan = await insertPlan()
+      const user = await insertUser({ uuid: plan.ownerUuid })
+      const invite = await insertInvite({ planUuid: plan.uuid })
+
+      expect(
+        Subscription.subscribeUser(plan, user, invite),
+      ).rejects.toMatchObject({
+        message: OWNER_OF_PLAN_SUBSCRIBE,
+      })
+    })
+
+    test('rejects if invite is already claimed', async () => {
+      const users = await Promise.all([
+        insertUser({ index: 0 }),
+        insertUser({ index: 1 }),
+      ])
+      const plan = await insertPlan()
+      const invite = await insertInvite({ planUuid: plan.uuid })
+      await Subscription.subscribeUser(plan, users[0], invite)
+
+      const rejectFn = jest.fn()
+
+      return Subscription.subscribeUser(plan, users[1], invite)
+        .catch(rejectFn)
+        .then(() => {
+          expect(rejectFn).toHaveBeenCalledWith(new Error(INVITE_ALREADY_USED))
+        })
     })
   })
 

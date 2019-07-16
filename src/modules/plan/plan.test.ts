@@ -7,16 +7,9 @@ import { knex } from '@/db'
 import { Plan } from '@/modules/plan/plan.model'
 import { Subscription } from '@/modules/subscription/subscription.model'
 import {
-  INVITE_ALREADY_USED,
-  INVITE_NOT_FOUND,
-  OWNER_OF_PLAN_SUBSCRIBE,
-  USER_NOT_FOUND,
-} from '@/errors'
-import {
   assertObjectEquals,
   cleanupDatabases,
   insertInvite,
-  insertPlan,
   insertUser,
 } from '@/utils/tests'
 
@@ -147,76 +140,6 @@ describe('plan.model', () => {
     })
   })
 
-  describe('.subscribeUser()', () => {
-    test('subscribes user', async () => {
-      const user = await insertUser()
-      const plan = await createPlan()
-      const invite = await insertInvite({ planUuid: plan.uuid })
-
-      const subscription = await plan.subscribeUser(user.uuid, invite.shortId)
-
-      const result = await Subscription.table()
-        .where({ user_uuid: user.uuid })
-        .first()
-
-      expect(result).toBeDefined()
-
-      expect(result!.uuid).toEqual(subscription.uuid)
-      expect(result!.plan_uuid).toEqual(subscription.planUuid)
-    })
-
-    test('rejects if user does not exist', async () => {
-      const plan = await createPlan()
-
-      expect(plan.subscribeUser(uuid(), 'hahaha')).rejects.toMatchObject({
-        message: USER_NOT_FOUND,
-      })
-    })
-
-    test('rejects if user is owner of plan', async () => {
-      const plan = await createPlan()
-      const invite = await insertInvite({ planUuid: plan.uuid })
-
-      expect(
-        plan.subscribeUser(plan.ownerUuid, invite.shortId),
-      ).rejects.toMatchObject({
-        message: OWNER_OF_PLAN_SUBSCRIBE,
-      })
-    })
-
-    test('rejects if invite does not exist', async () => {
-      const user = await insertUser()
-      const plan = await createPlan()
-
-      return new Promise(resolve => {
-        plan.subscribeUser(user.uuid, 'hahaha').catch(err => {
-          expect(err).toMatchObject({ message: INVITE_NOT_FOUND })
-
-          resolve()
-        })
-      })
-    })
-
-    test('rejects if invite is already claimed', async () => {
-      const users = await Promise.all([
-        insertUser({ index: 0 }),
-        insertUser({ index: 1 }),
-      ])
-      const plan = await insertPlan()
-      const invite = await insertInvite({ planUuid: plan.uuid })
-      await plan.subscribeUser(users[0].uuid, invite.shortId)
-
-      const rejectFn = jest.fn()
-
-      return plan
-        .subscribeUser(users[1].uuid, invite.shortId)
-        .catch(rejectFn)
-        .then(() => {
-          expect(rejectFn).toHaveBeenCalledWith(new Error(INVITE_ALREADY_USED))
-        })
-    })
-  })
-
   test('.owner()', async () => {
     const owner = await insertUser()
     const plan = await createPlan(true, owner.uuid)
@@ -236,7 +159,7 @@ describe('plan.model', () => {
       await Promise.all(
         members.map(async member => {
           const invite = await plan.createInvite(addDays(new Date(), 7))
-          return plan.subscribeUser(member.uuid, invite.shortId)
+          return Subscription.subscribeUser(plan, member, invite)
         }),
       )
 

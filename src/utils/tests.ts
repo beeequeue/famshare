@@ -20,6 +20,7 @@ export const cleanupDatabases = () =>
 
 interface InsertUserOptions {
   index?: number
+  uuid?: string
   email?: string
   discord?: string
   stripe?: string
@@ -27,11 +28,13 @@ interface InsertUserOptions {
 
 export const insertUser = async ({
   index = 0,
+  uuid,
   email,
   discord,
   stripe,
 }: InsertUserOptions = {}) => {
   const user = new User({
+    uuid: uuid,
     email: email || `email_${index}@gmail.com`,
     discordId: discord || `discord_id_${index}`,
     stripeId: stripe || `stripe_id_${index}`,

@@ -169,7 +169,7 @@ describe('invite.model', () => {
       const plan = await insertPlan({ ownerUuid: owner.uuid })
       const invite = await createInvite(true, plan.uuid)
       const user = await insertUser({ index: 1 })
-      await plan.subscribeUser(user.uuid, invite.shortId)
+      await Subscription.subscribeUser(plan, user, invite)
 
       const rejectFn = jest.fn()
 

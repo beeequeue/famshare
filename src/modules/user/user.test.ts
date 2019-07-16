@@ -1,7 +1,4 @@
-import { mocked } from 'ts-jest/utils'
-
 import { knex } from '@/db'
-import { stripe as _stripe } from '@/modules/stripe/stripe.lib'
 import { ConnectionType } from '@/modules/connection/connection.model'
 import {
   assertObjectEquals,
@@ -11,9 +8,7 @@ import {
   insertUser,
 } from '@/utils/tests'
 import { DatabaseUser, User } from './user.model'
-
-jest.mock('@/modules/stripe/stripe.lib')
-const stripe = mocked(_stripe, true)
+import { Subscription } from '@/modules/subscription/subscription.model'
 
 const assertUserEquals = (result: DatabaseUser, user: User) => {
   expect(result.uuid).toEqual(user.uuid)
@@ -148,7 +143,6 @@ describe('user.model', () => {
 
   describe('.createStripeCustomer()', () => {
     test('creates stripe customer and saves id to db', async () => {
-      stripe.customers.create.mockResolvedValueOnce({ id: 'stripe_id' } as any)
       const user = await insertUser()
 
       await user.createStripeCustomer('stripe_token')
@@ -159,19 +153,6 @@ describe('user.model', () => {
 
       expect(user.stripeId).toEqual('stripe_id')
       expect(dbUser!.stripe_id).toEqual('stripe_id')
-    })
-
-    test('throws error if fails', async () => {
-      stripe.customers.create.mockRejectedValue('failed')
-      const user = await insertUser()
-
-      const onError = jest.fn()
-      return user
-        .createStripeCustomer('stripe_token')
-        .catch(onError)
-        .then(() => {
-          expect(onError).toHaveBeenCalledTimes(1)
-        })
     })
   })
 
@@ -238,7 +219,7 @@ describe('user.model', () => {
     const plan = await insertPlan()
     const invite = await insertInvite({ planUuid: plan.uuid })
 
-    const subscription = await plan.subscribeUser(user.uuid, invite.shortId)
+    const subscription = await Subscription.subscribeUser(plan, user, invite)
 
     const subscriptions = await user.subscriptions()
 
