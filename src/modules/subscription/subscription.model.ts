@@ -169,7 +169,6 @@ export class Subscription extends DatabaseTable<DatabaseSubscription> {
       try {
         await this.registerToStripe()
       } catch (e) {
-        console.error(e)
         throw new Error('Could not create stripe Subscription!')
       }
     }
