@@ -8,6 +8,7 @@ import { User } from '@/modules/user/user.model'
 import { Invite } from '@/modules/invite/invite.model'
 import { Table } from '@/constants'
 import { unBasisPoints } from '@/utils'
+import { Subscription } from '@/modules/subscription/subscription.model'
 
 interface Constructor extends ITableOptions {
   name: string
@@ -73,6 +74,10 @@ export class Plan extends DatabaseTable<DatabasePlan> {
   @Field(() => [Invite])
   public async invites(): Promise<Invite[]> {
     return Invite.findByPlan(this.uuid)
+  }
+
+  private async subscriptions(): Promise<Subscription[]> {
+    return Subscription.getByPlan(this)
   }
 
   constructor(options: Constructor) {
@@ -200,5 +205,17 @@ export class Plan extends DatabaseTable<DatabasePlan> {
       payment_day: this.paymentDay,
       owner_uuid: this.ownerUuid,
     })
+  }
+
+  public async delete() {
+    const subscriptions = await this.subscriptions()
+    await Promise.all(
+      subscriptions.map(sub => stripe.subscriptions.del(sub.stripeId)),
+    )
+
+    await stripe.plans.del(this.uuid)
+    await stripe.products.del(this.uuid)
+
+    return super.delete()
   }
 }

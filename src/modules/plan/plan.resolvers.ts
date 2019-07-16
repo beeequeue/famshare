@@ -83,4 +83,24 @@ export class PlanResolver {
 
     return plan
   }
+
+  @Mutation(() => ID)
+  public async deletePlan(
+    @Arg('uuid', () => ID) uuid: string,
+    @Ctx() context: Request,
+  ): Promise<string> {
+    const plan = await Plan.findByUuid(uuid)
+
+    if (isNil(plan)) {
+      throw notFound()
+    }
+
+    if (plan.ownerUuid !== context.session!.user.uuid) {
+      throw forbidden('You are not the owner of this Plan.')
+    }
+
+    await plan.delete()
+
+    return uuid
+  }
 }

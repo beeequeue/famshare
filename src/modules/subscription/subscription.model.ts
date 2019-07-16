@@ -105,6 +105,12 @@ export class Subscription extends DatabaseTable<DatabaseSubscription> {
     return sql.map(Subscription.fromSql)
   }
 
+  public static async getByPlan(plan: Plan): Promise<Subscription[]> {
+    const sql = await this.table().where({ plan_uuid: plan.uuid })
+
+    return sql.map(this.fromSql)
+  }
+
   public static async subscribeUser(plan: Plan, user: User, invite: Invite) {
     if (user.uuid === plan.ownerUuid) {
       throw new Error(OWNER_OF_PLAN_SUBSCRIBE)

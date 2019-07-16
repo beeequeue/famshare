@@ -139,6 +139,21 @@ describe('subscription.model', () => {
     })
   })
 
+  test('.getByPlan()', async () => {
+    const plan = await insertPlan()
+    const subscription = await createSubscription(
+      true,
+      (await insertUser({ index: 1 })).uuid,
+      plan.uuid,
+    )
+
+    const result = await Subscription.getByPlan(plan)
+
+    expect(result).toBeDefined()
+
+    assertObjectEquals(result!, [subscription])
+  })
+
   describe('.subscribeUser()', () => {
     test('subscribes user', async () => {
       const user = await insertUser()
