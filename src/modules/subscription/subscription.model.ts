@@ -179,4 +179,13 @@ export class Subscription extends DatabaseTable<DatabaseSubscription> {
       status: this.status,
     })
   }
+
+  public async delete() {
+    const plan = await this.plan()
+
+    await stripe.subscriptions.del(this.stripeId)
+    await plan.updateStripePlan('remove')
+
+    return super.delete()
+  }
 }

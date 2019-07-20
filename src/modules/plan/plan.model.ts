@@ -36,6 +36,11 @@ export class Plan extends DatabaseTable<DatabasePlan> {
   public readonly amount: number
   @Field(() => Int)
   public readonly feeBasisPoints: number
+  @Field(() => Int)
+  public async splitAmount(): Promise<number> {
+    return this.getPaymentAmount((await this.members()).length)
+  }
+
   @Field(() => Int, {
     description: '1-indexed day in month payments are done.',
   })
@@ -43,7 +48,7 @@ export class Plan extends DatabaseTable<DatabasePlan> {
   @Field(() => Date, {
     description: 'The date the next payment will be attempted.',
   })
-  public nextPaymentDate() {
+  public nextPaymentDate(): Date {
     let nextPaymentDate = setDate(new Date(), this.paymentDay)
 
     if (isAfter(new Date(), nextPaymentDate)) {
@@ -58,6 +63,11 @@ export class Plan extends DatabaseTable<DatabasePlan> {
     return User.getByUuid(this.ownerUuid)
   }
   public readonly ownerUuid: string
+
+  @Field(() => [Subscription])
+  public async subscriptions(): Promise<Subscription[]> {
+    return Subscription.getByPlan(this)
+  }
 
   @Field(() => [User])
   public async members(): Promise<User[]> {
@@ -74,10 +84,6 @@ export class Plan extends DatabaseTable<DatabasePlan> {
   @Field(() => [Invite])
   public async invites(): Promise<Invite[]> {
     return Invite.findByPlan(this.uuid)
-  }
-
-  private async subscriptions(): Promise<Subscription[]> {
-    return Subscription.getByPlan(this)
   }
 
   constructor(options: Constructor) {
