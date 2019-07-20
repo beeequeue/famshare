@@ -166,6 +166,37 @@ describe('plan.model', () => {
     expect(plan.getPaymentAmount((await plan.members()).length)).toBe(287)
   })
 
+  describe('.isSubscribed', () => {
+    test('returns true if subscribed', async () => {
+      const plan = await insertPlan()
+      const invite = await insertInvite({ planUuid: plan.uuid })
+      const user = await insertUser()
+      await Subscription.subscribeUser(plan, user, invite)
+
+      expect(
+        plan.isSubscribed({ session: { user: { uuid: user.uuid } } } as any),
+      ).resolves.toBe(true)
+    })
+
+    test('returns true if owner', async () => {
+      const plan = await insertPlan()
+
+      expect(
+        plan.isSubscribed({
+          session: { user: { uuid: plan.ownerUuid } },
+        } as any),
+      ).resolves.toBe(true)
+    })
+
+    test('returns false if not subscribed', async () => {
+      const plan = await insertPlan()
+
+      expect(
+        plan.isSubscribed({ session: { user: { uuid: uuid() } } } as any),
+      ).resolves.toBe(false)
+    })
+  })
+
   test('.owner()', async () => {
     const owner = await insertUser()
     const plan = await createPlan(true, owner.uuid)

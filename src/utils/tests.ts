@@ -58,7 +58,7 @@ export const insertPlan = async ({
   amount,
 }: InsertPlanOptions = {}) => {
   if (isNil(ownerUuid)) {
-    ownerUuid = (await insertUser()).uuid
+    ownerUuid = (await insertUser({ index: 100 })).uuid
   }
 
   const plan = new Plan({

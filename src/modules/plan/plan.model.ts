@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { Field, Int, ObjectType } from 'type-graphql'
+import { Request } from 'express'
+import { Ctx, Field, Int, ObjectType } from 'type-graphql'
 import { addMonths, isAfter, setDate } from 'date-fns'
 
 import { DatabaseTable, ITableData, ITableOptions, knex } from '@/db'
 import { stripe } from '@/modules/stripe/stripe.lib'
 import { User } from '@/modules/user/user.model'
 import { Invite } from '@/modules/invite/invite.model'
-import { Table } from '@/constants'
-import { unBasisPoints } from '@/utils'
 import { Subscription } from '@/modules/subscription/subscription.model'
+import { Table } from '@/constants'
+import { isNil, unBasisPoints } from '@/utils'
 
 interface Constructor extends ITableOptions {
   name: string
@@ -84,6 +85,16 @@ export class Plan extends DatabaseTable<DatabasePlan> {
   @Field(() => [Invite])
   public async invites(): Promise<Invite[]> {
     return Invite.findByPlan(this.uuid)
+  }
+
+  @Field(() => Boolean)
+  public async isSubscribed(@Ctx() context: Request): Promise<boolean> {
+    const sessionUserUuid = context.session!.user.uuid
+    if (this.ownerUuid === sessionUserUuid) return true
+
+    return !isNil(
+      (await this.members()).find(user => user.uuid === sessionUserUuid),
+    )
   }
 
   constructor(options: Constructor) {
