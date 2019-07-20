@@ -6,6 +6,7 @@ import MockDate from 'mockdate'
 import { knex } from '@/db'
 import { Plan } from '@/modules/plan/plan.model'
 import { Subscription } from '@/modules/subscription/subscription.model'
+import { FEE_BASIS_POINTS } from '@/constants'
 import {
   assertObjectEquals,
   cleanupDatabases,
@@ -23,7 +24,7 @@ const createPlan = async (
     name: 'plan_name',
     paymentDay: paymentDay || 12,
     amount: 1000_00,
-    feeBasisPoints: 15_00,
+    feeBasisPoints: FEE_BASIS_POINTS,
     ownerUuid: ownerUuid || uuid(),
   })
 
@@ -154,16 +155,16 @@ describe('plan.model', () => {
       await insertInvite({ planUuid: plan.uuid }),
     ])
 
-    expect(plan.getPaymentAmount(0)).toBe(11_49)
+    expect(plan.getPaymentAmount(0)).toBe(10_99)
 
     await Subscription.subscribeUser(plan, members[0], invites[0])
-    expect(plan.getPaymentAmount((await plan.members()).length)).toBe(574)
+    expect(plan.getPaymentAmount((await plan.members()).length)).toBe(5_49)
 
     await Subscription.subscribeUser(plan, members[1], invites[1])
-    expect(plan.getPaymentAmount((await plan.members()).length)).toBe(383)
+    expect(plan.getPaymentAmount((await plan.members()).length)).toBe(3_66)
 
     await Subscription.subscribeUser(plan, members[2], invites[2])
-    expect(plan.getPaymentAmount((await plan.members()).length)).toBe(287)
+    expect(plan.getPaymentAmount((await plan.members()).length)).toBe(2_75)
   })
 
   describe('.isSubscribed', () => {

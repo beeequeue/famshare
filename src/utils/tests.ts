@@ -6,6 +6,7 @@ import { Plan } from '@/modules/plan/plan.model'
 import { Session } from '@/modules/session/session.model'
 import { Subscription } from '@/modules/subscription/subscription.model'
 import { AccessLevel, User } from '@/modules/user/user.model'
+import { FEE_BASIS_POINTS } from '@/constants'
 import { isNil } from '@/utils/functional'
 
 export const cleanupDatabases = () =>
@@ -64,7 +65,7 @@ export const insertPlan = async ({
   const plan = new Plan({
     name: name || 'plan',
     amount: amount || 12_99,
-    feeBasisPoints: 15_00,
+    feeBasisPoints: FEE_BASIS_POINTS,
     paymentDay: 1,
     ownerUuid,
   })

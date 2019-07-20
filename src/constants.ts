@@ -1,3 +1,5 @@
+export const FEE_BASIS_POINTS = 10_00
+
 export enum Environment {
   DEVELOPMENT = 'development',
   PRODUCTION = 'production',

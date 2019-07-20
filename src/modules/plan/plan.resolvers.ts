@@ -13,6 +13,7 @@ import { Request } from 'express'
 import { forbidden, notFound } from 'boom'
 
 import { Plan } from '@/modules/plan/plan.model'
+import { FEE_BASIS_POINTS } from '@/constants'
 import { isNil } from '@/utils'
 
 @InputType()
@@ -53,7 +54,7 @@ export class PlanResolver {
   ): Promise<Plan> {
     const plan = new Plan({
       ...options,
-      feeBasisPoints: 10_00,
+      feeBasisPoints: FEE_BASIS_POINTS,
       ownerUuid: context.session!.user.uuid,
     })
 
