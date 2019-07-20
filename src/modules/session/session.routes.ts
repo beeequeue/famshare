@@ -8,8 +8,8 @@ const assertGoodRequest = (req: Request, next: NextFunction) => {
     return next()
   }
 
-  if (isNil(req.query.userUuid)) {
-    throw badRequest('Missing User UUID.')
+  if (isNil(req.query.email)) {
+    throw badRequest('Missing email.')
   }
 }
 
@@ -19,7 +19,7 @@ if (process.env.NODE_ENV === 'development') {
   sessionRouter.get('/dev_session', async (req, res, next) => {
     assertGoodRequest(req, next)
 
-    const user = await User.findByUuid(req.query.userUuid)
+    const user = await User.findByEmail(req.query.email)
 
     if (isNil(user)) {
       throw notFound()
@@ -33,7 +33,7 @@ if (process.env.NODE_ENV === 'development') {
   sessionRouter.get('/dev_token', async (req, res, next) => {
     assertGoodRequest(req, next)
 
-    const user = await User.findByUuid(req.query.userUuid)
+    const user = await User.findByEmail(req.query.email)
 
     if (isNil(user)) {
       throw notFound()

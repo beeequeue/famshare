@@ -123,6 +123,16 @@ export class User extends DatabaseTable<DatabaseUser> {
     return User.fromSql(user)
   }
 
+  public static async findByEmail(email: string) {
+    const user = await this.table()
+      .where({ email })
+      .first()
+
+    if (!user) return null
+
+    return User.fromSql(user)
+  }
+
   public async createStripeCustomer(stripeToken: string) {
     const customer = await stripe.customers.create({
       email: this.email,
