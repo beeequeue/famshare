@@ -33,7 +33,6 @@ export class SubscriptionResolver {
     @Arg('userUuid', () => ID, { nullable: true }) userUuid: string | null,
     @Ctx() context: Request,
   ) {
-    console.log(userUuid)
     if (isNil(userUuid)) {
       userUuid = context.session!.user.uuid
     }
