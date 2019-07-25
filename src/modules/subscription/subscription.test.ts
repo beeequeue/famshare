@@ -12,7 +12,11 @@ import {
   insertUser,
 } from '@/utils/tests'
 import { Invite } from '@/modules/invite/invite.model'
-import { INVITE_ALREADY_USED, OWNER_OF_PLAN_SUBSCRIBE } from '@/errors'
+import {
+  ALREADY_SUBSCRIBED,
+  INVITE_ALREADY_USED,
+  OWNER_OF_PLAN_SUBSCRIBE,
+} from '@/errors'
 import { isNil } from '@/utils'
 import { stripe } from '@/modules/stripe/stripe.lib'
 
@@ -218,7 +222,7 @@ describe('subscription.model', () => {
       return Subscription.subscribeUser(plan, users[0], invites[1])
         .catch(rejectFn)
         .then(() => {
-          expect(rejectFn).toHaveBeenCalledWith(new Error())
+          expect(rejectFn).toHaveBeenCalledWith(new Error(ALREADY_SUBSCRIBED))
         })
     })
   })
