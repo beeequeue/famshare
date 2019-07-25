@@ -17,7 +17,14 @@ export enum SubscriptionStatus {
   LATE = 'LATE',
   EXPIRED = 'EXPIRED',
   EXEMPTED = 'EXEMPTED',
+  CANCELLED = 'CANCELLED',
 }
+
+export const PayingSubscriptionStatuses = [
+  SubscriptionStatus.ACTIVE,
+  SubscriptionStatus.JOINED,
+  SubscriptionStatus.LATE,
+]
 
 registerEnumType(SubscriptionStatus, {
   name: 'SubscriptionStatus',
@@ -45,7 +52,7 @@ export class Subscription extends DatabaseTable<DatabaseSubscription> {
     knex<DatabaseSubscription>(Table.SUBSCRIPTION)
 
   @Field(() => SubscriptionStatus)
-  public readonly status: SubscriptionStatus
+  public status: SubscriptionStatus
 
   public stripeId!: string
 
@@ -135,6 +142,10 @@ export class Subscription extends DatabaseTable<DatabaseSubscription> {
     return subscription
   }
 
+  public static shouldPay(subscription: Subscription) {
+    return PayingSubscriptionStatuses.includes(subscription.status)
+  }
+
   private async registerToStripe() {
     const user = await this.user()
     const plan = await this.plan()
@@ -151,6 +162,32 @@ export class Subscription extends DatabaseTable<DatabaseSubscription> {
     })
 
     this.stripeId = stripeSub.id
+  }
+
+  private async _setStatus(status: SubscriptionStatus) {
+    await Subscription.table()
+      .update({ status })
+      .where({ uuid: this.uuid })
+
+    this.status = status
+  }
+
+  /**
+   *  Excludes cancel status, use .cancel() instead.
+   */
+  public async setStatus(
+    status: Exclude<SubscriptionStatus, SubscriptionStatus.CANCELLED>,
+  ) {
+    return this._setStatus(status)
+  }
+
+  public async cancel() {
+    const plan = await this.plan()
+
+    await stripe.subscriptions.del(this.stripeId)
+    await plan.updateStripePlan('remove')
+
+    return this._setStatus(SubscriptionStatus.CANCELLED)
   }
 
   public async exists() {
@@ -178,14 +215,5 @@ export class Subscription extends DatabaseTable<DatabaseSubscription> {
       stripe_id: this.stripeId,
       status: this.status,
     })
-  }
-
-  public async delete() {
-    const plan = await this.plan()
-
-    await stripe.subscriptions.del(this.stripeId)
-    await plan.updateStripePlan('remove')
-
-    return super.delete()
   }
 }

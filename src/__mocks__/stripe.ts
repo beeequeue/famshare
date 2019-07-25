@@ -1,19 +1,20 @@
 // eslint-disable-next-line import/no-default-export
 export default class Stripe {
   public products = {
-    create: (options: any) => options,
+    create: jest.fn(obj => obj),
   }
 
   public plans = {
-    create: (options: any) => options,
-    del: () => {},
+    create: jest.fn(obj => obj),
+    del: jest.fn(),
   }
 
   public subscriptions = {
-    create: () => ({ id: 'stripe_id' }),
+    create: jest.fn().mockReturnValue({ id: 'stripe_id' }),
+    del: jest.fn(),
   }
 
   public customers = {
-    create: () => ({ id: 'stripe_id' }),
+    create: jest.fn().mockReturnValue({ id: 'stripe_id' }),
   }
 }

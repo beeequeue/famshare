@@ -14,12 +14,14 @@ import {
 import { Invite } from '@/modules/invite/invite.model'
 import { INVITE_ALREADY_USED, OWNER_OF_PLAN_SUBSCRIBE } from '@/errors'
 import { isNil } from '@/utils'
+import { stripe } from '@/modules/stripe/stripe.lib'
 
 const createSubscription = async (
   save = true,
   userUuid?: string,
   planUuid?: string,
   inviteUuid?: string,
+  status?: SubscriptionStatus,
 ) => {
   if (isNil(userUuid)) {
     userUuid = (await insertUser()).uuid
@@ -35,7 +37,7 @@ const createSubscription = async (
     userUuid: userUuid,
     planUuid: planUuid,
     inviteUuid: inviteUuid,
-    status: SubscriptionStatus.JOINED,
+    status: status || SubscriptionStatus.JOINED,
   })
 
   if (save) {
@@ -201,6 +203,70 @@ describe('subscription.model', () => {
           expect(rejectFn).toHaveBeenCalledWith(new Error(INVITE_ALREADY_USED))
         })
     })
+  })
+
+  test('.shouldPay()', async () => {
+    const createWithStatus = (status: SubscriptionStatus) =>
+      createSubscription(false, uuid(), uuid(), uuid(), status)
+
+    const subscriptions = await Promise.all([
+      createWithStatus(SubscriptionStatus.JOINED),
+      createWithStatus(SubscriptionStatus.LATE),
+      createWithStatus(SubscriptionStatus.CANCELLED),
+      createWithStatus(SubscriptionStatus.EXPIRED),
+      createWithStatus(SubscriptionStatus.EXEMPTED),
+    ])
+
+    expect(subscriptions.map(Subscription.shouldPay)).toEqual([
+      true, // Joined
+      true, // Late
+      false, // Cancelled
+      false, // Expired
+      false, // Exempted
+    ])
+  })
+
+  test('.setStatus()', async () => {
+    const users = await Promise.all([
+      insertUser({ index: 0 }),
+      insertUser({ index: 1 }),
+    ])
+    const plan = await insertPlan()
+    const invite = await insertInvite({ planUuid: plan.uuid })
+    const subscription = await Subscription.subscribeUser(
+      plan,
+      users[0],
+      invite,
+    )
+
+    await subscription.setStatus(SubscriptionStatus.ACTIVE)
+
+    expect(subscription.status).toBe(SubscriptionStatus.ACTIVE)
+    expect(await Subscription.getByPlan(plan)).toMatchObject([
+      { status: SubscriptionStatus.ACTIVE },
+    ])
+  })
+
+  test('.cancel()', async () => {
+    const users = await Promise.all([
+      insertUser({ index: 0 }),
+      insertUser({ index: 1 }),
+    ])
+    const plan = await insertPlan()
+    const invite = await insertInvite({ planUuid: plan.uuid })
+    const subscription = await Subscription.subscribeUser(
+      plan,
+      users[0],
+      invite,
+    )
+
+    await subscription.cancel()
+
+    expect(stripe.subscriptions.del).toHaveBeenCalledTimes(1)
+    expect(subscription.status).toBe(SubscriptionStatus.CANCELLED)
+    expect(await Subscription.getByPlan(plan)).toMatchObject([
+      { status: SubscriptionStatus.CANCELLED },
+    ])
   })
 
   describe('getters', () => {

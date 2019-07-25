@@ -57,7 +57,7 @@ export class SubscriptionResolver {
       throw new Error('You are not allowed to unsubscribe this User.')
     }
 
-    await subscription.delete()
+    await subscription.cancel()
 
     return subscription.uuid
   }

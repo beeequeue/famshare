@@ -7,7 +7,10 @@ import { DatabaseTable, ITableData, ITableOptions, knex } from '@/db'
 import { stripe } from '@/modules/stripe/stripe.lib'
 import { User } from '@/modules/user/user.model'
 import { Invite } from '@/modules/invite/invite.model'
-import { Subscription } from '@/modules/subscription/subscription.model'
+import {
+  PayingSubscriptionStatuses,
+  Subscription,
+} from '@/modules/subscription/subscription.model'
 import { Table } from '@/constants'
 import { isNil, unBasisPoints } from '@/utils'
 
@@ -78,6 +81,7 @@ export class Plan extends DatabaseTable<DatabasePlan> {
         this.on('user.uuid', '=', 'subscription.user_uuid')
       })
       .where({ 'subscription.plan_uuid': this.uuid })
+      .whereIn('subscription.status', PayingSubscriptionStatuses)
 
     return results.map(result => User.fromSql(result))
   }

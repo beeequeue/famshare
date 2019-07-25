@@ -5,7 +5,10 @@ import MockDate from 'mockdate'
 
 import { knex } from '@/db'
 import { Plan } from '@/modules/plan/plan.model'
-import { Subscription } from '@/modules/subscription/subscription.model'
+import {
+  Subscription,
+  SubscriptionStatus,
+} from '@/modules/subscription/subscription.model'
 import { FEE_BASIS_POINTS } from '@/constants'
 import {
   assertObjectEquals,
@@ -142,29 +145,71 @@ describe('plan.model', () => {
     })
   })
 
-  test('.getPaymentAmount()', async () => {
-    const plan = await insertPlan({ amount: 9_99 })
-    const members = await Promise.all([
-      await insertUser({ index: 1 }),
-      await insertUser({ index: 2 }),
-      await insertUser({ index: 3 }),
-    ])
-    const invites = await Promise.all([
-      await insertInvite({ planUuid: plan.uuid }),
-      await insertInvite({ planUuid: plan.uuid }),
-      await insertInvite({ planUuid: plan.uuid }),
-    ])
+  describe('.getPaymentAmount()', () => {
+    test('works correctly with no cancelled subscriptions', async () => {
+      const plan = await insertPlan({ amount: 9_99 })
+      const members = await Promise.all([
+        await insertUser({ index: 1 }),
+        await insertUser({ index: 2 }),
+        await insertUser({ index: 3 }),
+      ])
+      const invites = await Promise.all([
+        await insertInvite({ planUuid: plan.uuid }),
+        await insertInvite({ planUuid: plan.uuid }),
+        await insertInvite({ planUuid: plan.uuid }),
+      ])
 
-    expect(plan.getPaymentAmount(0)).toBe(10_99)
+      expect(plan.getPaymentAmount(0)).toBe(10_99)
 
-    await Subscription.subscribeUser(plan, members[0], invites[0])
-    expect(plan.getPaymentAmount((await plan.members()).length)).toBe(5_49)
+      await Subscription.subscribeUser(plan, members[0], invites[0])
+      expect(plan.getPaymentAmount((await plan.members()).length)).toBe(5_49)
 
-    await Subscription.subscribeUser(plan, members[1], invites[1])
-    expect(plan.getPaymentAmount((await plan.members()).length)).toBe(3_66)
+      await Subscription.subscribeUser(plan, members[1], invites[1])
+      expect(plan.getPaymentAmount((await plan.members()).length)).toBe(3_66)
 
-    await Subscription.subscribeUser(plan, members[2], invites[2])
-    expect(plan.getPaymentAmount((await plan.members()).length)).toBe(2_75)
+      await Subscription.subscribeUser(plan, members[2], invites[2])
+      expect(plan.getPaymentAmount((await plan.members()).length)).toBe(2_75)
+    })
+
+    test('excludes cancelled/inactive subscriptions', async () => {
+      const plan = await insertPlan({ amount: 9_99 })
+      const members = await Promise.all([
+        await insertUser({ index: 1 }),
+        await insertUser({ index: 2 }),
+        await insertUser({ index: 3 }),
+      ])
+      const invites = await Promise.all([
+        await insertInvite({ planUuid: plan.uuid }),
+        await insertInvite({ planUuid: plan.uuid }),
+        await insertInvite({ planUuid: plan.uuid }),
+      ])
+
+      expect(plan.getPaymentAmount(0)).toBe(10_99)
+
+      const sub1 = await Subscription.subscribeUser(
+        plan,
+        members[0],
+        invites[0],
+      )
+      expect(plan.getPaymentAmount((await plan.members()).length)).toBe(5_49)
+
+      const sub2 = await Subscription.subscribeUser(
+        plan,
+        members[1],
+        invites[1],
+      )
+      expect(plan.getPaymentAmount((await plan.members()).length)).toBe(3_66)
+
+      await sub1.cancel()
+      expect(plan.getPaymentAmount((await plan.members()).length)).toBe(5_49)
+
+      await Subscription.subscribeUser(plan, members[2], invites[2])
+      expect(plan.getPaymentAmount((await plan.members()).length)).toBe(3_66)
+
+      await sub2.setStatus(SubscriptionStatus.EXPIRED)
+
+      expect(plan.getPaymentAmount((await plan.members()).length)).toBe(5_49)
+    })
   })
 
   describe('.isSubscribed', () => {
