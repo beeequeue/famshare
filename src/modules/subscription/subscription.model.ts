@@ -8,7 +8,11 @@ import { Plan } from '@/modules/plan/plan.model'
 import { Invite } from '@/modules/invite/invite.model'
 import { isNil } from '@/utils'
 import { Table } from '@/constants'
-import { INVITE_ALREADY_USED, OWNER_OF_PLAN_SUBSCRIBE } from '@/errors'
+import {
+  ALREADY_SUBSCRIBED,
+  INVITE_ALREADY_USED,
+  OWNER_OF_PLAN_SUBSCRIBE,
+} from '@/errors'
 
 export enum SubscriptionStatus {
   INVITED = 'INVITED',
@@ -126,6 +130,10 @@ export class Subscription extends DatabaseTable<DatabaseSubscription> {
     const isClaimed = !isNil(await invite.user())
     if (isClaimed) {
       throw new Error(INVITE_ALREADY_USED)
+    }
+
+    if ((await plan.members()).some(member => member.uuid === user.uuid)) {
+      throw new Error(ALREADY_SUBSCRIBED)
     }
 
     const subscription = new Subscription({

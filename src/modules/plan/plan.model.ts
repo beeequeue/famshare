@@ -73,7 +73,9 @@ export class Plan extends DatabaseTable<DatabasePlan> {
     return Subscription.getByPlan(this)
   }
 
-  @Field(() => [User])
+  @Field(() => [User], {
+    description: 'Returns all active members (with active subscriptions)',
+  })
   public async members(): Promise<User[]> {
     const results: any[] = await knex(Table.USER)
       .select('user.*')

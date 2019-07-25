@@ -203,6 +203,24 @@ describe('subscription.model', () => {
           expect(rejectFn).toHaveBeenCalledWith(new Error(INVITE_ALREADY_USED))
         })
     })
+
+    test('rejects if already subscribed', async () => {
+      const plan = await insertPlan()
+      const users = await Promise.all([
+        insertUser({ index: 0 }),
+        insertUser({ index: 1 }),
+      ])
+      const invites = await Promise.all([insertInvite(), insertInvite()])
+      await Subscription.subscribeUser(plan, users[0], invites[0])
+
+      const rejectFn = jest.fn()
+
+      return Subscription.subscribeUser(plan, users[0], invites[1])
+        .catch(rejectFn)
+        .then(() => {
+          expect(rejectFn).toHaveBeenCalledWith(new Error())
+        })
+    })
   })
 
   test('.shouldPay()', async () => {

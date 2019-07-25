@@ -13,3 +13,4 @@ export const INVITE_ALREADY_USED = 'This invite has already been used.'
 
 export const OWNER_OF_PLAN_SUBSCRIBE =
   "The owner can't subscribe to his own plan!"
+export const ALREADY_SUBSCRIBED = 'Already subscribed to this plan!'
