@@ -3,7 +3,7 @@
 .nuxt
 .env
 !.gitkeep
-sqlite/*.sqlite3
+sqlite/*.sqlite3*
 test-results
 
 # Cached builds
