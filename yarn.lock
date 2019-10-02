@@ -2240,10 +2240,10 @@ express-graphql@0.9.0:
     http-errors "^1.7.3"
     raw-body "^2.4.1"
 
-express-winston@3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/express-winston/-/express-winston-3.2.1.tgz#95eae61620ece8dd7de976589fb823baa138dde7"
-  integrity sha512-yh49mpFcoLAFs4yuplIutTAqs+jgRQYB2bLoDTpMvQDARzQKHvABfj2PYMPfmk087+OsEBJmm96i6//q9RJnnw==
+express-winston@4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/express-winston/-/express-winston-4.0.0.tgz#15aba012d7312b82b7bfba81ef0f70d05ab6b459"
+  integrity sha512-/Da8VFo1u2QEf4EKUHoIlBY3MioGdrraHfExxEqfiyhCY5WsVTxGMw5R2/Bn1Zk9pDrJI5y5/d2ALvuoRz5utA==
   dependencies:
     chalk "^2.4.1"
     lodash "^4.17.10"
